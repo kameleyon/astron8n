@@ -106,14 +106,14 @@ export async function generateAIResponse(messages: { role: string; content: stri
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://astrogenie.vercel.app",
-        "X-Title": "AstroGenie",
+        "Referer": "https://astrogenie.ai"
       },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      const errorBody = await response.text();
+      throw new Error(`API request failed (${response.status}): ${errorBody}`);
     }
 
     const data = await response.json();

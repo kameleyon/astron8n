@@ -15,7 +15,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+  output: 'export',
 };
 
 module.exports = nextConfig;

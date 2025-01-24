@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "rimraf out && next build",
+    "build": "rimraf out && next build && next export",
     "export": "next build && next export",
     "start:static": "npx serve@latest out",
-    "start": "next start -p 3001",
+    "start": "npx serve@latest out",
     "lint": "next lint",
     "api": "node api/server.js"
   },
@@ -62,7 +62,6 @@
     "react-hook-form": "7.47.0",
     "react-resizable-panels": "1.0.9",
     "recharts": "2.9.0",
-    "serve": "^14.2.4",
     "sonner": "1.2.0",
     "swisseph": "^0.5.17",
     "tailwind-merge": "1.14.0",
@@ -81,6 +80,7 @@
     "@types/uuid": "9.0.7",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "serve": "^14.2.4"
   }
 }
