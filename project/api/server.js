@@ -16,6 +16,15 @@ function dateToJulianDay(date, time = '12:00') {
   return swisseph.swe_julday(year, month, day, hour + minute/60, swisseph.SE_GREG_CAL);
 }
 
+// Endpoint to calculate planetary data
+app.post('/api/calculate', (req, res) => {
+  const { jd, planet, flags } = req.body;
+  swisseph.swe_calc_ut(jd, planet, flags, (result) => {
+      if (result.rc < 0) return res.status(400).send(result);
+      res.send(result);
+  });
+});
+
 // Calculate planetary positions
 app.post('/api/planets', (req, res) => {
   try {
