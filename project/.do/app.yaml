@@ -1,18 +1,17 @@
 name: astrogenie
-services:
+static_sites:
   - name: web
     git:
       branch: main
       repo_clone_url: ${REPO_URL}
-    build_command: npm run build
-    run_command: npm start
+    build_command: npm install && npm run build
+    output_dir: out
+    environment_slug: html
     envs:
       - key: NODE_ENV
         value: production
-    http_port: 3000
-    instance_count: 1
-    instance_size_slug: basic-xxs
 
+services:
   - name: api
     git:
       branch: main
@@ -25,14 +24,3 @@ services:
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
-
-static_sites:
-  - name: client
-    git:
-      branch: main
-      repo_clone_url: ${REPO_URL}
-    build_command: npm run build
-    output_dir: out
-    envs:
-      - key: NODE_ENV
-        value: production
