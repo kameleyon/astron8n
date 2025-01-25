@@ -16,11 +16,21 @@ services:
     git:
       branch: main
       repo_clone_url: ${REPO_URL}
-    build_command: npm install
+    build_command: |
+      npm install
+      if [ ! -d "api/ephemeris" ]; then
+        mkdir -p api/ephemeris
+      fi
+      # Ensure ephemeris files are preserved
+      git checkout api/ephemeris/
     run_command: npm run api
     envs:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "8080"
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
+    routes:
+      - path: /api
