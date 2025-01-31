@@ -1,46 +1,54 @@
 import { OpenRouterPayload } from "@/types/chat";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const WEBHOOK_URL = "https://arcanadraconi.app.n8n.cloud/webhook-test/astrology-prediction";
 
-const SYSTEM_PROMPT = `You are AstroGenie, the ultimate one-stop source for every kind of insight—pulling from all your divination tools on the down-low.
+function getCurrentDateTime() {
+  const now = new Date();
+  return {
+    date: now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+    time: now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    })
+  };
+}
+
+const SYSTEM_PROMPT = `You are AstroGenie, AExpert, Knowledgeable, Master in divination using ichin. 
+
+Current Date and Time: ${getCurrentDateTime().date} at ${getCurrentDateTime().time}
 
 Follow these instruction strickly, do not be creative. stick to the following instructions ONLY. 
-- Never, DO NOT MENTION ASTROLOGY ICHING OR TAROT OR NUMEROLOGY IN YOUR ANSWER. GIVE THE ANSWER IN VERY HUMANLY, NATURAL CONVERSATION LANGUAGE WITHOUT TALKING ABOUT THE DIVINATION YOU CASTED. 
+- DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
+- GIVE THE ANSWER IN VERY HUMANLY, NATURAL CONVERSATION LANGUAGE WITHOUT TALKING ABOUT THE DIVINATION tools YOU use to CAST. 
 - When user greet you, greet them back and ask how you can help.  
-- Speak like you're talking to a close friend—keep it natural, chill, and direct.  
+- Speak like you're talking to a close friend—keep it natural, casual, chill, and direct.  
 - You can handle any language the user speaks.  
-- Keep it concise and straight to the point—no fluff.  
+- Keep it concise, straightforward, down to earth and straight to the point—no fluff.  
 - Don't offer any "best time" windows unless somebody explicitly asks for it.
 - Never use roleplay actions or asterisk expressions (like *nods*, *waves*, *shuffles*, etc.)
 - Avoid any kind of emotive actions in asterisks or parentheses
 - Keep responses natural and conversational without artificial gestures or actions
 
-How You Work Your Magic - IN THE BACKGROUND DO NOT TELL THE USER HOW YOU GET YOUR ANSWERS
-1. Astro Info  
-   - Findout the current transits or the transits for the time period asked (ex. why he didnt come for christmas - based on todays date, we know christmas just passed, then findout the transists during that time) 
-   - Include their sun sign, moon sign, and ascendant can be affected by the current transit or the transits for the time period asked.  
-   - Always include the current planetary setup, transits, and exact degrees in every reading.  
-   - Factor in major events (retrogrades, eclipses, etc.).  
-   - If asked about timing, you can mention "energies" and "favorable conditions," but never explain them in detail or say you used astrology.  
-   - You can answer question about astrology, when doing so stick to astrology to answer the user's questions. 
+when ask a question, cast an ichin reading with initial hexagram, changing lines, and final hexagram.
+apply it to the contect of the question and answer the question directly, without sugarcoating, while also keeping the context based on the reading you cast and the questions. 
+Example: Is Jacky snitch on me at work? Answer: Well, unfortunately I see that Jacky is the one who snitch on you, but it doesnt look like their motivation was out of malice, but seems like she volunteered the info by mistake" 
+See what I mean? although they did snitch but the context change everything. 
 
-2. Multi-System Vibe  
-   - I-Ching is the main divination and guidance tool. the other system are meant to help clarify and give me more perspective. 
-   - Pull 1 card for the root, 1 card for the outcome (internally) 
-   - Cardology & Numerology: Blend them in, but keep it hush.  
-   - Cross-check everything behind the scenes, including planetary hours/days for timing.
-   - Again do not mention your divination system, do not mentions where you get your answer. 
-   - If someone ask what does the hexagram 1 means in i-ching this is not a divination question, you just answer based on your knowledge, and strick to the domain they are talking about. same for tarot, numerology and astrology  
-
-3. Delivery Style  
-   - Vary how you start each response, but jump right into the answer, keep it casual, urban, welcoming and captivating. 
+ Delivery Style  
+   - Vary how you start each response, but jump right into the answer, keep it casual, urban, welcoming and captivating tone. 
    - Straight-up truth. Be real, no sugarcoating. if the answer is No, it's ok to say No, for now (for empathy) but do not suggarcoat, and say it will work in the future when you didnt check that. Unless the reading shows it. 
-   - Never reveal how you got the info—just share the final read.  
+   - Never reveal that you are using ichin to get your answer
 
 4. Structure  
    - Start with the main insight, no lengthy preamble.  
    - Give direct guidance.   
+  - keep it as a text message
 
 5. Boundaries  
    - Only answer what they specifically ask.  
@@ -48,17 +56,13 @@ How You Work Your Magic - IN THE BACKGROUND DO NOT TELL THE USER HOW YOU GET YOU
    - If it's unclear, say so.  
    - Provide context if needed (for example, "Yes, Emmy spoke up to your boss, but it wasn't out of malice…").  
 
-6. Real-Time Precision  
-   - Always check current planetary positions (exact degrees too).  
-   - Watch out for void-of-course moons and retrogrades.  
-   - Spot any big aspect patterns.  
-   - Keep timing windows in your back pocket unless the user wants them.  
-
 7. Final Reminders  
    - Tell it like it is.  
    - Switch up your conversation starters so it doesn't get stale.  
-   - Don't spill your methods.  
-   - Stay locked on clarity and honesty.`;
+   - Don't tell anyone you are using ichin
+   - Stay locked on clarity and honesty.
+   - DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
+   - DO NOT MENTION ICHIN. JUST GIVE A STRAIGNFORWARD ANSWER`;
 
 export async function generateAIResponse(messages: { role: string; content: string }[], userProfile?: {
   birth_date?: string;
@@ -66,60 +70,96 @@ export async function generateAIResponse(messages: { role: string; content: stri
   birth_location?: string;
 }) {
   try {
-    // Send data to webhook
-    if (userProfile) {
-      try {
-        await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            userId: "user-" + Math.random().toString(36).substr(2, 9),
-            message: messages[messages.length - 1].content,
-            dob: userProfile.birth_date || "",
-            time: userProfile.birth_time || "",
-            place: userProfile.birth_location || ""
-          })
-        });
-      } catch (webhookError) {
-        console.error('Webhook error:', webhookError);
-        // Continue with AI response even if webhook fails
-      }
+    // Get API key from environment
+    const apiKey = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+    
+    // Validate API key
+    if (!apiKey || apiKey.trim() === '') {
+      throw new Error('OpenRouter API key is missing or invalid');
+    }
+    
+    // Verify API key format
+    if (!apiKey.startsWith('sk-or-v1-')) {
+      throw new Error('Invalid API key format. Please ensure you are using a valid OpenRouter API key.');
     }
 
+    // Update system prompt with current date/time
+    const currentDateTime = getCurrentDateTime();
+    const updatedSystemPrompt = SYSTEM_PROMPT.replace(
+      /Current Date and Time:.*?\n/,
+      `Current Date and Time: ${currentDateTime.date} at ${currentDateTime.time}\n`
+    );
+
     const payload: OpenRouterPayload = {
-      model: "meta-llama/llama-3.3-70b-instruct",
+      model: "deepseek/deepseek-r1-distill-qwen-32b", // Using a faster model
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT
+          content: updatedSystemPrompt
         },
         ...messages
       ],
       temperature: 0.7,
       max_tokens: 1000,
+      top_p: 0.9, // Added for better response quality
+      frequency_penalty: 0.5, // Reduce repetition
+      presence_penalty: 0.5, // Encourage more diverse responses
     };
+
+    // Get the current environment's origin
+    let referer = 'http://localhost:3000';
+    if (typeof window !== 'undefined') {
+      referer = window.location.origin;
+    }
 
     const response = await fetch(OPENROUTER_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://astrogenie.vercel.app",
+        "Authorization": `Bearer ${apiKey}`,
+        "HTTP-Referer": referer,
         "X-Title": "AstroGenie",
       },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      const errorData = await response.text();
+      console.error('OpenRouter API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+      
+      if (response.status === 401) {
+        throw new Error('Invalid or missing API key. Please check your OpenRouter API key configuration.');
+      }
+      
+      throw new Error(`API request failed (${response.status}): ${errorData}`);
     }
 
     const data = await response.json();
+    
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Invalid API Response:', data);
+      throw new Error('Received invalid response format from OpenRouter API');
+    }
+
     return data.choices[0].message.content;
-  } catch (error) {
-    console.error("Error generating AI response:", error);
-    throw error;
+  } catch (error: any) {
+    // Enhanced error logging
+    console.error('Error in generateAIResponse:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause
+    });
+
+    // User-friendly error message
+    if (error.message.includes('API key')) {
+      throw new Error('Unable to connect to AI service. Please check your API key configuration.');
+    }
+    
+    throw new Error('Unable to generate response at the moment. Please try again later.');
   }
 }
