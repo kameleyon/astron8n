@@ -38,7 +38,8 @@ export async function POST(req: Request) {
 
     // Try local API server
     try {
-      const response = await fetch('http://localhost:3001/birth-chart', {
+      const serverUrl = process.env.BIRTH_CHART_SERVER_URL || "http://localhost:3001";
+      const response = await fetch(`${serverUrl}/birth-chart`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
