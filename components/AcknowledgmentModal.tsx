@@ -31,13 +31,14 @@ export default function AcknowledgmentModal({ isOpen, onClose, onAccept }: Ackno
             </div>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Welcome to AstroGenie
+            Welcome to AstroGenie 🌟
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            Before we proceed, please read and accept our terms of service.
+            Please accept our terms and complete your birth chart profile to get started.
           </p>
           
-          <div className="text-left text-sm text-gray-600 mb-6 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto">
+          <div className="space-y-6">
+            <div className="text-left text-sm text-gray-600 mb-4 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto">
             <p className="mb-4">By using AstroGenie, you acknowledge and agree that:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>The astrological insights provided are for entertainment and self-reflection purposes only</li>
@@ -46,6 +47,8 @@ export default function AcknowledgmentModal({ isOpen, onClose, onAccept }: Ackno
             </ul>
           </div>
 
+          </div>
+          
           <div className="flex items-center justify-center mb-6">
             <input
               type="checkbox"
@@ -58,6 +61,7 @@ export default function AcknowledgmentModal({ isOpen, onClose, onAccept }: Ackno
               I accept the terms of service
             </label>
           </div>
+
         </div>
 
         <button

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       `${MAPBOX_ENDPOINT}/${encodeURIComponent(query)}.json?` + 
       new URLSearchParams({
         access_token: MAPBOX_API_KEY,
-        types: 'place,locality,neighborhood',
+        types: 'place,locality,neighborhood,region,country',
         limit: '5'
       })
     );
