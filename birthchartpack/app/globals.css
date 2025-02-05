@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+ 
+    --radius: 0.5rem;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Birth Chart Specific Styles */
+.gradient-primary {
+  background: linear-gradient(45deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.birth-chart-wheel {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* Maintain aspect ratio */
+}
+
+.birth-chart-wheel svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.planet-symbol {
+  font-family: 'Arial Unicode MS', sans-serif;
+}
+
+.aspect-line {
+  stroke-width: 1;
+  stroke-dasharray: none;
+}
+
+.aspect-line.conjunction { stroke: #FFD700; }
+.aspect-line.opposition { stroke: #FF4444; }
+.aspect-line.trine { stroke: #4CAF50; }
+.aspect-line.square { stroke: #9C27B0; }
+.aspect-line.sextile { stroke: #2196F3; }
+
+.house-cusp {
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1;
+}
+
+.zodiac-wheel {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 1;
+}
+
+.zodiac-sign {
+  font-family: 'Arial Unicode MS', sans-serif;
+  fill: rgba(255, 255, 255, 0.8);
+}
+
+.planet-position {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.house-number {
+  font-size: 10px;
+  fill: rgba(255, 255, 255, 0.6);
+}
+
+/* Pattern Visualization Styles */
+.pattern-line {
+  stroke-width: 1.5;
+  fill: none;
+  opacity: 0.6;
+}
+
+.pattern-point {
+  fill: white;
+  stroke: none;
+  r: 3;
+}
+
+/* Tooltip Styles */
+.chart-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  max-width: 200px;
+}
+
+/* Animation Utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rotate-in {
+  animation: rotateIn 1s ease-out;
+}
+
+@keyframes rotateIn {
+  from { transform: rotate(-180deg); opacity: 0; }
+  to { transform: rotate(0); opacity: 1; }
+}
