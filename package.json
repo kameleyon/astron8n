@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev\" \"node api-server.js\"",
+    "dev": "concurrently \"next dev\" \"node api-server.js\" \"cd birthchartpack ; npm run dev\"",
     "api": "node api-server.js",
-    "build": "next build",
+    "build": "next build && cd birthchartpack && npm run build",
     "start": "next start",
-    "start:prod": "concurrently \"npm start\" \"npm run api\"",
+    "start:prod": "concurrently \"npm start\" \"npm run api\" \"cd birthchartpack ; npm run start:prod\"",
     "lint": "next lint"
   },
   "dependencies": {

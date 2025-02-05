@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         // Calculate birth chart
         try {
             const birthChartData = await calculateBirthChart(body)
-            return NextResponse.json(birthChartData, { status: 200 })
+            return NextResponse.json(birthChartData)
         } catch (err) {
             const error = err as Error
             console.error('Birth chart calculation error:', error)

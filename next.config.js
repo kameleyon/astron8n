@@ -1,5 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      swisseph: true,
+      'swisseph/build/Release/swisseph.node': true,
+      fs: false,
+      path: false,
+    };
+    return config;
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/test',
+        destination: '/app/test',
+      },
+      {
+        source: '/api/:path*',
+        destination: '/app/api/:path*',
+      }
+    ];
+  },
   images: { 
     remotePatterns: [
       {
@@ -17,17 +39,6 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
     removeConsole: process.env.NODE_ENV === 'production',
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // Don't attempt to load native modules on the client side
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        swisseph: false,
-        'swisseph/build/Release/swisseph.node': false
-      };
-    }
-    return config;
   },
 };
 

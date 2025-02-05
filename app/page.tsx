@@ -29,7 +29,13 @@ export default function Home() {
       <div className="min-h-screen flex flex-col relative">
         <Suspense fallback={<LoadingState />}>
           <Header onAuth={handleAuth} />
-        </Suspense>
+              </Suspense>
+              <button 
+                onClick={() => router.push('/test')}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Go to Test Page
+              </button>
         
         <div className="bg-gradient-to-r from-secondary to-accent flex-grow relative">
           <div className="absolute inset-0 dot-pattern"></div>

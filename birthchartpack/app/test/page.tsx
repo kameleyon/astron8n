@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from 'react'
-import { BirthChartForm } from '@/components/birth-chart/birth-chart-form'
-import { BirthChartResult } from '@/components/birth-chart/birth-chart-result'
-import type { BirthChartData } from '@/lib/types/birth-chart'
+import { BirthChartForm } from '../../components/birth-chart/birth-chart-form'
+import { BirthChartResult } from '../../components/birth-chart/birth-chart-result'
+import type { BirthChartData } from '../../lib/types/birth-chart'
 
 export default function TestPage() {
   const [birthChartData, setBirthChartData] = useState<BirthChartData | null>(null)
