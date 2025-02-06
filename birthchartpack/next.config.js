@@ -33,13 +33,13 @@ const nextConfig = {
 
     // Handle native modules
     if (isServer) {
-      config.externals = [...config.externals, 'swisseph', 'swisseph-v2', 'tz-lookup'];
+      config.externals = [...(config.externals || []), 'swisseph', 'swisseph-v2', 'tz-lookup'];
     } else {
       config.resolve.alias = {
         ...config.resolve.alias,
-        'swisseph': require.resolve('swisseph'),
-        'swisseph-v2': require.resolve('swisseph-v2'),
-        'tz-lookup': require.resolve('tz-lookup')
+        'swisseph': false,
+        'swisseph-v2': false,
+        'tz-lookup': false
       };
     }
 
