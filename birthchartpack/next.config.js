@@ -17,7 +17,6 @@ const nextConfig = {
   experimental: {
     // Ensure SWC is used for compilation
     forceSwcTransforms: true,
-    // Remove appDir since it's causing the warning
   },
 
   webpack: (config, { isServer }) => {
@@ -34,12 +33,13 @@ const nextConfig = {
 
     // Handle native modules
     if (isServer) {
-      config.externals = [...config.externals, 'swisseph', 'swisseph-v2'];
+      config.externals = [...config.externals, 'swisseph', 'swisseph-v2', 'tz-lookup'];
     } else {
       config.resolve.alias = {
         ...config.resolve.alias,
         'swisseph': require.resolve('swisseph'),
-        'swisseph-v2': require.resolve('swisseph-v2')
+        'swisseph-v2': require.resolve('swisseph-v2'),
+        'tz-lookup': require.resolve('tz-lookup')
       };
     }
 
