@@ -31,7 +31,6 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "autoprefixer": "^10.4.16",
-    "concurrently": "^8.2.2",
     "node-loader": "^2.1.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
@@ -39,10 +38,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "concurrently \"next dev\" \"node api-server.js\"",
-    "start": "next start",
-    "api": "node api-server.js",
-    "start:prod": "concurrently \"npm start\" \"npm run api\""
+    "dev": "next dev"
   },
   "keywords": [
     "astrology",
