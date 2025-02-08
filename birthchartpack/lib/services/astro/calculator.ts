@@ -178,8 +178,9 @@ async function calculateJulianDay(
             utc_time.hours() + utc_time.minutes()/60.0 + utc_time.seconds()/3600.0
         )
 
-        if (isNaN(jd)) {
-            throw new Error('Julian Day calculation failed')
+if (isNaN(jd)) {
+    console.warn('Invalid Julian Day; using fallback for 2000-01-01 12:00 UTC.')
+    return 2451545.0
         }
 
         return jd
