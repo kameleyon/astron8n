@@ -10,7 +10,6 @@ import {
 } from './planets'
 import moment from 'moment-timezone'
 import path from 'path'
-import { initSwissEphemeris } from './init'
 
 interface BirthChartInput {
     name: string
@@ -75,9 +74,6 @@ function normalizeSwissEph(swe: any) {
 async function loadAstrologyModules() {
     let swe;
     try {
-        // Initialize Swiss Ephemeris first
-        await initSwissEphemeris()
-        
         // Try loading swisseph-v2 first
         swe = await import('swisseph-v2')
         console.debug('Using swisseph-v2 module')
@@ -90,6 +86,14 @@ async function loadAstrologyModules() {
         } catch (fallbackErr) {
             throw new Error('Failed to load Swiss Ephemeris modules. Please ensure either swisseph-v2 or swisseph is properly installed.')
         }
+    }
+
+    // Set ephemeris path
+    const ephePath = process.env.SWISSEPH_PATH || path.join(process.cwd(), 'ephe')
+    console.debug('Using ephemeris path:', ephePath)
+
+    if ('swe_set_ephe_path' in swe) {
+        swe.swe_set_ephe_path(ephePath)
     }
 
     return { swe: normalizeSwissEph(swe), moment }
@@ -175,7 +179,7 @@ async function calculateJulianDay(
         )
 
         if (isNaN(jd)) {
-            throw new Error('Failed to calculate Julian Day')
+            throw new Error('Julian Day calculation failed')
         }
 
         return jd

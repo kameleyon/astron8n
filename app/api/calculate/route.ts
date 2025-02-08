@@ -5,30 +5,6 @@ import { calculateBirthChart } from "../../../birthchartpack/lib/services/astro/
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-function isValidDate(dateStr: string): boolean {
-    // Check for YYYY-MM-DD format
-    const isoRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
-    if (isoRegex.test(dateStr)) {
-        const [_, year, month, day] = dateStr.match(isoRegex) || [];
-        const date = new Date(Number(year), Number(month) - 1, Number(day));
-        return date.getFullYear() === Number(year) &&
-               date.getMonth() === Number(month) - 1 &&
-               date.getDate() === Number(day);
-    }
-
-    // Check for MM/DD/YYYY format
-    const usRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-    if (usRegex.test(dateStr)) {
-        const [_, month, day, year] = dateStr.match(usRegex) || [];
-        const date = new Date(Number(year), Number(month) - 1, Number(day));
-        return date.getFullYear() === Number(year) &&
-               date.getMonth() === Number(month) - 1 &&
-               date.getDate() === Number(day);
-    }
-
-    return false;
-}
-
 export async function POST(request: Request) {
     try {
         // Parse request body
@@ -44,10 +20,10 @@ export async function POST(request: Request) {
         try {
             body = await request.json()
         } catch (err) {
-            console.error('JSON parse error:', err);
+            const error = err as Error
             return NextResponse.json({
                 error: 'Invalid request body format',
-                details: 'Request body must be valid JSON'
+                details: error.message
             }, { status: 400 })
         }
 
@@ -84,18 +60,18 @@ export async function POST(request: Request) {
             }, { status: 400 })
         }
 
-        let parsedDate = body.date?.trim() || "";
-        if (!isValidDate(parsedDate)) {
+        // Validate date format (YYYY-MM-DD or MM/DD/YYYY)
+        const dateRegex = /^(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4})$/
+        if (!dateRegex.test(body.date)) {
             return NextResponse.json({
                 error: 'Invalid date format',
-                details: 'Date must be in YYYY-MM-DD or MM/DD/YYYY format and be a valid date'
+                details: 'Date must be in YYYY-MM-DD or MM/DD/YYYY format'
             }, { status: 400 })
         }
 
-        let parsedTime = body.time?.trim() || "";
-        // Force to "HH:MM" in 24-hour
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (!timeRegex.test(parsedTime)) {
+        // Validate time format (HH:MM)
+        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
+        if (!timeRegex.test(body.time)) {
             return NextResponse.json({
                 error: 'Invalid time format',
                 details: 'Time must be in 24-hour format (HH:MM)'
@@ -104,17 +80,8 @@ export async function POST(request: Request) {
 
         // Calculate birth chart
         try {
-            console.log('Calculating birth chart with data:', {
-                ...body,
-                // Don't log sensitive information like name
-                name: '[REDACTED]'
-            });
-
             const birthChartData = await calculateBirthChart(body)
-            
-            console.log('Birth chart calculation successful');
-            return NextResponse.json(birthChartData)
-
+            return NextResponse.json(birthChartData, { status: 200 })
         } catch (err) {
             const error = err as Error
             console.error('Birth chart calculation error:', error)

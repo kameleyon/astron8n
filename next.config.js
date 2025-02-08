@@ -62,10 +62,10 @@ const nextConfig = {
         source: '/test',
         destination: '/app/test',
       },
-      // {
-      //   source: '/api/:path*',
-      //   destination: '/app/api/:path*',
-      // }
+      {
+        source: '/api/:path*',
+        destination: '/app/api/:path*',
+      }
     ];
   },
   eslint: {
