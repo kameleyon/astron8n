@@ -8,14 +8,22 @@ export const runtime = 'nodejs'
 export async function POST(request: Request) {
     try {
         // Parse request body
-        let body: {
-            name: string;
-            date: string;
-            time: string;
-            location: string;
-            latitude: number;
-            longitude: number;
-        };
+const contentType = request.headers.get('content-type') || '';
+if (!contentType.toLowerCase().includes('application/json')) {
+    return NextResponse.json({
+        error: 'Invalid or missing Content-Type',
+        details: 'Request Content-Type must be application/json'
+    }, { status: 400 });
+}
+
+let body: {
+    name: string;
+    date: string;
+    time: string;
+    location: string;
+    latitude: number;
+    longitude: number;
+};
 
         try {
             body = await request.json()
