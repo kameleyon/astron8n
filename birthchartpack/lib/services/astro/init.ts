@@ -34,7 +34,8 @@ export async function initSwissEphemeris() {
     if (!julianDay) {
       throw new Error('Failed to initialize Swiss Ephemeris');
     }
-  } catch (err) {
-    throw new Error(`Failed to load Swiss Ephemeris modules: ${err.message}`);
-  }
+} catch (err) {
+  const typedErr = err as Error;
+  throw new Error(`Failed to load Swiss Ephemeris modules: ${typedErr.message}`);
+}
 }
