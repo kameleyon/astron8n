@@ -6,7 +6,15 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
+    if (request.method !== 'POST') {
+        return NextResponse.json({
+            error: 'Method Not Allowed',
+            details: 'This endpoint only accepts POST requests'
+        }, { status: 405 });
+    }
     try {
+        // Force Next.js to return JSON on errors
+        request.headers.set('Accept', 'application/json');
         // Parse request body
 const contentType = request.headers.get('content-type') || '';
 if (!contentType.toLowerCase().includes('application/json')) {
