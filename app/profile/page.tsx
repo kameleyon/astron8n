@@ -10,32 +10,12 @@ import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { BirthChartWheel } from "@/components/BirthChartWheel";
 import { Separator } from "@/components/ui/separator";
 import { User, Settings, FileText, Activity, CreditCard, Edit } from "lucide-react";
 import ProgressBar from "../../components/ui/ProgressBar";
 import BirthChartModal from "@/components/BirthChartModal";
-
-// This type is the full response from the /api/birth-chart route
-interface BirthChartApiResponse {
-  planets: Array<{
-    name: string;
-    degrees: number;
-    sign: string;
-    retrograde: boolean;
-    formatted: string;
-  }>;
-  houses: Record<string, { degrees: number; sign: string; formatted: string }>;
-  ascendant: { degrees: number; sign: string; formatted: string };
-  midheaven: { degrees: number; sign: string; formatted: string };
-  aspects: Array<{
-    planet1: string;
-    planet2: string;
-    aspect: string;
-    orb: number;
-  }>;
-  // You may have additional fields if needed
-}
+import type { BirthChartData } from "../../birthchartpack/lib/types/birth-chart";
+import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
 
 // This type is for the data we pass to the BirthChartModal form
 interface BirthChartFormData {
@@ -59,12 +39,39 @@ interface UserProfile {
   has_unknown_birth_time: boolean;
 }
 
+/**
+ * Convert a time string (possibly including seconds, e.g. "09:54:00") 
+ * into a "HH:MM" 24-hour format. 
+ * If the string can't be parsed, we default to noon ("12:00").
+ */
+function standardizeTime(originalTime: string | null): string {
+  if (!originalTime || !originalTime.trim()) {
+    return "12:00"; 
+  }
+
+  // If it has seconds, strip them off: e.g. "09:54:00" -> "09:54"
+  // e.g. "HH:MM:SS"
+  const parts = originalTime.trim().split(":");
+  if (parts.length === 3) {
+    // Keep only [HH, MM]
+    originalTime = `${parts[0]}:${parts[1]}`;
+  }
+
+  // Check if it's already valid 24-hour HH:MM
+  const hhmm24 = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (hhmm24.test(originalTime)) {
+    return originalTime;
+  }
+
+  // If not valid, fallback to noon
+  return "12:00";
+}
+
 export default function ProfilePage() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [birthChartData, setBirthChartData] = useState<BirthChartApiResponse | null>(null);
-
+  const [birthChartData, setBirthChartData] = useState<BirthChartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [email, setEmail] = useState<string | null>(null);
@@ -103,10 +110,12 @@ export default function ProfilePage() {
         // Calculate birth chart data
         if (data) {
           try {
+            const birthTime = standardizeTime(data.birth_time);
+
             const requestData = {
               name: data.full_name,
               date: data.birth_date,
-              time: data.birth_time || "12:00",
+              time: birthTime,
               location: data.birth_location,
               latitude: data.latitude,
               longitude: data.longitude,
@@ -114,7 +123,7 @@ export default function ProfilePage() {
 
             console.log("Sending birth chart request:", requestData);
 
-            const response = await fetch("/api/birth-chart", {
+            const response = await fetch("/api/calculate", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -128,7 +137,7 @@ export default function ProfilePage() {
               throw new Error(errorData.error || "Failed to fetch birth chart data");
             }
 
-            const chartData: BirthChartApiResponse = await response.json();
+            const chartData = await response.json();
             console.log("Birth chart data received:", chartData);
             setBirthChartData(chartData);
           } catch (err) {
@@ -210,7 +219,7 @@ export default function ProfilePage() {
       };
       console.log("Sending birth chart update request:", requestData);
 
-      const response = await fetch("/api/birth-chart", {
+      const response = await fetch("/api/calculate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -224,7 +233,7 @@ export default function ProfilePage() {
         throw new Error(errorData.error || "Failed to fetch birth chart data");
       }
 
-      const chartData: BirthChartApiResponse = await response.json();
+      const chartData = await response.json();
       console.log("Updated birth chart data received:", chartData);
       setBirthChartData(chartData);
 
@@ -374,136 +383,10 @@ export default function ProfilePage() {
                 <Card className="bg-white/70 backdrop-blur-sm rounded-3xl">
                   <CardContent className="p-6">
                     {birthChartData ? (
-                      <div className="space-y-18">
-                        {profile.has_unknown_birth_time && (
-                          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                            <div className="flex">
-                              <div className="flex-shrink-0">
-                                <svg
-                                  className="h-5 w-5 text-yellow-400"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </div>
-                              <div className="ml-3">
-                                <p className="text-sm text-yellow-700">
-                                  Birth time not provided. Using noon (12:00) as default.
-                                  Some calculations may be less accurate.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-8">
-                          <h2 className="text-2xl font-semibold mb-8">
-                            Your Birth Chart
-                          </h2>
-
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                            <div>
-                              <h3 className="text-xl font-semibold mb-4">
-                                Planetary Positions
-                              </h3>
-                              <div className="space-y-3">
-                                {birthChartData.planets.map((planet) => (
-                                  <div
-                                    key={planet.name}
-                                    className="flex justify-between items-center"
-                                  >
-                                    <span className="font-medium text-gray-700">
-                                      {planet.name}
-                                    </span>
-                                    <div className="text-right">
-                                      <span className="text-gray-600">
-                                        {planet.formatted}
-                                        {planet.retrograde && (
-                                          <span className="text-red-500 ml-1">℞</span>
-                                        )}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-
-                            <div>
-                              <h3 className="text-xl font-semibold mb-4">
-                                Houses
-                              </h3>
-                              <div className="space-y-3">
-                                {Object.entries(birthChartData.houses).map(([house, data]) => (
-                                  <div
-                                    key={house}
-                                    className="flex justify-between items-center"
-                                  >
-                                    <span className="font-medium text-gray-700">
-                                      house {house.split("_")[1]}
-                                    </span>
-                                    <span className="text-gray-600">
-                                      {data.formatted}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="mt-8">
-                            <h3 className="text-xl font-semibold mb-4">
-                              Important Points
-                            </h3>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-700">
-                                  Ascendant
-                                </span>
-                                <span className="text-gray-600">
-                                  {birthChartData.ascendant.formatted}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-700">
-                                  Midheaven
-                                </span>
-                                <span className="text-gray-600">
-                                  {birthChartData.midheaven.formatted}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {birthChartData.aspects.length > 0 && (
-                            <div className="mt-8">
-                              <h3 className="text-xl font-semibold mb-4">
-                                Major Aspects
-                              </h3>
-                              <div className="space-y-2">
-                                {birthChartData.aspects.map((aspect, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex justify-between items-center"
-                                  >
-                                    <span className="font-medium text-gray-700">
-                                      {aspect.planet1} {aspect.aspect.toLowerCase()}{" "}
-                                      {aspect.planet2}
-                                    </span>
-                                    <span className="text-gray-600">
-                                      {aspect.orb}°
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <BirthChartResult
+                        data={birthChartData}
+                        onBack={() => {}}
+                      />
                     ) : (
                       <div className="text-center py-8">
                         <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
