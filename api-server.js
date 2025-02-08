@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const { createBirthChart } = require('astrogenie-birthchart');
 const dotenv = require('dotenv');
 
@@ -10,6 +11,7 @@ const app = express();
 const port = process.env.API_PORT || 3001;
 
 app.use(cors());
+app.use(bodyParser.json());
 app.use(express.json());
 
 // Birth chart calculation endpoint
