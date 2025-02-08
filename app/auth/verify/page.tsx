@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function VerifyPage() {
+function VerifyPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [message, setMessage] = useState("Verifying your email...");
@@ -72,5 +72,22 @@ export default function VerifyPage() {
         Go to Login
       </button>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
+          <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
+          <p className="text-gray-700 text-center max-w-md mb-6">
+            Loading verification...
+          </p>
+        </div>
+      }
+    >
+      <VerifyPageInner />
+    </Suspense>
   );
 }
