@@ -100,7 +100,7 @@ export default function TestPage() {
         };
 
         // Call our /api/calculate route
-        const response = await fetch("/api/calculate", {
+        const response = await fetch("../pages/api/calculate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
