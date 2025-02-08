@@ -17,8 +17,10 @@ function AuthPageInner() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const mode = searchParams.get("mode");
-    setIsLogin(mode !== "signup");
+    if (searchParams) {
+      const mode = searchParams.get("mode");
+      setIsLogin(mode !== "signup");
+    }
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,14 +38,23 @@ function AuthPageInner() {
         router.push("/dashboard");
       } else {
         // Use standard string concatenation to avoid TS errors
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin + "/auth/verify",
-          },
+            emailRedirectTo: window.location.origin + "/auth/verify"
+          }
         });
         if (error) throw error;
+        
+        // Check if email confirmation was sent
+        if (data?.user?.identities?.length === 0) {
+          setError("This email is already registered. Please sign in instead.");
+          return;
+        }
+        
+        // Show success message and redirect
+        setError(""); // Clear any existing errors
         router.push("/auth/verify");
       }
     } catch (err: any) {

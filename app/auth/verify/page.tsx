@@ -1,31 +1,75 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function VerifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [message, setMessage] = useState("Verifying your email...");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Immediately sign the user out to end their session
-    supabase.auth.signOut().then(() => {
-      // Optionally navigate to a message or standard page
-      // after sign-out; for example, we can remain here or display a message
-    });
-  }, []);
+    const handleEmailVerification = async () => {
+      try {
+        // Get the token and type from URL
+        if (!searchParams) {
+          setMessage("Invalid verification URL.");
+          return;
+        }
+
+        const token = searchParams.get('token');
+        const type = searchParams.get('type');
+
+        if (!token || !type) {
+          setMessage("Please check your email for the verification link.");
+          return;
+        }
+
+        // Verify the email
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'email'
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        setMessage("Email verified successfully! You can now sign in.");
+        // Wait a moment before redirecting
+        setTimeout(() => {
+          router.push('/auth?mode=login');
+        }, 2000);
+
+      } catch (err: any) {
+        console.error('Verification error:', err);
+        setError(err.message || "Failed to verify email");
+        setMessage("");
+      }
+    };
+
+    handleEmailVerification();
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
       <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
-      <p className="text-gray-700 text-center max-w-md mb-6">
-        We have ended your current session to allow you to verify your email address.
-        Once your email is verified, please sign in again to continue.
-      </p>
+      {message && (
+        <p className="text-gray-700 text-center max-w-md mb-6">
+          {message}
+        </p>
+      )}
+      {error && (
+        <p className="text-red-600 text-center max-w-md mb-6">
+          {error}
+        </p>
+      )}
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/auth?mode=login")}
         className="px-6 py-2 rounded-md bg-primary text-white hover:bg-opacity-90 transition"
       >
-        Return Home
+        Go to Login
       </button>
     </div>
   );
