@@ -1,5 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  output: 'standalone',
+  poweredByHeader: false,
+  compress: true,
+  experimental: {
+    forceSwcTransforms: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+      },
+    ],
+    // Merged from birthchartpack config
+    unoptimized: true,
+  },
   webpack: (config, { isServer }) => {
     // Handle polyfills and fallbacks
     config.resolve.fallback = {
@@ -51,14 +68,6 @@ const nextConfig = {
       }
     ];
   },
-  images: { 
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'i.ibb.co',
-      },
-    ],
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -69,6 +78,7 @@ const nextConfig = {
     styledComponents: true,
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  transpilePackages: ['moment-timezone'],
 };
 
 module.exports = nextConfig;
