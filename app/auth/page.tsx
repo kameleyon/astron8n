@@ -1,12 +1,13 @@
+// We wrap our component in Suspense to satisfy Next.js's requirement for useSearchParams
 "use client";
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { Shield } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AuthPage() {
+function AuthPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
@@ -34,11 +35,12 @@ export default function AuthPage() {
         if (error) throw error;
         router.push("/dashboard");
       } else {
+        // Use standard string concatenation to avoid TS errors
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/verify`,
+            emailRedirectTo: window.location.origin + "/auth/verify",
           },
         });
         if (error) throw error;
@@ -70,9 +72,7 @@ export default function AuthPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {isLogin ? "Secure Login" : "Create Secure Account"}
           </h2>
-          <p className="text-sm text-gray-600">
-            
-          </p>
+          <p className="text-sm text-gray-600"></p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,7 +133,7 @@ export default function AuthPage() {
           <button
             onClick={() => {
               setIsLogin(!isLogin);
-              router.push(`/auth?mode=${isLogin ? 'signup' : 'login'}`);
+              router.push(`/auth?mode=${isLogin ? "signup" : "login"}`);
             }}
             className="text-primary hover:text-opacity-80 transition-colors"
           >
@@ -143,10 +143,16 @@ export default function AuthPage() {
           </button>
         </div>
 
-        <div className="mt-4 text-center text-xs text-gray-500">
-          
-        </div>
+        <div className="mt-4 text-center text-xs text-gray-500"></div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white">Loading auth...</div>}>
+      <AuthPageInner />
+    </Suspense>
   );
 }
