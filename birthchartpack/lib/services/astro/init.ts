@@ -19,7 +19,7 @@ export async function initSwissEphemeris() {
     console.log(`Using ephemeris files from ${ephePath}`);
 
     // Set the ephemeris path
-    swisseph.swe_set_ephe_path(path.join(process.cwd(), 'ephe'));
+swisseph.swe_set_ephe_path(path.join(process.cwd(), 'birthchartpack', 'ephe'));
     
     // Verify we can calculate a basic date
     const date = new Date();

@@ -89,7 +89,7 @@ async function loadAstrologyModules() {
     }
 
     // Set ephemeris path
-    const ephePath = process.env.SWISSEPH_PATH || path.join(process.cwd(), 'ephe')
+const ephePath = process.env.SWISSEPH_PATH || path.join(process.cwd(), 'birthchartpack', 'ephe')
     console.debug('Using ephemeris path:', ephePath)
 
     if ('swe_set_ephe_path' in swe) {
