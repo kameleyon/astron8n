@@ -60,18 +60,20 @@ export async function POST(request: Request) {
             }, { status: 400 })
         }
 
-        // Validate date format (YYYY-MM-DD or MM/DD/YYYY)
-        const dateRegex = /^(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4})$/
-        if (!dateRegex.test(body.date)) {
+let parsedDate = body.date?.trim() || "";
+// Force to "YYYY-MM-DD" if needed
+const dateRegex = /^(\d{4}-\d{2}-\d{2})$/;
+if (!dateRegex.test(parsedDate)) {
             return NextResponse.json({
                 error: 'Invalid date format',
                 details: 'Date must be in YYYY-MM-DD or MM/DD/YYYY format'
             }, { status: 400 })
         }
 
-        // Validate time format (HH:MM)
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
-        if (!timeRegex.test(body.time)) {
+let parsedTime = body.time?.trim() || "";
+// Force to "HH:MM" in 24-hour
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+if (!timeRegex.test(parsedTime)) {
             return NextResponse.json({
                 error: 'Invalid time format',
                 details: 'Time must be in 24-hour format (HH:MM)'
