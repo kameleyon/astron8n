@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { calculateBirthChart } from "../../../birthchartpack/lib/services/astro/calculator";
 
 // Mark this route as dynamic and use Node.js runtime
+export const config = {
+    api: {
+        bodyParser: true
+    }
+};
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
