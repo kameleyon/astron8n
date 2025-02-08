@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Astrogenie</title>
+</head>
+<body>
+    <div id="__next"></div>
+    <script>
+        // Handle client-side routing
+        window.history.pushState = function() {
+            try {
+                return History.prototype.pushState.apply(history, arguments);
+            } catch (e) {
+                var l = window.location;
+                l.hash = arguments[2];
+            }
+        };
+    </script>
+</body>
+</html>
