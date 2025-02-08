@@ -16,7 +16,7 @@ export default function ChatHistoryLayout({ children }: ChatHistoryLayoutProps) 
       <Header onAuth={() => {}} />
       
       <main className="flex-grow relative z-10 py-8 flex justify-center">
-        <div className="w-full max-w-3xl px-4">
+        <div className="w-full max-w-5xl px-4">
           {children}
         </div>
       </main>

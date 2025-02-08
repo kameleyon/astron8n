@@ -30,22 +30,17 @@ export default function Home() {
         <Suspense fallback={<LoadingState />}>
           <Header onAuth={handleAuth} />
               </Suspense>
-              <button 
-                onClick={() => router.push('/test')}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-              >
-                Go to Test Page
-              </button>
+          
         
         <div className="bg-gradient-to-r from-secondary to-accent flex-grow relative">
           <div className="absolute inset-0 dot-pattern"></div>
           
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 relative z-10">
             <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
               <Suspense fallback={<LoadingState />}>
                 <Hero onAuth={handleAuth} />
               </Suspense>
-              <div className="flex items-center justify-center mt-8 md:mt-16 mb-20 md:mb-0">
+              <div className="flex items-center justify-center mt-4 md:mt-8 mb-20 md:mb-0">
                 <Suspense fallback={<LoadingState />}>
                   <ChatInterfaceindex />
                 </Suspense>

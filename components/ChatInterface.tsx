@@ -176,7 +176,7 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="chat-container bg-white/50 border border-white/80 shadow-md shadow-black mt-16 mb-8 h-[600px] w-full flex flex-col transition-all duration-300">
+    <div className="chat-container bg-white/50 border border-white/80 shadow-md shadow-black mt-8 mb-8 h-[600px] w-full flex flex-col transition-all duration-300">
       {/* Header */}
       <div className="p-4 border-b border-white/20 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Chat with AstroGenie</h2>

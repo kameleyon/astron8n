@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { Settings, History, FileText, LogOut, User, Key } from "lucide-react";
+import { MessageCircle, Settings, History, BookOpenText, LogOut, User} from "lucide-react";
 import MobileMenu from "./MobileMenu";
 import AuthModal from "./AuthModal";
 
@@ -94,6 +94,13 @@ export default function Header({ onAuth }: HeaderProps) {
           ) : isAuthenticated ? (
             <div className="flex items-center space-x-4">
               <button 
+                onClick={() => router.push('/dashboard')}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                title="Chat with Astrogenie"
+              >
+                <MessageCircle size={20} />
+              </button>
+              <button 
                 onClick={() => router.push('/profile')}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                 title="Profile"
@@ -112,14 +119,14 @@ export default function Header({ onAuth }: HeaderProps) {
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                 title="Reports"
               >
-                <FileText size={20} />
+                <BookOpenText size={20} />
               </button>
               <button 
-                onClick={() => router.push('/api-keys')}
+                onClick={() => router.push('/settings')}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                title="API Keys"
+                title="Settings"
               >
-                <Key size={20} />
+                <Settings size={20} />
               </button>
               <button 
                 onClick={handleLogout}

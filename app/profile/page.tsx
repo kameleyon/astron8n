@@ -255,10 +255,10 @@ export default function ProfilePage() {
 
         <Header onAuth={() => {}} />
 
-        <main className="flex-grow relative z-10 py-12">
+        <main className="flex-grow relative z-10 py-12 mb-8">
           <div className="w-full max-w-5xl mx-auto px-4">
-            <h1 className="text-3xl font-bold text-white text-center mb-8">
-              Your Profile
+            <h1 className="text-3xl font-bold text-white text-left mb-4 pl-8">
+              My profile
             </h1>
 
             <Tabs defaultValue="personal" className="w-full">
@@ -389,7 +389,7 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <div className="text-center py-8">
-                        <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                        <FileText className="h-12 w-12 mx-auto text-gray-400 mb-16" />
                         <p className="text-gray-600">Loading birth chart data...</p>
                       </div>
                     )}

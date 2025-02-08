@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SessionProvider from '@/components/SessionProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { FileText, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const reports = [
   {
@@ -108,21 +108,13 @@ export default function ReportsPage() {
         <Header onAuth={() => {}} />
         
         <main className="flex-grow relative z-10 py-2 md:py-8 px-2 md:px-4 mt-14 md:mt-20">
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-3 md:mb-6">
-              <button 
-                onClick={() => router.push('/dashboard')}
-                className="p-1.5 md:p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 text-white" />
-              </button>
-              <h1 className="text-lg md:text-2xl font-bold text-white">
-                Available Reports
-              </h1>
-            </div>
-
+        <div className="w-full max-w-5xl mx-auto px-4">
+            <h1 className="text-3xl font-bold text-white text-left mb-8 pl-24">
+            Available Reports
+            </h1>
+            
             {/* Carousel Container with Navigation */}
-            <div className="relative flex items-center justify-center gap-1 md:gap-2">
+            <div className="relative flex items-center justify-center gap-1 md:gap-2 w-full max-w-5xl ">
               {/* Left Navigation */}
               <button
                 onClick={handlePrev}
@@ -133,7 +125,7 @@ export default function ReportsPage() {
               </button>
 
               {/* Slides Container */}
-              <div className="relative w-full max-w-xl h-[500px] md:h-[400px] overflow-hidden">
+              <div className="relative w-full max-w-5xl h-[500px] md:h-[400px] overflow-hidden">
                 <AnimatePresence initial={false} custom={direction}>
                   <motion.div
                     key={activeIndex}
@@ -169,7 +161,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Navigation Dots */}
-            <div className="flex justify-center items-center gap-1 md:gap-2 mt-3 md:mt-6">
+            <div className="flex justify-center items-center w-full max-w-5xl  gap-1 md:gap-2 mt-3 md:mt-6">
               {reports.map((_, index) => (
                 <button
                   key={index}
@@ -212,7 +204,7 @@ interface ReportCardProps {
 function ReportCard({ report, isActive }: ReportCardProps) {
   return (
     <div className="bg-white/90 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl h-full p-8 md:py-8">
-      <div className="max-w-lg mx-auto h-full flex flex-col justify-between">
+      <div className="max-w-4xl mx-auto h-full flex flex-col justify-between">
         <div>
           <div className="flex items-start gap-2 md:gap-4 mb-2 md:mb-4">
             <div className="bg-primary/10 p-1.5 md:p-3 rounded-lg">

@@ -140,19 +140,12 @@ export default function ChatHistoryPage() {
   return (
     <SessionProvider requireAuth>
       <ChatHistoryLayout>
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg p-6">
-          <div className="flex items-center gap-4 mb-6">
-            <button 
-              onClick={() => router.push('/dashboard')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Bookmark className="h-6 w-6" />
-              Chat History
+      <main className="flex-grow relative z-10 py-4">
+          <div className="max-w-5xl mx-auto px-4">
+            <h1 className="text-3xl font-bold text-white text-left mb-8 pl-8">
+              My Chat History
             </h1>
-          </div>
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg p-6">
           
           <div className="space-y-6">
             <div className="space-y-4">
@@ -255,6 +248,8 @@ export default function ChatHistoryPage() {
             </div>
           </div>
         </div>
+        </div>
+      </main>
       </ChatHistoryLayout>
     </SessionProvider>
   );
