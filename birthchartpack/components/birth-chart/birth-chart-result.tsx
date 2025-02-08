@@ -118,7 +118,7 @@ export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
   const secondColumnPlanets = wheelPlanets.slice(midPoint)
 
   return (
-    <div className="min-h-screen bg-background text-gray-200">
+    <div className="min-h-screen bg-background text-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-4 mt-14">
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -126,7 +126,7 @@ export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
             <motion.h1 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-lg md:text-2xl font-futura mb-1 text-white/80"
+              className="text-lg md:text-2xl font-futura mb-1 text-[#0d0630]"
             >
               {data.name}&apos;s Birth Chart
             </motion.h1>
@@ -134,7 +134,7 @@ export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-white/60 text-sm"
+              className="text-[#0d0630] text-sm"
             >
               {data.location}
             </motion.p>
@@ -142,24 +142,18 @@ export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-white/60 text-sm"
+              className="text-[#0d0630] text-sm"
             >
               {data.date} at {data.time}
             </motion.p>
           </div>
-          <Button 
-            onClick={onBack}
-            variant="outline"
-            className="text-sm text-white/80"
-          >
-            Back to Form
-          </Button>
+          
         </div>
 
         {/* Main Content */}
         <div className="space-y-6">
           {/* Birth Chart Wheel */}
-          <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
+          <div className="rounded-xl bg-white/1">
             <InteractiveWheel
               houses={wheelHouses}
               planets={wheelPlanets}
@@ -167,11 +161,11 @@ export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
           </div>
 
           {/* Planets and Houses */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shadow-lg shadow-black/20 rounded-xl bg-white">
             {/* Planets */}
-            <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
+            <div className="rounded-xl bg-white">
               <div className="p-6">
-                <h2 className="text-lg font-futura text-white/80 mb-4">Planetary Positions</h2>
+                <h2 className="text-lg font-futura text-[#0d0630] mb-4">Planetary Positions</h2>
                 <div className="grid grid-cols-2 gap-0">
                   <div>
                     <PlanetsSection planets={firstColumnPlanets} hideTitle />
@@ -184,9 +178,9 @@ export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
             </div>
 
             {/* Houses */}
-            <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
+            <div className=" rounded-xl bg-white">
               <div className="p-6">
-                <h2 className="text-lg font-futura text-white/80 mb-4">Houses</h2>
+                <h2 className="text-lg font-futura text-[#0d0630] mb-4">Houses</h2>
                 <div className="grid grid-cols-2 gap-0">
                   <div>
                     <HousesSection houses={wheelHouses.slice(0, 6)} hideTitle />
