@@ -1,4 +1,5 @@
 import { ZodiacSign, PlanetPosition, HouseData } from '../../types/birth-chart'
+import path from 'path'
 
 // Zodiac signs
 const ZODIAC_SIGNS: readonly ZodiacSign[] = [
@@ -31,20 +32,20 @@ function formatDegreeMinute(longitude: number): string {
     if (typeof longitude !== 'number' || isNaN(longitude)) {
         throw new Error('Invalid longitude value for formatting')
     }
-    
+
     // Normalize to 0-360 range
     longitude = ((longitude % 360) + 360) % 360
-    
+
     // Convert to sign-specific degrees (0-30)
     const signDegrees = longitude % 30
-    
+
     // Split into degrees and minutes
     const degrees = Math.floor(signDegrees)
     const minutes = Math.floor((signDegrees - degrees) * 60)
-    
+
     // Ensure two digits for minutes
     const minutesStr = minutes.toString().padStart(2, '0')
-    
+
     return `${degrees}° ${minutesStr}'`
 }
 
@@ -150,8 +151,8 @@ async function initializeSwissEph() {
             }
         }
 
-        // Get ephemeris path from environment or default to local path
-        const ephePath = process.env.SWISSEPH_PATH || './ephe'
+        // Get ephemeris path from environment or default to birthchartpack/ephe
+        const ephePath = process.env.SWISSEPH_PATH || path.join(process.cwd(), 'birthchartpack', 'ephe')
         console.debug('Using ephemeris path:', ephePath)
 
         // Set ephemeris path if the function exists
@@ -184,7 +185,7 @@ export async function calculatePlanetPositions(
         const error = err as Error
         throw new Error(`Failed to initialize Swiss Ephemeris: ${error.message || 'Unknown error'}`)
     }
-    
+
     return new Promise((resolve, reject) => {
         const positions: Record<string, PlanetPosition> = {}
         const calcFlags = (flags || swe.flags.SEFLG_SWIEPH) | swe.flags.SEFLG_SPEED
@@ -251,7 +252,7 @@ export async function calculatePlanetPositions(
                 // Check if we have at least the essential planets
                 const essentialPlanets = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars']
                 const missingEssentials = essentialPlanets.filter(p => !positions[p])
-                
+
                 if (missingEssentials.length > 0) {
                     reject(new Error(
                         `Failed to calculate essential planets: ${missingEssentials.join(', ')}. ` +
@@ -306,7 +307,7 @@ export async function calculateHouses(
         const error = err as Error
         throw new Error(`Failed to initialize Swiss Ephemeris for house calculation: ${error.message || 'Unknown error'}`)
     }
-    
+
     try {
         const houses: Record<string, HouseData> = {}
         const hsys = HOUSE_SYSTEMS[houseSystem]

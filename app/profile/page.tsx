@@ -10,11 +10,9 @@ import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { User, Settings, FileText, Activity, CreditCard, Edit } from "lucide-react";
-import ProgressBar from "../../components/ui/ProgressBar";
+import { User, FileText, Edit } from "lucide-react";
 import BirthChartModal from "@/components/BirthChartModal";
-import type { BirthChartData } from "../../birthchartpack/lib/types/birth-chart";
+import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
 
 // This type is for the data we pass to the BirthChartModal form
@@ -75,8 +73,6 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [email, setEmail] = useState<string | null>(null);
-  const [credits, setCredits] = useState(100); // Initial credits
-  const [billingInfo, setBillingInfo] = useState({ nextPaymentDate: "", activities: [] });
   const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
@@ -262,7 +258,7 @@ export default function ProfilePage() {
             </h1>
 
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-3 lg:grid-cols-6 bg-white/20 backdrop-blur-sm rounded-xl p-1 mb-8">
+              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm rounded-xl p-1 mb-8">
                 <TabsTrigger
                   value="personal"
                   className="text-white data-[state=active]:bg-white/50 data-[state=active]:text-primary"
@@ -283,27 +279,6 @@ export default function ProfilePage() {
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Reports
-                </TabsTrigger>
-                <TabsTrigger
-                  value="usage"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
-                >
-                  <Activity className="h-4 w-4 mr-2" />
-                  Usage
-                </TabsTrigger>
-                <TabsTrigger
-                  value="billing"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Billing
-                </TabsTrigger>
-                <TabsTrigger
-                  value="settings"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
                 </TabsTrigger>
               </TabsList>
 
@@ -411,56 +386,6 @@ export default function ProfilePage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="usage">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
-                  <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold text-primary mb-4">
-                      Usage
-                    </h2>
-                    <p className="text-gray-600">
-                      You have {credits} credits remaining.
-                    </p>
-                    <ProgressBar value={((100 - credits) / 100) * 100} />
-                    {/* Add logic for credit management */}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="billing">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
-                  <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold text-primary mb-4">
-                      Billing
-                    </h2>
-                    <p className="text-gray-600">
-                      Next payment date: {billingInfo.nextPaymentDate}
-                    </p>
-                    <p className="text-gray-600">Billing activities:</p>
-                    <ul className="list-disc list-inside">
-                      {billingInfo.activities.map((activity, index) => (
-                        <li key={index} className="text-gray-600">
-                          {activity}
-                        </li>
-                      ))}
-                    </ul>
-                    {/* Add logic for billing activities */}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="settings">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
-                  <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold text-primary mb-4">
-                      Settings
-                    </h2>
-                    <p className="text-gray-600">
-                      Manage your account settings here.
-                    </p>
-                    {/* Add settings options */}
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
         </main>
