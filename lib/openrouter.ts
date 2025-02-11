@@ -1,4 +1,5 @@
 import { OpenRouterPayload } from "@/types/chat";
+import { updateUserCredits, checkUserCredits } from "@/lib/utils/credits";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -64,11 +65,21 @@ See what I mean? although they did snitch but the context change everything.
    - DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
    - DO NOT MENTION ICHIN. JUST GIVE A STRAIGNFORWARD ANSWER`;
 
-export async function generateAIResponse(messages: { role: string; content: string }[], userProfile?: {
-  birth_date?: string;
-  birth_time?: string;
-  birth_location?: string;
-}) {
+export async function generateAIResponse(
+  messages: { role: string; content: string }[],
+  userId: string,
+  userProfile?: {
+    birth_date?: string;
+    birth_time?: string;
+    birth_location?: string;
+  }
+) {
+  // Check if user has enough credits
+  const creditCheck = await checkUserCredits(userId);
+  if (!creditCheck.hasCredits) {
+    throw new Error(creditCheck.error || 'Insufficient credits');
+  }
+
   try {
     // Get API key from environment
     const apiKey = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
@@ -142,7 +153,20 @@ export async function generateAIResponse(messages: { role: string; content: stri
       throw new Error('Received invalid response format from OpenRouter API');
     }
 
-    return data.choices[0].message.content;
+    // Get token usage from response
+    const tokensUsed = data.usage?.total_tokens || 0;
+
+    // Update user credits
+    const creditUpdate = await updateUserCredits(userId, tokensUsed);
+    if (!creditUpdate.success) {
+      throw new Error(creditUpdate.error || 'Failed to update credits');
+    }
+
+    return {
+      content: data.choices[0].message.content,
+      tokensUsed,
+      remainingCredits: creditUpdate.remainingCredits
+    };
   } catch (error: any) {
     // Enhanced error logging
     console.error('Error in generateAIResponse:', {

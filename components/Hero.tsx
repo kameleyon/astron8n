@@ -9,7 +9,7 @@ export default function Hero({ onAuth }: HeroProps) {
     <div className="text-white w-full max-w-4xl mx-auto px-4">
       <div className="flex items-center justify-center mb-2">
         <Image
-          src="https://i.ibb.co/0VDHcNn/ecare-4.png"
+          src="/astrogenielogo.png" 
           alt="AstroGenie Logo"
           width={200}
           height={200}

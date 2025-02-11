@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mic, Send, AlertCircle, Loader2, Plus } from "lucide-react";
+import { Mic, Send, AlertCircle, Loader2, Plus, Coins } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { generateAIResponse } from "@/lib/openrouter";
 import { Message } from "@/types/chat";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { checkUserCredits } from "@/lib/utils/credits";
 
 const suggestedQuestions = [
   "Will I get the job at the dealership",
@@ -25,6 +26,8 @@ export default function ChatInterface() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -42,6 +45,8 @@ export default function ChatInterface() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          setUserId(user.id);
+          
           const { data: profile } = await supabase
             .from('user_profiles')
             .select('*')
@@ -51,6 +56,10 @@ export default function ChatInterface() {
           if (profile) {
             setUserProfile(profile);
           }
+
+          // Check user credits
+          const creditInfo = await checkUserCredits(user.id);
+          setRemainingCredits(creditInfo.remainingCredits || 0);
         }
       } catch (error) {
         console.error('Error loading user profile:', error);
@@ -61,7 +70,7 @@ export default function ChatInterface() {
   }, []);
 
   useEffect(() => {
-    const sessionParam = searchParams.get('session');
+    const sessionParam = searchParams?.get('session');
     if (sessionParam) {
       setSessionId(sessionParam);
       loadSessionMessages(sessionParam);
@@ -86,7 +95,7 @@ export default function ChatInterface() {
         const formattedMessages = data.map(msg => ({
           id: msg.id,
           content: msg.content,
-          role: msg.is_bot ? 'assistant' : 'user',
+          role: msg.is_bot ? 'assistant' as const : 'user' as const,
           createdAt: new Date(msg.created_at),
         }));
         setMessages(formattedMessages);
@@ -121,6 +130,12 @@ export default function ChatInterface() {
         throw new Error('Please sign in to send messages.');
       }
 
+      // Check credits before proceeding
+      const creditInfo = await checkUserCredits(user.id);
+      if (!creditInfo.hasCredits) {
+        throw new Error(creditInfo.error || 'Insufficient credits');
+      }
+
       const userMessage: Message = {
         id: uuidv4(),
         content: newMessage,
@@ -141,22 +156,24 @@ export default function ChatInterface() {
       });
 
       // Generate AI response with user profile data
-      const aiResponse = await generateAIResponse(
+      const response = await generateAIResponse(
         messages.concat(userMessage).map(msg => ({
           role: msg.role,
           content: msg.content,
         })),
+        user.id,
         userProfile
       );
 
       const assistantMessage: Message = {
         id: uuidv4(),
-        content: aiResponse,
+        content: response.content,
         role: 'assistant',
         createdAt: new Date(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      setRemainingCredits(response.remainingCredits ?? null);
 
       // Store AI response
       await supabase.from('messages').insert({
@@ -170,6 +187,12 @@ export default function ChatInterface() {
     } catch (error: any) {
       console.error('Error:', error);
       setError(error.message);
+      
+      // Refresh credit info after error
+      if (userId) {
+        const creditInfo = await checkUserCredits(userId);
+        setRemainingCredits(creditInfo.remainingCredits || 0);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -180,7 +203,13 @@ export default function ChatInterface() {
       {/* Header */}
       <div className="p-4 border-b border-white/20 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Chat with AstroGenie</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {remainingCredits !== null && (
+            <div className="flex items-center gap-1 text-sm text-gray-600">
+              <Coins className="h-4 w-4" />
+              <span>{remainingCredits} credits</span>
+            </div>
+          )}
           <button
             onClick={startNewChat}
             className="p-2 hover:bg-white/20 rounded-full transition-colors"
@@ -221,6 +250,11 @@ export default function ChatInterface() {
             <div className="mt-4 bg-red-50 text-red-800 p-3 rounded-lg text-sm flex items-center gap-2">
               <AlertCircle size={16} />
               {error}
+              {error.includes('credits') && (
+                <a href="/billing" className="ml-2 text-primary hover:underline">
+                  Get more credits
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -265,7 +299,7 @@ export default function ChatInterface() {
           <button 
             type="submit" 
             className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isLoading || !newMessage.trim()}
+            disabled={isLoading || !newMessage.trim() || remainingCredits === 0}
           >
             <Send className="text-primary" size={20} />
           </button>
