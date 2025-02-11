@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       .from('user_credits')
       .upsert([{
         user_id: userId,
-        total_credits: 3500, // Monthly premium credits
+        total_credits: 17000, // Monthly premium credits
         used_credits: 0,
         rollover_credits: 0,
         is_subscriber: true,

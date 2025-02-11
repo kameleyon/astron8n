@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-r1-distill-qwen-32b',
+        model: 'qwen/qwen-plus',
         messages: [
           {
             role: 'user',

@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-//import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { InteractiveWheel } from './interactive-wheel'
 import { PlanetsSection } from './planets-section'
 import { HousesSection } from './houses-section'
+import { supabase } from '@/lib/supabase/client'
 import { generateWithOpenRouter } from '@/lib/services/openrouter'
 import type { 
   BirthChartData, 
@@ -20,7 +21,7 @@ interface BirthChartResultProps {
   onBack: () => void
 }
 
-
+// ... (keep all the existing functions and transformations)
 
 export function BirthChartResult({ data, onBack }: BirthChartResultProps) {
   const [personalizedMessage, setPersonalizedMessage] = useState<string>('')
@@ -61,8 +62,8 @@ ${stelliums.length > 0 ? `\nNotable stelliums:\n${stelliums.map(s => `- ${s.plan
 ${significantAspects.length > 0 ? `\nSignificant aspects:\n${significantAspects.map(a => `- ${a.planet1} ${a.aspect.toLowerCase()} ${a.planet2}`).join('\n')}` : ''}
 ${data.patterns.length > 0 ? `\nNotable patterns:\n${data.patterns.map((p: PatternData) => `- ${p.name}: ${p.planets.join(', ')}`).join('\n')}` : ''}
 
-Create a warm, welcoming and casual personal message that:
-1. Addresses ${data.name} directly by name in a warmed and welcoming way
+Create a warm, personal message that:
+1. Addresses ${data.name} directly by name
 2. Describes how their Sun, Moon, and Ascendant work together to create their unique personality
 3. Highlights the most significant features found in their chart (stelliums, aspects, or patterns)
 4. Explains what these placements mean specifically for them
@@ -70,8 +71,6 @@ Create a warm, welcoming and casual personal message that:
 6. Makes them feel seen and understood
 7. Is about 4-5 sentences long
 8. Avoids technical jargon
-9. DO NOT WRIGHT YOUR THOUGHT PROCESS, YOUR PLANS, JUST START THE MESSAGE DIRECTLY
-10. Sign as AstroGenie
 
 Format as a single, flowing paragraph that captures ${data.name}'s unique essence and makes them feel like you're speaking directly to them about their personal cosmic blueprint.`
 
@@ -188,15 +187,15 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
   const secondColumnPlanets = wheelPlanets.slice(midPoint)
 
   return (
-    <div className="min-h-screen bg-background text-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-4 mt-6">
+    <div className="min-h-screen bg-background text-gray-200">
+      <div className="max-w-7xl mx-auto px-4 py-4 mt-14">
         {/* Header */}
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <motion.h1 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-lg md:text-2xl font-futura mb-1 text-[#0d0630]"
+              className="text-lg md:text-2xl font-futura mb-1 text-white/80"
             >
               {data.name}&apos;s Birth Chart
             </motion.h1>
@@ -204,7 +203,7 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-[#0d0630] text-sm"
+              className="text-white/60 text-sm"
             >
               {data.location}
             </motion.p>
@@ -212,12 +211,18 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-[#0d0630] text-sm"
+              className="text-white/60 text-sm"
             >
               {data.date} at {data.time}
             </motion.p>
           </div>
-          
+          <Button 
+            onClick={onBack}
+            variant="outline"
+            className="text-sm text-white/80"
+          >
+            Back to Form
+          </Button>
         </div>
 
         {/* Main Content */}
@@ -227,15 +232,15 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
             {/* Personalized Message - Left Column */}
             <div className="md:col-span-4">
               <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
-                <div className="p-3">
-                  <h2 className="text-lg font-futura text-white/80 mb-2">Your Astro Blueprint</h2>
+                <div className="p-6">
+                  <h2 className="text-lg font-futura text-white/80 mb-2">Your Cosmic Blueprint</h2>
                   {loading ? (
                     <div className="animate-pulse">
                       <div className="h-4 bg-gray-800 rounded w-3/4 mb-2"></div>
                       <div className="h-4 bg-gray-800 rounded w-5/6"></div>
                     </div>
                   ) : (
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-white/60">
                       {personalizedMessage}
                     </p>
                   )}
@@ -245,7 +250,7 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
 
             {/* Birth Chart Wheel - Right Column */}
             <div className="md:col-span-8">
-              <div className=" rounded-xl bg-[#0B1121]/1">
+              <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
                 <InteractiveWheel
                   houses={wheelHouses}
                   planets={wheelPlanets}
@@ -255,11 +260,11 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
           </div>
 
           {/* Planets and Houses */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 shadow-md shadow-black/20 rounded-xl bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Planets */}
-            <div className="rounded-xl bg-white">
-              <div className="p-3">
-                <h2 className="text-lg font-futura text-[#0d0630] mb-4">Planetary Positions</h2>
+            <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
+              <div className="p-6">
+                <h2 className="text-lg font-futura text-white/80 mb-4">Planetary Positions</h2>
                 <div className="grid grid-cols-2 gap-0">
                   <div>
                     <PlanetsSection planets={firstColumnPlanets} hideTitle />
@@ -272,9 +277,9 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
             </div>
 
             {/* Houses */}
-            <div className=" rounded-xl bg-white">
+            <div className="shadow-lg shadow-black/20 rounded-xl bg-[#0B1121]">
               <div className="p-6">
-                <h2 className="text-lg font-futura text-[#0d0630] mb-4">Houses</h2>
+                <h2 className="text-lg font-futura text-white/80 mb-4">Houses</h2>
                 <div className="grid grid-cols-2 gap-0">
                   <div>
                     <HousesSection houses={wheelHouses.slice(0, 6)} hideTitle />

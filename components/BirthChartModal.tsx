@@ -107,7 +107,7 @@ export default function BirthChartModal({
       
       const { error } = await supabase.from('user_credits').insert({
         user_id: userId,
-        total_credits: 1500,
+        total_credits: 5000,
         used_credits: 0,
         is_subscriber: false,
         trial_end_date: trialEndDate.toISOString(),

@@ -77,7 +77,7 @@ export async function generateAIResponse(
   // Check if user has enough credits
   const creditCheck = await checkUserCredits(userId);
   if (!creditCheck.hasCredits) {
-    throw new Error(creditCheck.error || 'Insufficient credits');
+    throw new Error(creditCheck.error || 'You have run out of credits. Please visit the billing page to add more credits to continue using the service.');
   }
 
   try {
@@ -102,7 +102,7 @@ export async function generateAIResponse(
     );
 
     const payload: OpenRouterPayload = {
-      model: "deepseek/deepseek-r1-distill-qwen-32b",
+      model: "qwen/qwen-plus",
       messages: [
         {
           role: "system",
@@ -179,6 +179,10 @@ export async function generateAIResponse(
     // User-friendly error message
     if (error.message.includes('API key')) {
       throw new Error('Unable to connect to AI service. Please check your API key configuration.');
+    }
+    
+    if (error.message.includes('run out of credits')) {
+      throw error; // Re-throw credit-related errors with the original message
     }
     
     throw new Error('Unable to generate response at the moment. Please try again later.');
