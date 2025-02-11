@@ -405,18 +405,9 @@ export default function ProfilePage() {
               </TabsContent>
 
               <TabsContent value="birthchart">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-xl font-semibold text-primary">Birth Chart</h2>
-                      <button
-                        onClick={() => setShowEditModal(true)}
-                        className="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
-                      >
-                        <Edit className="h-4 w-4" />
-                        Edit
-                      </button>
-                    </div>
+                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-2">
+                  <CardContent className="p-2">
+                    
                     {isBirthDataIncomplete ? (
                       <div className="text-gray-600">
                         Please complete your birth information to view your birth chart.
