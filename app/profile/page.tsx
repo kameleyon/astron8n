@@ -15,6 +15,7 @@ import BirthChartModal from "@/components/BirthChartModal";
 import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
 import { calculateLifePath, getBirthCard } from "@/lib/utils/calculations";
+import { HumanDesignProfile } from "@/lib/utils/humanDesign";
 
 // This type is for the data we pass to the BirthChartModal form
 interface BirthChartFormData {
@@ -71,6 +72,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [birthChartData, setBirthChartData] = useState<BirthChartData | null>(null);
+  const [humanDesignData, setHumanDesignData] = useState<HumanDesignProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [email, setEmail] = useState<string | null>(null);
@@ -149,6 +151,30 @@ export default function ProfilePage() {
             const chartData = await response.json();
             console.log("Birth chart data received:", chartData);
             setBirthChartData(chartData);
+
+            // Fetch Human Design data
+            const hdResponse = await fetch("/api/human-design", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                birthDate: data.birth_date,
+                birthTime: birthTime,
+                latitude: data.latitude,
+                longitude: data.longitude,
+              }),
+            });
+
+            if (!hdResponse.ok) {
+              const errorData = await hdResponse.json();
+              console.error("Human Design API error:", errorData);
+              throw new Error(errorData.error || "Failed to fetch Human Design data");
+            }
+
+            const hdData = await hdResponse.json();
+            console.log("Human Design data received:", hdData);
+            setHumanDesignData(hdData);
           } catch (err) {
             console.error("Error calculating birth chart:", err);
             setError(err instanceof Error ? err.message : "Failed to calculate birth chart");
@@ -245,6 +271,30 @@ export default function ProfilePage() {
       const chartData = await response.json();
       console.log("Updated birth chart data received:", chartData);
       setBirthChartData(chartData);
+
+      // Update Human Design data
+      const hdResponse = await fetch("/api/human-design", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          birthDate: data.date,
+          birthTime: timeValue,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        }),
+      });
+
+      if (!hdResponse.ok) {
+        const errorData = await hdResponse.json();
+        console.error("Human Design API error:", errorData);
+        throw new Error(errorData.error || "Failed to fetch Human Design data");
+      }
+
+      const hdData = await hdResponse.json();
+      console.log("Updated Human Design data received:", hdData);
+      setHumanDesignData(hdData);
 
       setShowEditModal(false);
     } catch (err) {
@@ -384,9 +434,19 @@ export default function ProfilePage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="bg-white rounded-xl p-4 shadow-sm">
                           <p className="text-sm text-gray-500 mb-1">Human Design</p>
-                          <p className="text-gray-900 font-medium">
-                            {profile.birth_date && profile.birth_time ? "Coming soon" : "Not available"}
-                          </p>
+                          <div className="text-gray-900">
+                            {humanDesignData ? (
+                              <div className="space-y-1">
+                                <p className="font-medium">{humanDesignData.type}</p>
+                                <p className="text-sm">Authority: {humanDesignData.authority}</p>
+                                <p className="text-sm">Profile: {humanDesignData.profile}</p>
+                              </div>
+                            ) : profile.birth_date && profile.birth_time ? (
+                              <p className="font-medium">Loading...</p>
+                            ) : (
+                              <p className="font-medium">Not available</p>
+                            )}
+                          </div>
                         </div>
                         <div className="bg-white rounded-xl p-4 shadow-sm">
                           <p className="text-sm text-gray-500 mb-1">Life Path Number</p>
