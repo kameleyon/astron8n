@@ -92,12 +92,24 @@ export default function ProfilePage() {
           .from("user_profiles")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
-        if (error) throw error;
+        // Only throw error if it's not a "no rows returned" error
+        if (error && error.code !== 'PGRST116') throw error;
 
+        // Even if there's no data, we should show the profile page with a warning
         if (!data) {
-          router.push("/birth-chart");
+          // Create an empty profile to show the warning message
+          setProfile({
+            id: user.id,
+            full_name: '',
+            birth_date: '',
+            birth_time: null,
+            birth_location: '',
+            latitude: 0,
+            longitude: 0,
+            has_unknown_birth_time: true
+          });
           return;
         }
 
@@ -375,22 +387,21 @@ export default function ProfilePage() {
               </TabsContent>
 
               <TabsContent value="birthchart">
-                <Card className="bg-white/70 backdrop-blur-sm rounded-3xl">
+                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
                   <CardContent className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-semibold text-primary">Birth Chart</h2>
+                      <button
+                        onClick={() => setShowEditModal(true)}
+                        className="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </button>
+                    </div>
                     {isBirthDataIncomplete ? (
-                      <div className="text-center py-8">
-                        <AlertCircle className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Birth Information Required</h3>
-                        <p className="text-gray-600 mb-4">
-                          Please complete your birth information to view your birth chart.
-                        </p>
-                        <button
-                          onClick={() => setShowEditModal(true)}
-                          className="text-primary hover:text-primary/80 font-medium flex items-center gap-1 mx-auto"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Update Birth Details
-                        </button>
+                      <div className="text-gray-600">
+                        Please complete your birth information to view your birth chart.
                       </div>
                     ) : birthChartData ? (
                       <BirthChartResult
@@ -398,9 +409,8 @@ export default function ProfilePage() {
                         onBack={() => {}}
                       />
                     ) : (
-                      <div className="text-center py-8">
-                        <FileText className="h-12 w-12 mx-auto text-gray-400 mb-16" />
-                        <p className="text-gray-600">Loading birth chart data...</p>
+                      <div className="text-gray-600">
+                        Loading birth chart data...
                       </div>
                     )}
                   </CardContent>

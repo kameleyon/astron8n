@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { LocationSearch } from "@/components/LocationSearch";
 import { addDays } from "date-fns";
 import { supabase } from "@/lib/supabase";
@@ -168,20 +168,9 @@ export default function BirthChartModal({
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative animate-in slide-in-from-bottom duration-300">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
-        >
-          <X size={24} />
-        </button>
-
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Enter Your Birth Details
-          </h2>
-          <p className="text-sm text-gray-600">
-            Provide your birth info for accurate readings
-          </p>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Update Birth Details</h2>
+          
         </div>
 
         {error && (
