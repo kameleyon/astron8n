@@ -91,7 +91,7 @@ export async function generateAIResponse(messages: { role: string; content: stri
     );
 
     const payload: OpenRouterPayload = {
-      model: "deepseek/deepseek-r1-distill-llama-70b",
+      model: "deepseek/deepseek-r1-distill-qwen-32b",
       messages: [
         {
           role: "system",

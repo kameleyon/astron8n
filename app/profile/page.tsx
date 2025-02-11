@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, FileText, Edit } from "lucide-react";
+import { User, FileText, Edit, AlertCircle } from "lucide-react";
 import BirthChartModal from "@/components/BirthChartModal";
 import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
@@ -244,6 +244,8 @@ export default function ProfilePage() {
     }
   };
 
+  const isBirthDataIncomplete = !profile.birth_date || !profile.birth_location;
+
   return (
     <SessionProvider requireAuth>
       <div className="min-h-screen flex flex-col bg-gradient-to-r from-secondary to-accent">
@@ -306,27 +308,45 @@ export default function ProfilePage() {
                             <p className="mt-1 text-gray-900">{email}</p>
                           </div>
                         </div>
-
-                        <button
-                          className="mt-4 text-primary hover:underline flex items-center"
-                          onClick={() => setShowEditModal(true)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </button>
                       </div>
 
                       <div>
-                        <h3 className="text-lg font-semibold text-primary mb-4">
-                          Birth Information
-                        </h3>
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-semibold text-primary">
+                            Birth Information
+                          </h3>
+                          <button
+                            className="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+                            onClick={() => setShowEditModal(true)}
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit
+                          </button>
+                        </div>
+
+                        {isBirthDataIncomplete && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                            <p className="text-yellow-800 flex items-center gap-2">
+                              <AlertCircle className="h-5 w-5" />
+                              Your birth information is incomplete. Please update your details to get accurate readings.
+                            </p>
+                            <button
+                              onClick={() => setShowEditModal(true)}
+                              className="mt-2 text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+                            >
+                              <Edit className="h-4 w-4" />
+                              Update Birth Details
+                            </button>
+                          </div>
+                        )}
+
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
                             <label className="block text-sm font-medium text-gray-600">
                               Birth Date
                             </label>
                             <p className="mt-1 text-gray-900">
-                              {formatDate(profile.birth_date)}
+                              {profile.birth_date ? formatDate(profile.birth_date) : "Not provided"}
                             </p>
                           </div>
                           <div>
@@ -344,7 +364,7 @@ export default function ProfilePage() {
                               Birth Location
                             </label>
                             <p className="mt-1 text-gray-900">
-                              {profile.birth_location}
+                              {profile.birth_location || "Not provided"}
                             </p>
                           </div>
                         </div>
@@ -357,7 +377,22 @@ export default function ProfilePage() {
               <TabsContent value="birthchart">
                 <Card className="bg-white/70 backdrop-blur-sm rounded-3xl">
                   <CardContent className="p-6">
-                    {birthChartData ? (
+                    {isBirthDataIncomplete ? (
+                      <div className="text-center py-8">
+                        <AlertCircle className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Birth Information Required</h3>
+                        <p className="text-gray-600 mb-4">
+                          Please complete your birth information to view your birth chart.
+                        </p>
+                        <button
+                          onClick={() => setShowEditModal(true)}
+                          className="text-primary hover:text-primary/80 font-medium flex items-center gap-1 mx-auto"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Update Birth Details
+                        </button>
+                      </div>
+                    ) : birthChartData ? (
                       <BirthChartResult
                         data={birthChartData}
                         onBack={() => {}}
