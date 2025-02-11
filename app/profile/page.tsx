@@ -14,6 +14,7 @@ import { User, FileText, Edit, AlertCircle } from "lucide-react";
 import BirthChartModal from "@/components/BirthChartModal";
 import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
+import { calculateLifePath, getBirthCard } from "@/lib/utils/calculations";
 
 // This type is for the data we pass to the BirthChartModal form
 interface BirthChartFormData {
@@ -297,88 +298,105 @@ export default function ProfilePage() {
               </TabsList>
 
               <TabsContent value="personal">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
-                  <CardContent className="p-6">
-                    <div className="space-y-6">
-                      <div>
-                        <h2 className="text-xl font-semibold text-primary mb-4">
-                          Personal Information
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-600">
-                              Full Name
-                            </label>
-                            <p className="mt-1 text-gray-900">
-                              {profile.full_name}
-                            </p>
+                <Card className="bg-white/95 backdrop-blur-sm rounded-3xl mb-6 overflow-hidden">
+                  <CardContent className="p-0">
+                    {/* Personal Information Section */}
+                    <div className="p-8 border-b border-gray-100">
+                      <div className="flex justify-between items-start mb-6">
+                        <div>
+                          <h2 className="text-2xl font-semibold text-gray-900">
+                            {profile.full_name}
+                          </h2>
+                          <p className="text-gray-500 mt-1">{email}</p>
+                        </div>
+                        <button
+                          onClick={() => setShowEditModal(true)}
+                          className="text-primary hover:text-primary/80 flex items-center gap-1.5 transition-colors text-sm"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Edit Profile
+                        </button>
+                      </div>
+
+                      {isBirthDataIncomplete && (
+                        <div className="bg-yellow-50/50 border border-yellow-200 rounded-xl p-4 mb-6">
+                          <p className="text-yellow-800 flex items-center gap-2 text-sm">
+                            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                            Please complete your birth information to get accurate readings
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-900 mb-4">Birth Details</h3>
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm text-gray-500">Birth Date</p>
+                              <p className="text-gray-900 mt-0.5">
+                                {profile.birth_date ? formatDate(profile.birth_date) : "Not provided"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Birth Time</p>
+                              <p className="text-gray-900 mt-0.5">
+                                {profile.has_unknown_birth_time ? "Not provided" : profile.birth_time}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Birth Location</p>
+                              <p className="text-gray-900 mt-0.5">
+                                {profile.birth_location || "Not provided"}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-600">
-                              Email
-                            </label>
-                            <p className="mt-1 text-gray-900">{email}</p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-900 mb-4">Astrological Profile</h3>
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm text-gray-500">Sun Sign</p>
+                              <p className="text-gray-900 mt-0.5">
+                                {birthChartData?.planets.find(p => p.name === "Sun")?.sign || "Not available"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Moon Sign</p>
+                              <p className="text-gray-900 mt-0.5">
+                                {birthChartData?.planets.find(p => p.name === "Moon")?.sign || "Not available"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Ascendant</p>
+                              <p className="text-gray-900 mt-0.5">
+                                {birthChartData?.ascendant?.sign || "Not available"}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      <div>
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="text-lg font-semibold text-primary">
-                            Birth Information
-                          </h3>
-                          <button
-                            className="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
-                            onClick={() => setShowEditModal(true)}
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit
-                          </button>
+                    {/* Spiritual Profile Section */}
+                    <div className="p-8 bg-gray-50/50">
+                      <h3 className="text-lg font-medium text-gray-900 mb-6">Spiritual Profile</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white rounded-xl p-4 shadow-sm">
+                          <p className="text-sm text-gray-500 mb-1">Human Design</p>
+                          <p className="text-gray-900 font-medium">Coming soon</p>
                         </div>
-
-                        {isBirthDataIncomplete && (
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                            <p className="text-yellow-800 flex items-center gap-2">
-                              <AlertCircle className="h-5 w-5" />
-                              Your birth information is incomplete. Please update your details to get accurate readings.
-                            </p>
-                            <button
-                              onClick={() => setShowEditModal(true)}
-                              className="mt-2 text-primary hover:text-primary/80 font-medium flex items-center gap-1"
-                            >
-                              <Edit className="h-4 w-4" />
-                              Update Birth Details
-                            </button>
-                          </div>
-                        )}
-
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-600">
-                              Birth Date
-                            </label>
-                            <p className="mt-1 text-gray-900">
-                              {profile.birth_date ? formatDate(profile.birth_date) : "Not provided"}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-600">
-                              Birth Time
-                            </label>
-                            <p className="mt-1 text-gray-900">
-                              {profile.has_unknown_birth_time
-                                ? "Not provided"
-                                : profile.birth_time}
-                            </p>
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-600">
-                              Birth Location
-                            </label>
-                            <p className="mt-1 text-gray-900">
-                              {profile.birth_location || "Not provided"}
-                            </p>
-                          </div>
+                        <div className="bg-white rounded-xl p-4 shadow-sm">
+                          <p className="text-sm text-gray-500 mb-1">Life Path Number</p>
+                          <p className="text-gray-900 font-medium">
+                            {profile.birth_date ? calculateLifePath(profile.birth_date) : "Not available"}
+                          </p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4 shadow-sm">
+                          <p className="text-sm text-gray-500 mb-1">Birth Card</p>
+                          <p className="text-gray-900 font-medium">
+                            {profile.birth_date ? getBirthCard(profile.birth_date) : "Not available"}
+                          </p>
                         </div>
                       </div>
                     </div>
