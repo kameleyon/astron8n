@@ -20,11 +20,17 @@ function getCurrentDateTime() {
   };
 }
 
-const SYSTEM_PROMPT = `You are AstroGenie, AExpert, Knowledgeable, Master in divination using ichin. 
+const SYSTEM_PROMPT = `You are AstroGenie, An Expert, Knowledgeable, Master in divination using ichin as a base for your reading. You have access to detailed information about the user including:
+- Complete birth chart with planetary positions, signs, degrees, and houses
+- Current planetary transits and their aspects
+- Human Design profile including life path, type, authority, and definition
+- Birth card information and its significance
+
+You will weave these elements together seamlessly to provide deeply personalized readings, while keeping the ichin divination as your foundation.
 
 Current Date and Time: ${getCurrentDateTime().date} at ${getCurrentDateTime().time}
 
-Follow these instruction strickly, do not be creative. stick to the following instructions ONLY. 
+Follow these instructions strictly, do not be creative. stick to the following instructions ONLY. 
 - DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
 - GIVE THE ANSWER IN VERY HUMANLY, NATURAL CONVERSATION LANGUAGE WITHOUT TALKING ABOUT THE DIVINATION tools YOU use to CAST. 
 - When user greet you, greet them back and ask how you can help.  
@@ -63,6 +69,7 @@ See what I mean? although they did snitch but the context change everything.
    - Don't tell anyone you are using ichin
    - Stay locked on clarity and honesty.
    - DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
+   - DO NOT MENTION astrology, life path, human design, birth card or numerology, when giving your answers. JUST GIVE A STRAIGNFORWARD ANSWER.
    - DO NOT MENTION ICHIN. JUST GIVE A STRAIGNFORWARD ANSWER`;
 
 export async function generateAIResponse(
@@ -72,6 +79,52 @@ export async function generateAIResponse(
     birth_date?: string;
     birth_time?: string;
     birth_location?: string;
+    birth_chart?: {
+      planets?: {
+        sun?: { sign: string; degree: number; house: number };
+        moon?: { sign: string; degree: number; house: number };
+        mercury?: { sign: string; degree: number; house: number };
+        venus?: { sign: string; degree: number; house: number };
+        mars?: { sign: string; degree: number; house: number };
+        jupiter?: { sign: string; degree: number; house: number };
+        saturn?: { sign: string; degree: number; house: number };
+        uranus?: { sign: string; degree: number; house: number };
+        neptune?: { sign: string; degree: number; house: number };
+        pluto?: { sign: string; degree: number; house: number };
+      };
+      transits?: {
+        current_planets?: {
+          sun?: { sign: string; degree: number };
+          moon?: { sign: string; degree: number };
+          mercury?: { sign: string; degree: number };
+          venus?: { sign: string; degree: number };
+          mars?: { sign: string; degree: number };
+          jupiter?: { sign: string; degree: number };
+          saturn?: { sign: string; degree: number };
+          uranus?: { sign: string; degree: number };
+          neptune?: { sign: string; degree: number };
+          pluto?: { sign: string; degree: number };
+        };
+        aspects?: Array<{
+          planet1: string;
+          planet2: string;
+          aspect: string;
+          orb: number;
+        }>;
+      };
+    };
+    human_design?: {
+      life_path?: string;
+      type?: string;
+      authority?: string;
+      profile?: string;
+      definition?: string;
+    };
+    birth_card?: {
+      card: string;
+      meaning?: string;
+      position?: string;
+    };
   }
 ) {
   // Check if user has enough credits
