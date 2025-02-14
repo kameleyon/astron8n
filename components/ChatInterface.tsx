@@ -8,6 +8,7 @@ import { Message } from "@/types/chat";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { checkUserCredits } from "@/lib/utils/credits";
+import ReactMarkdown from 'react-markdown';
 
 const suggestedQuestions = [
   "Will I get the job at the dealership",
@@ -234,7 +235,26 @@ export default function ChatInterface() {
                     : 'bg-[#FFF3E0] text-gray-800'
                 }`}
               >
-                {message.content}
+                {message.role === 'assistant' ? (
+                  <ReactMarkdown
+                    className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2"
+                    components={{
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
+                      li: ({ children }) => <li className="mb-1">{children}</li>,
+                      h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                      strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                      em: ({ children }) => <em className="italic">{children}</em>,
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                ) : (
+                  message.content
+                )}
               </div>
             </div>
           ))}
