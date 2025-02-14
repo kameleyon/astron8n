@@ -13,53 +13,65 @@ export async function POST(request: Request) {
       );
     }
 
-    // Destructure after validation
-    const { userId, ...birthChartData } = data;
     
-    // Check if user profile exists
-    const { data: existingProfile } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+   // Validate input data before destructuring
+if (!data) {
+  throw new Error("Invalid input: data is undefined or null");
+}
 
-    // Prepare profile data
-    const profileData = {
-      id: userId,
-      full_name: birthChartData.full_name,
-      birth_date: birthChartData.birth_date,
-      birth_time: birthChartData.birth_time === '' ? null : birthChartData.birth_time,
-      birth_location: birthChartData.birth_location,
-      latitude: birthChartData.latitude,
-      longitude: birthChartData.longitude,
-      has_unknown_birth_time: birthChartData.hasUnknownBirthTime,
-      updated_at: new Date().toISOString(),
-    };
+// Destructure after validation
+const { userId, ...birthChartData } = data;
 
-    // If profile doesn't exist, add additional fields for new users
-    if (!existingProfile) {
-      Object.assign(profileData, {
-        has_accepted_terms: true,
-        created_at: new Date().toISOString(),
-        timezone: null,
-        acknowledged: true,
-        subscription_start_date: null,
-        trial_expires_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        next_payment_date: null
-      });
-    }
+// Check if user profile exists
+const { data: existingProfile, error: fetchError } = await supabase
+  .from("user_profiles")
+  .select("*")
+  .eq("id", userId)
+  .limit(1);
 
-    // Update or insert user profile
-    if (existingProfile) {
-      await supabase
-        .from('user_profiles')
-        .update(profileData)
-        .eq('id', userId);
-    } else {
-      await supabase
-        .from('user_profiles')
-        .insert([profileData]);
-    }
+if (fetchError && fetchError.code !== "PGRST116") {
+  console.error("Error fetching profile:", fetchError);
+  throw new Error("Failed to fetch user profile");
+}
+
+// Prepare profile data
+const profileData = {
+  id: userId,
+  full_name: birthChartData.full_name,
+  birth_date: birthChartData.birth_date,
+  birth_time: !birthChartData.birth_time || birthChartData.birth_time === "" ? null : birthChartData.birth_time,
+  birth_location: birthChartData.birth_location,
+  latitude: birthChartData.latitude,
+  longitude: birthChartData.longitude,
+  has_unknown_birth_time: birthChartData.hasUnknownBirthTime ?? false, // Ensures default value
+  updated_at: new Date().toISOString(),
+};
+
+// If profile doesn't exist, add additional fields for new users
+if (!existingProfile) {
+  Object.assign(profileData, {
+    has_accepted_terms: true,
+    created_at: new Date().toISOString(),
+    timezone: null,
+    acknowledged: true,
+    subscription_start_date: null,
+    trial_expires_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    next_payment_date: null,
+  });
+}
+
+console.log("Upserting profile with ID:", profileData.id);
+
+// Update or insert user profile
+const { error: upsertError } = await supabase
+  .from("user_profiles")
+  .upsert (profileData);
+
+if (upsertError) {
+  console.error("Error in upsert:", upsertError);
+  throw new Error("Failed to save birth chart data: user defined");
+}
+
 
     // Check credit balance for existing users
 if (existingProfile) {

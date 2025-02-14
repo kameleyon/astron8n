@@ -52,7 +52,7 @@ export default function BirthChartModal({
         .from('user_profiles')
         .select()
         .eq('id', userId)
-        .single();
+        .limit(1);
 
       const profileData = {
         id: userId,
@@ -75,17 +75,24 @@ export default function BirthChartModal({
           .from('user_profiles')
           .update(profileData)
           .eq('id', userId));
-      } else {
+      } /*else {
         // Insert new profile
         ({ error } = await supabase
           .from('user_profiles')
           .insert(profileData));
-      }
+      }*/
 
-      if (error) throw error;
+      /*console.log("Upserting profile from Modal with ID:", profileData.id);
+
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert(profileData);*/
+
     } catch (error) {
       console.error('Error saving user profile:', error);
-      throw error;
+      //throw error;
+    
+      throw new Error("Error saving user profile:");
     }
   };
 
@@ -115,6 +122,7 @@ export default function BirthChartModal({
       });
 
       if (error) throw error;
+
     } catch (error) {
       console.error('Error saving user credits:', error);
       throw error;
