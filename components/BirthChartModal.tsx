@@ -52,7 +52,7 @@ export default function BirthChartModal({
         .from('user_profiles')
         .select()
         .eq('id', userId)
-        .single();
+        .limit(1);
 
       const profileData = {
         id: userId,
@@ -75,17 +75,22 @@ export default function BirthChartModal({
           .from('user_profiles')
           .update(profileData)
           .eq('id', userId));
-      } else {
+      } /*else {
         // Insert new profile
         ({ error } = await supabase
           .from('user_profiles')
           .insert(profileData));
-      }
+      }*/
+      /*console.log("Upserting profile from Modal with ID:", profileData.id);
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert(profileData);*/
 
-      if (error) throw error;
     } catch (error) {
       console.error('Error saving user profile:', error);
-      throw error;
+      //throw error;
+    
+      throw new Error("Error saving user profile:");
     }
   };
 
@@ -104,7 +109,7 @@ export default function BirthChartModal({
       }
 
       const trialEndDate = addDays(new Date(), 3);
-      
+
       const { error } = await supabase.from('user_credits').insert({
         user_id: userId,
         total_credits: 5000,
@@ -134,7 +139,7 @@ export default function BirthChartModal({
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         setError("User not authenticated");
         setIsLoading(false);
@@ -170,7 +175,7 @@ export default function BirthChartModal({
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative animate-in slide-in-from-bottom duration-300">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Update Birth Details</h2>
-          
+
         </div>
 
         {error && (

@@ -26,7 +26,21 @@ const SYSTEM_PROMPT = `You are AstroGenie, An Expert, Knowledgeable, Master in d
 - Human Design profile including life path, type, authority, and definition
 - Birth card information and its significance
 
-You will weave these elements together seamlessly to provide deeply personalized readings, while keeping the ichin divination as your foundation.
+You will weave these elements together seamlessly to provide deeply personalized readings, while keeping the ichin divination as your foundation. For any questions involving timing or future events, use your internet access to research current and upcoming planetary transits for that specific time period, and analyze how they interact with the user's natal chart positions provided above.
+
+When providing readings, consider the user's unique astrological profile:
+- Analyze the positions of planets in signs and houses
+- Consider the aspects between planets
+- For time-based questions (e.g. "this week", "next month", "in 3 months"):
+  * Use your internet access to check real-time planetary positions and upcoming transits
+  * Consider how these transits will interact with the user's natal chart
+  * Pay special attention to transiting planets in angular houses and major aspects
+- Integrate this with the user's Human Design and birth card information
+
+Remember to:
+1. Always check current and upcoming transits when the question involves timing
+2. Consider transit-to-natal aspects for the specific time period mentioned
+3. Maintain a natural, conversational tone while incorporating these insights
 
 Current Date and Time: ${getCurrentDateTime().date} at ${getCurrentDateTime().time}
 
@@ -55,7 +69,12 @@ See what I mean? although they did snitch but the context change everything.
 4. Structure  
    - Start with the main insight, no lengthy preamble.  
    - Give direct guidance.   
-  - keep it as a text message
+   - Keep it as a text message
+   - For time-based questions:
+     * Extract the time period mentioned (e.g., "this week", "next 3 months")
+     * Use your internet access to research planetary positions for that period
+     * Consider how these transits interact with the natal chart
+     * Include this analysis in your response without mentioning astrology
 
 5. Boundaries  
    - Only answer what they specifically ask.  
@@ -154,12 +173,46 @@ export async function generateAIResponse(
       `Current Date and Time: ${currentDateTime.date} at ${currentDateTime.time}\n`
     );
 
+    // Prepare birth chart context
+    let birthChartContext = '';
+    if (userProfile?.birth_chart?.planets) {
+      const planets = userProfile.birth_chart.planets;
+      birthChartContext = `
+User's Birth Chart:
+Planets:
+${Object.entries(planets)
+  .filter(([_, data]) => data)
+  .map(([planet, data]: [string, any]) => 
+    `- ${planet.charAt(0).toUpperCase() + planet.slice(1)}: ${data.sign} (${data.degree}°) in House ${data.house}`
+  ).join('\n')}
+
+${userProfile.birth_chart.transits?.aspects ? `
+Aspects:
+${userProfile.birth_chart.transits.aspects
+  .map((aspect: any) => 
+    `- ${aspect.planet1} ${aspect.aspect} ${aspect.planet2} (orb: ${aspect.orb}°)`
+  ).join('\n')}
+` : ''}
+
+${userProfile.human_design ? `
+Human Design:
+- Type: ${userProfile.human_design.type || 'Unknown'}
+- Authority: ${userProfile.human_design.authority || 'Unknown'}
+- Profile: ${userProfile.human_design.profile || 'Unknown'}
+` : ''}
+
+${userProfile.birth_card ? `
+Birth Card: ${userProfile.birth_card.card}
+${userProfile.birth_card.meaning ? `Meaning: ${userProfile.birth_card.meaning}` : ''}
+` : ''}`;
+    }
+
     const payload: OpenRouterPayload = {
-      model: "qwen/qwen-plus",
+      model: "perplexity/llama-3.1-sonar-small-128k-online",
       messages: [
         {
           role: "system",
-          content: updatedSystemPrompt
+          content: updatedSystemPrompt + (birthChartContext ? `\n\nCurrent User's Information:\n${birthChartContext}` : '')
         },
         ...messages
       ],
