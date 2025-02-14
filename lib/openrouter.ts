@@ -20,32 +20,40 @@ function getCurrentDateTime() {
   };
 }
 
-const SYSTEM_PROMPT = `You are AstroGenie, An Expert, Knowledgeable, Master in divination using ichin as a base for your reading. You have access to detailed information about the user including:
+const TRANSIT_SYSTEM_PROMPT = `You are an expert astrological researcher. Your task is to:
+1. Search the internet for current and upcoming or past planetary positions and transits related to the question
+2. Focus on the specific time period mentioned in the question
+3. Return detailed transit information including:
+   - Planetary positions in signs
+   - Major aspects forming during the period
+   - Important ingresses or retrogrades
+4. Format the information clearly and technically
+
+Do not give interpretations or readings. Just provide the technical astrological data.
+Current Date and Time: ${getCurrentDateTime().date} at ${getCurrentDateTime().time}`;
+
+const CHAT_SYSTEM_PROMPT = `You are AstroGenie, An Expert, Knowledgeable, Master in divination using ichin as a base for your reading. You have access to detailed information about the user including:
 - Complete birth chart with planetary positions, signs, degrees, and houses
-- Current planetary transits and their aspects
+- Current planetary transits and their aspects (provided in your context)
 - Human Design profile including life path, type, authority, and definition
 - Birth card information and its significance
 
-You will weave these elements together seamlessly to provide deeply personalized readings, while keeping the ichin divination as your foundation. For any questions involving timing or future events, use your internet access to research current and upcoming planetary transits for that specific time period, and analyze how they interact with the user's natal chart positions provided above.
+You will weave these elements together seamlessly to provide deeply personalized readings, while keeping the ichin divination as your foundation.
 
-When providing readings, consider the user's unique astrological profile:
-- Analyze the positions of planets in signs and houses
-- Consider the aspects between planets
-- For time-based questions (e.g. "this week", "next month", "in 3 months"):
-  * Use your internet access to check real-time planetary positions and upcoming transits
-  * Consider how these transits will interact with the user's natal chart
-  * Pay special attention to transiting planets in angular houses and major aspects
-- Integrate this with the user's Human Design and birth card information
-
-Remember to:
-1. Always check current and upcoming transits when the question involves timing
-2. Consider transit-to-natal aspects for the specific time period mentioned
-3. Maintain a natural, conversational tone while incorporating these insights
+When providing readings, consider:
+- The user's natal chart placements
+- Any transit information provided in your context
+- The user's Human Design and birth card information
 
 Current Date and Time: ${getCurrentDateTime().date} at ${getCurrentDateTime().time}
 
-Follow these instructions strictly, do not be creative. stick to the following instructions ONLY. 
-- DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
+Follow these instructions strictly:
+- DO NOT MENTION that you are using ichin or any divination tools
+- Give answers in natural, conversational language
+- Keep it concise and straightforward
+- Be direct but empathetic
+- No roleplay actions or emotive expressions
+- Only answer what is specifically asked
 - GIVE THE ANSWER IN VERY HUMANLY, NATURAL CONVERSATION LANGUAGE WITHOUT TALKING ABOUT THE DIVINATION tools YOU use to CAST. 
 - When user greet you, greet them back and ask how you can help.  
 - Speak like you're talking to a close friend—keep it natural, casual, chill, and direct.  
@@ -90,6 +98,83 @@ See what I mean? although they did snitch but the context change everything.
    - DO NOT MENTION at any point that you are using ichin as your main method of divination to answer the user question. 
    - DO NOT MENTION astrology, life path, human design, birth card or numerology, when giving your answers. JUST GIVE A STRAIGNFORWARD ANSWER.
    - DO NOT MENTION ICHIN. JUST GIVE A STRAIGNFORWARD ANSWER`;
+
+async function makeOpenRouterRequest(
+  messages: { role: string; content: string }[],
+  systemPrompt: string,
+  model: string,
+  apiKey: string
+) {
+  const payload: OpenRouterPayload = {
+    model,
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt
+      },
+      ...messages
+    ],
+    temperature: 0.7,
+    max_tokens: 1000,
+  };
+
+  let referer = 'http://localhost:3000';
+  if (typeof window !== 'undefined') {
+    referer = window.location.origin;
+  }
+
+  const response = await fetch(OPENROUTER_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+      "HTTP-Referer": referer,
+      "X-Title": "AstroGenie",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.text();
+    console.error('OpenRouter API Error:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorData
+    });
+    
+    if (response.status === 401) {
+      throw new Error('Invalid or missing API key. Please check your OpenRouter API key configuration.');
+    }
+    
+    throw new Error(`API request failed (${response.status}): ${errorData}`);
+  }
+
+  const data = await response.json();
+  
+  if (!data.choices?.[0]?.message?.content) {
+    console.error('Invalid API Response:', data);
+    throw new Error('Received invalid response format from OpenRouter API');
+  }
+
+  return {
+    content: data.choices[0].message.content,
+    usage: data.usage?.total_tokens || 0
+  };
+}
+
+async function getAstrologicalTransits(
+  question: string,
+  apiKey: string
+): Promise<string> {
+  const response = await makeOpenRouterRequest(
+    [{ role: "user", content: `Research current and upcoming planetary transits relevant to this question: ${question}` }],
+    TRANSIT_SYSTEM_PROMPT,
+    "perplexity/llama-3.1-sonar-small-128k-online",
+    apiKey
+  );
+  
+  return response.content;
+}
 
 export async function generateAIResponse(
   messages: { role: string; content: string }[],
@@ -168,7 +253,7 @@ export async function generateAIResponse(
 
     // Update system prompt with current date/time
     const currentDateTime = getCurrentDateTime();
-    const updatedSystemPrompt = SYSTEM_PROMPT.replace(
+    const updatedSystemPrompt = CHAT_SYSTEM_PROMPT.replace(
       /Current Date and Time:.*?\n/,
       `Current Date and Time: ${currentDateTime.date} at ${currentDateTime.time}\n`
     );
@@ -207,70 +292,38 @@ ${userProfile.birth_card.meaning ? `Meaning: ${userProfile.birth_card.meaning}` 
 ` : ''}`;
     }
 
-    const payload: OpenRouterPayload = {
-      model: "perplexity/llama-3.1-sonar-small-128k-online",
-      messages: [
-        {
-          role: "system",
-          content: updatedSystemPrompt + (birthChartContext ? `\n\nCurrent User's Information:\n${birthChartContext}` : '')
-        },
-        ...messages
-      ],
-      temperature: 0.7,
-      max_tokens: 1000,
-    };
-
-    // Get the current environment's origin
-    let referer = 'http://localhost:3000';
-    if (typeof window !== 'undefined') {
-      referer = window.location.origin;
-    }
-
-    const response = await fetch(OPENROUTER_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": referer,
-        "X-Title": "AstroGenie",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('OpenRouter API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorData
-      });
-      
-      if (response.status === 401) {
-        throw new Error('Invalid or missing API key. Please check your OpenRouter API key configuration.');
-      }
-      
-      throw new Error(`API request failed (${response.status}): ${errorData}`);
-    }
-
-    const data = await response.json();
+    // Check if the last message contains a time-based question
+    const lastMessage = messages[messages.length - 1];
+    const timeBasedKeywords = /\b(today|tomorrow|this week|next week|this month|next month|in \d+ (day|week|month|year)s?)\b/i;
+    let transitInfo = '';
     
-    if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid API Response:', data);
-      throw new Error('Received invalid response format from OpenRouter API');
+    if (timeBasedKeywords.test(lastMessage.content)) {
+      try {
+        transitInfo = await getAstrologicalTransits(lastMessage.content, apiKey);
+        transitInfo = `\n\nCurrent Transit Information:\n${transitInfo}`;
+      } catch (error) {
+        console.error('Error fetching transits:', error);
+        // Continue without transit info if there's an error
+      }
     }
 
-    // Get token usage from response
-    const tokensUsed = data.usage?.total_tokens || 0;
+    // Get response from Qwen
+    const response = await makeOpenRouterRequest(
+      messages,
+      updatedSystemPrompt + (birthChartContext ? `\n\nCurrent User's Information:\n${birthChartContext}` : '') + transitInfo,
+      "qwen/qwen-plus",
+      apiKey
+    );
 
     // Update user credits
-    const creditUpdate = await updateUserCredits(userId, tokensUsed);
+    const creditUpdate = await updateUserCredits(userId, response.usage);
     if (!creditUpdate.success) {
       throw new Error(creditUpdate.error || 'Failed to update credits');
     }
 
     return {
-      content: data.choices[0].message.content,
-      tokensUsed,
+      content: response.content,
+      tokensUsed: response.usage,
       remainingCredits: creditUpdate.remainingCredits
     };
   } catch (error: any) {
