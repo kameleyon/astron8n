@@ -100,8 +100,8 @@ export async function POST(req: Request) {
           },
         ],
         mode: 'payment',
-        success_url: `${NEXT_PUBLIC_URL}/reports/success?session_id={CHECKOUT_SESSION_ID}&report_type=${reportType}`,
-        cancel_url: `${NEXT_PUBLIC_URL}/reports`,
+        success_url: `https://www.astrogenie.ai/reports/success?session_id={CHECKOUT_SESSION_ID}&report_type=${reportType}`,
+        cancel_url: `https://www.astrogenie.ai/reports`,
         metadata: {
           userId: user.id,
           reportType: reportType,

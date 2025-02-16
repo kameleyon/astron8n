@@ -250,13 +250,29 @@ function ReportCard({ report, isActive }: ReportCardProps) {
 
       const priceId = PRICE_IDS[report.id];
       if (!priceId) {
-        throw new Error('Invalid report type');
+        setError('This report is currently unavailable. Please try another report.');
+        return;
       }
 
-      await createCheckoutSession(priceId, report.id, session.access_token);
+      try {
+        await createCheckoutSession(priceId, report.id, session.access_token);
+      } catch (checkoutError) {
+        if (checkoutError instanceof Error) {
+          if (checkoutError.message.includes('STRIPE_PUBLISHABLE_KEY')) {
+            setError('Payment system is currently unavailable. Please try again later.');
+          } else if (checkoutError.message.includes('401')) {
+            router.push('/auth');
+            setError('Your session has expired. Please log in again.');
+          } else {
+            setError(checkoutError.message);
+          }
+        } else {
+          setError('An unexpected error occurred. Please try again later.');
+        }
+      }
     } catch (err) {
       console.error('Error generating report:', err);
-      setError('Failed to generate report. Please try again.');
+      setError('Failed to generate report. Please try again later.');
     } finally {
       setLoading(false);
     }

@@ -61,23 +61,47 @@ export async function POST(req: Request) {
         throw new Error('Missing metadata in Stripe session');
       }
 
-      // Save payment information
-      const { error: paymentError } = await supabase
-        .from('payments')
-        .insert({
-          user_id: userId,
-          stripe_session_id: session.id,
-          payment_intent: session.payment_intent as string,
-          amount: session.amount_total || 0,
-          status: 'succeeded',
-          report_type: reportType,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
+      console.log(`Processing webhook for session ${session.id}, user ${userId}, report ${reportType}`);
 
-      if (paymentError) {
-        console.error('Error saving payment:', paymentError);
-        throw paymentError;
+      // Check if payment already exists
+      const { data: existingPayment, error: checkError } = await supabase
+        .from('payments')
+        .select('id, status')
+        .eq('stripe_session_id', session.id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing payment:', checkError);
+        throw checkError;
+      }
+
+      if (!existingPayment) {
+        console.log(`Creating new payment record for session ${session.id}`);
+        
+        // Save payment information
+        const { data: newPayment, error: paymentError } = await supabase
+          .from('payments')
+          .insert({
+            user_id: userId,
+            stripe_session_id: session.id,
+            payment_intent: session.payment_intent as string,
+            amount: session.amount_total || 0,
+            status: 'succeeded',
+            report_type: reportType,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (paymentError) {
+          console.error('Error saving payment:', paymentError);
+          throw paymentError;
+        }
+
+        console.log(`Successfully created payment record:`, newPayment);
+      } else {
+        console.log(`Payment already exists for session ${session.id}, status: ${existingPayment.status}`);
       }
     }
 

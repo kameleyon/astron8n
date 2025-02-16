@@ -36,52 +36,66 @@ function ReportSuccessContent() {
         const retryInterval = 2000; // 2 seconds
 
         while (Date.now() - startTime < maxWaitTime) {
-          const { data: payment, error: paymentError } = await supabase
-            .from('payments')
-            .select('status')
-            .eq('stripe_session_id', sessionId)
-            .eq('user_id', userId)
-            .single();
+          try {
+            const { data: payments, error: paymentError } = await supabase
+              .from('payments')
+              .select('status')
+              .eq('stripe_session_id', sessionId)
+              .eq('user_id', userId);
 
-          if (paymentError) {
-            console.error('Error checking payment status:', paymentError);
-          } else if (payment?.status === 'succeeded') {
-            // Payment confirmed, generate report
-            const response = await fetch('/api/reports/generate', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.access_token}`
-              },
-              body: JSON.stringify({
-                userId,
-                userName: session.user.email?.split('@')[0] || 'user',
-                sessionId,
-                reportType,
-              }),
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || 'Failed to generate report');
+            if (paymentError) {
+              console.error('Error checking payment status:', paymentError);
+              throw paymentError;
             }
 
-            const data = await response.json();
+            const payment = payments?.[0];
 
-            // Download the PDF
-            const pdfBytes = atob(data.pdfBytes);
-            const pdfBlob = new Blob([new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)))], { type: 'application/pdf' });
-            const downloadUrl = window.URL.createObjectURL(pdfBlob);
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = data.fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(downloadUrl);
+            if (!payment) {
+              console.log(`Payment not found for session ${sessionId}, attempt ${Math.floor((Date.now() - startTime) / retryInterval)}`);
+              await new Promise(resolve => setTimeout(resolve, retryInterval));
+              continue;
+            }
 
-            setLoading(false);
-            return;
+            if (payment.status === 'succeeded') {
+              // Payment confirmed, generate report
+              const response = await fetch('/api/reports/generate', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                  userId,
+                  userName: session.user.email?.split('@')[0] || 'user',
+                  sessionId,
+                  reportType,
+                }),
+              });
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate report');
+              }
+
+              const data = await response.json();
+
+              // Download the PDF
+              const pdfBytes = atob(data.pdfBytes);
+              const pdfBlob = new Blob([new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)))], { type: 'application/pdf' });
+              const downloadUrl = window.URL.createObjectURL(pdfBlob);
+              const link = document.createElement('a');
+              link.href = downloadUrl;
+              link.download = data.fileName;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(downloadUrl);
+
+              setLoading(false);
+              return;
+            }
+          } catch (error) {
+            console.error('Error in payment check iteration:', error);
           }
 
           // Wait before retrying
@@ -91,13 +105,13 @@ function ReportSuccessContent() {
         throw new Error('Payment processing is taking longer than expected. Please check your profile in a few minutes to access your report.');
       } catch (err) {
         console.error('Error generating report:', err);
-        setError('Failed to generate report. Please contact support.');
+        setError(err instanceof Error ? err.message : 'Failed to generate report. Please contact support.');
         setLoading(false);
       }
     };
 
     checkPaymentAndGenerateReport();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-secondary to-accent p-4">

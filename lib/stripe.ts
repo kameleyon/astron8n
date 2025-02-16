@@ -4,20 +4,33 @@ import { supabase } from './supabase';
 // Initialize Stripe
 let stripeInstance: Promise<Stripe | null> | null = null;
 
-export const getStripe = () => {
+export const getStripe = async () => {
   if (!stripeInstance) {
     const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
     if (!key) {
-      console.error('Stripe publishable key is not set');
-      return null;
+      throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set');
     }
     stripeInstance = loadStripe(key);
   }
-  return stripeInstance;
+  const stripe = await stripeInstance;
+  if (!stripe) {
+    throw new Error('Failed to initialize Stripe');
+  }
+  return stripe;
 };
 // Create Stripe Checkout Session
 export const createCheckoutSession = async (priceId: string, reportType: string, accessToken: string) => {
   try {
+    // Validate inputs
+    if (!priceId || !reportType || !accessToken) {
+      throw new Error('Missing required parameters for checkout session');
+    }
+
+    // Ensure price ID format is valid
+    if (!priceId.startsWith('price_')) {
+      throw new Error('Invalid price ID format');
+    }
+
     const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: {
@@ -33,19 +46,21 @@ export const createCheckoutSession = async (priceId: string, reportType: string,
     const data = await response.json();
 
     if (!response.ok) {
-      const error = data.error || 'Failed to create checkout session';
-      throw new Error(error);
+      throw new Error(data.error || `Failed to create checkout session: ${response.status}`);
     }
 
-    if (data.url) {
-      window.location.href = data.url;
-      return;
+    if (!data.url) {
+      throw new Error('No checkout URL received from server');
     }
 
-    throw new Error('No checkout URL received');
+    // Redirect to Stripe checkout
+    window.location.href = data.url;
   } catch (error) {
     console.error('Error creating checkout session:', error);
-    throw error;
+    if (error instanceof Error) {
+      throw new Error(`Checkout failed: ${error.message}`);
+    }
+    throw new Error('An unexpected error occurred during checkout');
   }
 };
 // Handle subscription status
