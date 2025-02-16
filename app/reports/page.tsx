@@ -223,53 +223,14 @@ function ReportCard({ report, isActive }: ReportCardProps) {
       setLoading(true);
       setError(null);
 
-      // Get the current session with retry
-      let session;
-      for (let i = 0; i < 3; i++) {
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          continue;
-        }
-
-        if (sessionData.session) {
-          session = sessionData.session;
-          break;
-        }
-
-        // Wait a bit before retrying
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push('/auth');
         setError('Please log in to generate a report.');
         return;
       }
 
-      const priceId = PRICE_IDS[report.id];
-      if (!priceId) {
-        setError('This report is currently unavailable. Please try another report.');
-        return;
-      }
-
-      try {
-        await createCheckoutSession(priceId, report.id, session.access_token);
-      } catch (checkoutError) {
-        if (checkoutError instanceof Error) {
-          if (checkoutError.message.includes('STRIPE_PUBLISHABLE_KEY')) {
-            setError('Payment system is currently unavailable. Please try again later.');
-          } else if (checkoutError.message.includes('401')) {
-            router.push('/auth');
-            setError('Your session has expired. Please log in again.');
-          } else {
-            setError(checkoutError.message);
-          }
-        } else {
-          setError('An unexpected error occurred. Please try again later.');
-        }
-      }
+      router.push(`/reports/success?report_type=${report.id}`);
     } catch (err) {
       console.error('Error generating report:', err);
       setError('Failed to generate report. Please try again later.');

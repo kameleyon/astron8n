@@ -99,20 +99,28 @@ export async function POST(req: Request) {
             quantity: 1,
           },
         ],
-        mode: 'payment',
-        success_url: `https://www.astrogenie.ai/reports/success?session_id={CHECKOUT_SESSION_ID}&report_type=${reportType}`,
-        cancel_url: `https://www.astrogenie.ai/reports`,
+        mode: reportType === 'subscription' ? 'subscription' : 'payment',
+        success_url: reportType === 'subscription' 
+          ? `${process.env.NEXT_PUBLIC_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`
+          : `${process.env.NEXT_PUBLIC_URL}/reports/success?session_id={CHECKOUT_SESSION_ID}&report_type=${reportType}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_URL}${reportType === 'subscription' ? '/billing' : '/reports'}`,
         metadata: {
           userId: user.id,
           reportType: reportType,
           userEmail: user.email
         },
-        payment_intent_data: {
+        subscription_data: reportType === 'subscription' ? {
           metadata: {
             userId: user.id,
             reportType: reportType
           }
-        }
+        } : undefined,
+        payment_intent_data: reportType !== 'subscription' ? {
+          metadata: {
+            userId: user.id,
+            reportType: reportType
+          }
+        } : undefined
       };
 
       checkoutSession = await stripe.checkout.sessions.create(sessionParams);

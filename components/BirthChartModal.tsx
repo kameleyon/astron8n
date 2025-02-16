@@ -5,6 +5,7 @@ import { AlertCircle } from "lucide-react";
 import { LocationSearch } from "@/components/LocationSearch";
 import { addDays } from "date-fns";
 import { supabase } from "@/lib/supabase";
+import { createCheckoutSession } from "@/lib/stripe";
 
 interface Location {
   name: string;
@@ -138,9 +139,9 @@ export default function BirthChartModal({
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!user) {
+      if (!session?.user) {
         setError("User not authenticated");
         setIsLoading(false);
         return;
@@ -148,8 +149,8 @@ export default function BirthChartModal({
 
       // Save data to both tables
       await Promise.all([
-        saveUserProfile(user.id),
-        saveUserCredits(user.id)
+        saveUserProfile(session.user.id),
+        saveUserCredits(session.user.id)
       ]);
 
       // Continue with the original onSubmit
@@ -162,6 +163,18 @@ export default function BirthChartModal({
         longitude: selectedLocation.lng,
         hasUnknownBirthTime: formData.hasUnknownBirthTime,
       });
+
+      // Trigger Stripe payment for subscription
+      try {
+        await createCheckoutSession(
+          'price_1QcV8VGTXKQOsgznhGV8qUmM',
+          'subscription',
+          session.access_token
+        );
+      } catch (stripeError) {
+        console.error('Error initiating subscription:', stripeError);
+        // Don't block the flow if payment fails
+      }
     } catch (error) {
       console.error('Error saving user data:', error);
       setError('Failed to save user data. Please try again.');

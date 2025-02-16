@@ -87,7 +87,7 @@ if (existingProfile) {
           .from('user_credits')
           .insert([{
             user_id: userId,
-            total_credits: 17000,
+            total_credits: 5000,
             used_credits: 0,
             rollover_credits: 0,
             is_subscriber: false,

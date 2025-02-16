@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
 function ReportSuccessContent() {
@@ -13,7 +12,7 @@ function ReportSuccessContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkPaymentAndGenerateReport = async () => {
+    const generateReport = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.replace('/auth');
@@ -21,99 +20,43 @@ function ReportSuccessContent() {
       }
 
       try {
-        const sessionId = searchParams?.get('session_id');
-        const reportType = searchParams?.get('report_type');
-
-        if (!sessionId || !reportType) {
-          throw new Error('Missing required parameters');
-        }
-
-        // Get user ID from session
+        const reportType = searchParams?.get('report_type') || '30-days';
         const userId = session.user.id;
 
-        // Wait for payment to be processed (retry up to 30 seconds)
-        const startTime = Date.now();
-        const maxWaitTime = 30000; // 30 seconds
-        const retryInterval = 2000; // 2 seconds
+        // Generate report
+        const response = await fetch('/api/reports/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            userId,
+            userName: session.user.email?.split('@')[0] || 'user',
+            reportType,
+          }),
+        });
 
-        while (Date.now() - startTime < maxWaitTime) {
-          try {
-            // Use service role client for payment check
-            const serviceClient = createClient(
-              process.env.NEXT_PUBLIC_SUPABASE_URL!,
-              process.env.SUPABASE_SERVICE_ROLE_KEY!,
-              {
-                auth: {
-                  autoRefreshToken: false,
-                  persistSession: false
-                }
-              }
-            );
-
-            const { data: payment, error: paymentError } = await serviceClient
-              .from('payments')
-              .select('status')
-              .eq('stripe_session_id', sessionId)
-              .single();
-
-            if (paymentError) {
-              console.error('Error checking payment status:', paymentError);
-              throw paymentError;
-            }
-
-            if (!payment) {
-              console.log(`Payment not found for session ${sessionId}, attempt ${Math.floor((Date.now() - startTime) / retryInterval)}`);
-              await new Promise(resolve => setTimeout(resolve, retryInterval));
-              continue;
-            }
-
-            if (payment.status === 'succeeded') {
-              // Payment confirmed, generate report
-              const response = await fetch('/api/reports/generate', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({
-                  userId,
-                  userName: session.user.email?.split('@')[0] || 'user',
-                  sessionId,
-                  reportType,
-                }),
-              });
-
-              if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to generate report');
-              }
-
-              const data = await response.json();
-
-              // Download the PDF
-              const pdfBytes = atob(data.pdfBytes);
-              const pdfBlob = new Blob([new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)))], { type: 'application/pdf' });
-              const downloadUrl = window.URL.createObjectURL(pdfBlob);
-              const link = document.createElement('a');
-              link.href = downloadUrl;
-              link.download = data.fileName;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              window.URL.revokeObjectURL(downloadUrl);
-
-              setLoading(false);
-              return;
-            }
-          } catch (error) {
-            console.error('Error in payment check iteration:', error);
-          }
-
-          // Wait before retrying
-          await new Promise(resolve => setTimeout(resolve, retryInterval));
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to generate report');
         }
 
-        throw new Error('Payment processing is taking longer than expected. Please check your profile in a few minutes to access your report.');
+        const data = await response.json();
+
+        // Download the PDF
+        const pdfBytes = atob(data.pdfBytes);
+        const pdfBlob = new Blob([new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)))], { type: 'application/pdf' });
+        const downloadUrl = window.URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = data.fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        setLoading(false);
       } catch (err) {
         console.error('Error generating report:', err);
         setError(err instanceof Error ? err.message : 'Failed to generate report. Please contact support.');
@@ -121,7 +64,7 @@ function ReportSuccessContent() {
       }
     };
 
-    checkPaymentAndGenerateReport();
+    generateReport();
   }, [searchParams, router]);
 
   return (
