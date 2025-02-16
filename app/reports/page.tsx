@@ -7,13 +7,15 @@ import SessionProvider from '@/components/SessionProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { createCheckoutSession } from '@/lib/stripe';
+import { supabase } from '@/lib/supabase';
 
 const reports = [
   {
-    id: 'life-path',
-    title: 'Life Path & Personality Report',
-    description: 'What if your birthday isn\'t just a date—it\'s a secret formula to your destiny? Your Life Path & Personality Report isn\'t just another horoscope. It\'s a mind-bending dive into the mystical equation that shapes your strengths, struggles, and soul\'s purpose.',
-    price: 19.99,
+    id: '30-days',
+    title: 'Next 30-Days Focus & Action Plan Report',
+    description: 'The 30-Day Focus & Action Plan is a personalized roadmap designed to help you navigate key areas of life—career, relationships, finances, personal growth, and well-being—over the next month. Using insights from astrology, I Ching, human design, numerology, life path, and cardology, this report provides a clear and actionable guide tailored to your unique energy. You\'ll receive key transits, focused action steps, power dates, and strategic insights to align with opportunities and overcome challenges. Whether you\'re seeking clarity, transformation, or success, this report equips you with the tools to make the most of the next 30 days.',
+    price: 14.99,
     icon: <FileText className="h-6 w-6" />
   },
   {
@@ -96,7 +98,7 @@ export default function ReportsPage() {
     exit: (direction: number) => ({
       x: direction < 0 ? 200 : -200,
       opacity: 0,
-      position: 'absolute'
+      position: "absolute" as const
     })
   };
 
@@ -202,6 +204,64 @@ interface ReportCardProps {
 }
 
 function ReportCard({ report, isActive }: ReportCardProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Map report IDs to Stripe price IDs
+  const PRICE_IDS: { [key: string]: string } = {
+    '30-days': 'price_1QsxLAGTXKQOsgznyJHgk0W9',
+    'annual-forecast': 'price_1QsxLBGTXKQOsgznKpL8j4Xt',
+    'relationship': 'price_1QsxLCGTXKQOsgznM9qR5kWn',
+    'career': 'price_1QsxLDGTXKQOsgznPwX2mJYt',
+    'decision': 'price_1QsxLEGTXKQOsgznRtK9nMZt',
+    'health': 'price_1QsxLFGTXKQOsgznTvN4pQZt'
+  };
+
+  const handleGenerateReport = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get the current session with retry
+      let session;
+      for (let i = 0; i < 3; i++) {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          continue;
+        }
+
+        if (sessionData.session) {
+          session = sessionData.session;
+          break;
+        }
+
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      if (!session) {
+        router.push('/auth');
+        setError('Please log in to generate a report.');
+        return;
+      }
+
+      const priceId = PRICE_IDS[report.id];
+      if (!priceId) {
+        throw new Error('Invalid report type');
+      }
+
+      await createCheckoutSession(priceId, report.id, session.access_token);
+    } catch (err) {
+      console.error('Error generating report:', err);
+      setError('Failed to generate report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white/90 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl h-full p-8 md:py-8">
       <div className="max-w-4xl mx-auto h-full flex flex-col justify-between">
@@ -222,12 +282,27 @@ function ReportCard({ report, isActive }: ReportCardProps) {
             <p className="text-gray-600 text-sm md:text-base">
               {report.description}
             </p>
+            {error && (
+              <p className="text-red-500 text-sm mt-2">{error}</p>
+            )}
           </div>
         </div>
 
-        <button className="w-full mt-4 bg-primary text-white py-2 md:py-3 px-3 md:px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-opacity-90 transition-all duration-300 hover:scale-105 transform">
-          <FileText className="w-4 h-4 md:w-5 md:h-5" />
-          <span className="text-sm md:text-base ">Generate Report</span>
+        <button
+          onClick={handleGenerateReport}
+          disabled={loading}
+          className={`w-full mt-4 bg-primary text-white py-2 md:py-3 px-3 md:px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 transform ${
+            loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'
+          }`}
+        >
+          {loading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+          ) : (
+            <FileText className="w-4 h-4 md:w-5 md:h-5" />
+          )}
+          <span className="text-sm md:text-base">
+            {loading ? 'Processing...' : 'Generate Report'}
+          </span>
         </button>
       </div>
     </div>

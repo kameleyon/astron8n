@@ -1,29 +1,48 @@
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { supabase } from './supabase';
+
 // Initialize Stripe
-export const stripePromise = loadStripe('pk_test_51QJcWMGTXKQOsgznvEcIRLI3gVc0wuICwLJhnIpWRNxNrarG4ayb9Of4yfUcOl0NGEpvSKgkLGFPHdNmZs7XAb5700UOpPtsAn');
+let stripeInstance: Promise<Stripe | null> | null = null;
+
+export const getStripe = () => {
+  if (!stripeInstance) {
+    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    if (!key) {
+      console.error('Stripe publishable key is not set');
+      return null;
+    }
+    stripeInstance = loadStripe(key);
+  }
+  return stripeInstance;
+};
 // Create Stripe Checkout Session
-export const createCheckoutSession = async (userId: string) => {
+export const createCheckoutSession = async (priceId: string, reportType: string, accessToken: string) => {
   try {
     const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
       },
       body: JSON.stringify({
-        userId,
-        priceId: 'prod_RVXNeQprNHXHhv', // Your product ID
+        priceId,
+        reportType,
       }),
     });
-    const session = await response.json();
-    // Redirect to Stripe Checkout
-    const stripe = await stripePromise;
-    const { error } = await stripe!.redirectToCheckout({
-      sessionId: session.id,
-    });
-    if (error) {
-      throw error;
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = data.error || 'Failed to create checkout session';
+      throw new Error(error);
     }
+
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    throw new Error('No checkout URL received');
   } catch (error) {
     console.error('Error creating checkout session:', error);
     throw error;
