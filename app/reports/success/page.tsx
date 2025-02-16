@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-export default function ReportSuccessPage() {
+function ReportSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -129,5 +129,23 @@ export default function ReportSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReportSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-secondary to-accent p-4">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Loading...</h1>
+            <p className="text-gray-600">Please wait while we prepare your report status...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <ReportSuccessContent />
+    </Suspense>
   );
 }
