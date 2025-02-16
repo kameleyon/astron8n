@@ -1,50 +1,60 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+// Create a Supabase client with the service role key for webhook
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+);
+
+// This file is a Route Handler in Next.js App Router
+// See: https://nextjs.org/docs/app/building-your-application/routing/route-handlers
 
 export async function POST(req: Request) {
-  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-  const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-
-  if (!STRIPE_SECRET_KEY) {
-    return NextResponse.json(
-      { error: 'STRIPE_SECRET_KEY environment variable is not set' },
-      { status: 500 }
-    );
-  }
-
-  if (!STRIPE_WEBHOOK_SECRET) {
-    return NextResponse.json(
-      { error: 'STRIPE_WEBHOOK_SECRET environment variable is not set' },
-      { status: 500 }
-    );
-  }
-
-  const stripe = new Stripe(STRIPE_SECRET_KEY, {
-    apiVersion: '2025-01-27.acacia'
-  });
-
   try {
+    const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+    const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
+      console.error('Missing required environment variables');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(STRIPE_SECRET_KEY, {
+      apiVersion: '2025-01-27.acacia'
+    });
+
+    const signature = req.headers.get('stripe-signature');
+    if (!signature) {
+      console.error('No stripe signature found');
+      return NextResponse.json(
+        { error: 'No Stripe signature found' },
+        { status: 400 }
+      );
+    }
+
     const rawBody = await req.text();
+    console.log('Received webhook payload:', rawBody.slice(0, 100) + '...');
+    console.log('Stripe signature:', signature);
+
     let event: Stripe.Event;
-
     try {
-      const headers = new Headers(req.headers);
-      const signature = headers.get('stripe-signature');
-      
-      if (!signature) {
-        return NextResponse.json(
-          { error: 'Missing stripe-signature header' },
-          { status: 400 }
-        );
-      }
-
-      // Use type assertion since we've verified signature exists
       event = stripe.webhooks.constructEvent(
         rawBody,
-        signature as string,
-        STRIPE_WEBHOOK_SECRET as string
+        signature,
+        STRIPE_WEBHOOK_SECRET
       );
+      console.log('Successfully constructed event:', event.type);
     } catch (err) {
       console.error('Error verifying webhook signature:', err);
       return NextResponse.json(

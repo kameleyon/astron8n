@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
 function ReportSuccessContent() {
@@ -37,18 +38,28 @@ function ReportSuccessContent() {
 
         while (Date.now() - startTime < maxWaitTime) {
           try {
-            const { data: payments, error: paymentError } = await supabase
+            // Use service role client for payment check
+            const serviceClient = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!,
+              {
+                auth: {
+                  autoRefreshToken: false,
+                  persistSession: false
+                }
+              }
+            );
+
+            const { data: payment, error: paymentError } = await serviceClient
               .from('payments')
               .select('status')
               .eq('stripe_session_id', sessionId)
-              .eq('user_id', userId);
+              .single();
 
             if (paymentError) {
               console.error('Error checking payment status:', paymentError);
               throw paymentError;
             }
-
-            const payment = payments?.[0];
 
             if (!payment) {
               console.log(`Payment not found for session ${sessionId}, attempt ${Math.floor((Date.now() - startTime) / retryInterval)}`);
