@@ -3,58 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { supabase } from '@/lib/supabase';
 
-const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
-
-if (!OPENROUTER_API_KEY) {
-  throw new Error('NEXT_PUBLIC_OPENROUTER_API_KEY environment variable is not set');
-}
-
-async function generateReportContent(userData: any) {
-  try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
-      },
-      body: JSON.stringify({
-        model: 'perplexity/llama-3.1-sonar-large-128k-online',
-        messages: [
-          {
-            role: 'user',
-            content: `Generate a comprehensive 30-day focus and action plan report for a person with the following data:
-            Birth Chart: ${userData.birthChart}
-            Human Design: ${userData.humanDesign}
-            Numerology: ${userData.numerology}
-            Life Path: ${userData.lifePath}
-            Cardology: ${userData.cardology}
-            
-            The report should include:
-            1. Key astrological transits for the next 30 days
-            2. Focused action steps for career, relationships, finances, personal growth, and well-being
-            3. Power dates and their significance
-            4. Strategic insights for aligning with opportunities
-            5. Guidance for overcoming potential challenges
-            
-            Format the response in markdown.`
-          }
-        ]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to generate report content');
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error('Error generating report content:', error);
-    throw error;
-  }
-}
-
 async function createPDF(content: string, userName: string) {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage();
@@ -160,8 +108,63 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check OpenRouter API key
+    const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+    if (!OPENROUTER_API_KEY) {
+      return NextResponse.json(
+        { error: 'OPENROUTER_API_KEY environment variable is not set' },
+        { status: 500 }
+      );
+    }
+
     // Generate report content
-    const reportContent = await generateReportContent(userData);
+    let reportContent;
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
+        },
+        body: JSON.stringify({
+          model: 'perplexity/llama-3.1-sonar-large-128k-online',
+          messages: [
+            {
+              role: 'user',
+              content: `Generate a comprehensive 30-day focus and action plan report for a person with the following data:
+              Birth Chart: ${userData.birth_chart}
+              Human Design: ${userData.human_design}
+              Numerology: ${userData.numerology}
+              Life Path: ${userData.life_path}
+              Cardology: ${userData.cardology}
+              
+              The report should include:
+              1. Key astrological transits for the next 30 days
+              2. Focused action steps for career, relationships, finances, personal growth, and well-being
+              3. Power dates and their significance
+              4. Strategic insights for aligning with opportunities
+              5. Guidance for overcoming potential challenges
+              
+              Format the response in markdown.`
+            }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate report content');
+      }
+
+      const data = await response.json();
+      reportContent = data.choices[0].message.content;
+    } catch (error) {
+      console.error('Error generating report content:', error);
+      return NextResponse.json(
+        { error: 'Failed to generate report content' },
+        { status: 500 }
+      );
+    }
 
     // Create PDF
     const pdfBytes = await createPDF(reportContent, userName);

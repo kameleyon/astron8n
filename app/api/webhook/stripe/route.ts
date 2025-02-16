@@ -2,22 +2,28 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabase';
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-
-if (!STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is not set');
-}
-
-if (!STRIPE_WEBHOOK_SECRET) {
-  throw new Error('STRIPE_WEBHOOK_SECRET environment variable is not set');
-}
-
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-01-27.acacia'
-});
-
 export async function POST(req: Request) {
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: 'STRIPE_SECRET_KEY environment variable is not set' },
+      { status: 500 }
+    );
+  }
+
+  if (!STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.json(
+      { error: 'STRIPE_WEBHOOK_SECRET environment variable is not set' },
+      { status: 500 }
+    );
+  }
+
+  const stripe = new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2025-01-27.acacia'
+  });
+
   try {
     const rawBody = await req.text();
     let event: Stripe.Event;

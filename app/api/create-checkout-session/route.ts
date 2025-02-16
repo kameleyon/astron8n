@@ -3,22 +3,28 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL;
-
-if (!STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is not set');
-}
-
-if (!NEXT_PUBLIC_URL) {
-  throw new Error('NEXT_PUBLIC_URL environment variable is not set');
-}
-
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-01-27.acacia'
-});
-
 export async function POST(req: Request) {
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL;
+
+  if (!STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: 'STRIPE_SECRET_KEY environment variable is not set' },
+      { status: 500 }
+    );
+  }
+
+  if (!NEXT_PUBLIC_URL) {
+    return NextResponse.json(
+      { error: 'NEXT_PUBLIC_URL environment variable is not set' },
+      { status: 500 }
+    );
+  }
+
+  const stripe = new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2025-01-27.acacia'
+  });
+
   try {
     // Check auth header
     const authHeader = req.headers.get('authorization');
