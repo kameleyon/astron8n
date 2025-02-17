@@ -2,17 +2,23 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Create a Supabase client with the service role key for webhook
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
+// Initialize Supabase client inside the route handler to avoid build-time errors
+const getSupabaseClient = () => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Missing Supabase environment variables');
   }
-);
+  
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  );
+};
 
 // This file is a Route Handler in Next.js App Router
 // See: https://nextjs.org/docs/app/building-your-application/routing/route-handlers
@@ -73,6 +79,7 @@ export async function POST(req: Request) {
 
       console.log(`Processing webhook for session ${session.id}, user ${userId}, report ${reportType}`);
 
+      const supabase = getSupabaseClient();
       // Check if payment already exists
       const { data: existingPayment, error: checkError } = await supabase
         .from('payments')
