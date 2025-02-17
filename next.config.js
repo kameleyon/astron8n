@@ -78,7 +78,7 @@ const nextConfig = {
     styledComponents: true,
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  transpilePackages: ['moment-timezone'],
+  transpilePackages: ['moment-timezone', 'birthchartpack'],
 };
 
 module.exports = nextConfig;
