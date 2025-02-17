@@ -2,17 +2,23 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-// Create a Supabase client with the service role key
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
+// Initialize Supabase client inside the route handler to avoid build-time errors
+const getSupabaseClient = () => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Missing Supabase environment variables');
   }
-);
+  
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  );
+};
 
 async function createPDF(content: string, userName: string) {
   const pdfDoc = await PDFDocument.create();
@@ -138,6 +144,7 @@ export async function POST(req: Request) {
 
     // Verify the access token
     const accessToken = authHeader.split(' ')[1];
+    const supabase = getSupabaseClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
     
     if (authError || !user) {
