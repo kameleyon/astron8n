@@ -5,7 +5,7 @@ import { AlertCircle } from "lucide-react";
 import { LocationSearch } from "@/components/LocationSearch";
 import { addDays } from "date-fns";
 import { supabase } from "@/lib/supabase";
-import { createCheckoutSession } from "@/lib/stripe";
+import { getStripeCheckoutUrl } from "@/lib/stripe-config";
 
 interface Location {
   name: string;
@@ -164,17 +164,8 @@ export default function BirthChartModal({
         hasUnknownBirthTime: formData.hasUnknownBirthTime,
       });
 
-      // Trigger Stripe payment for subscription
-      try {
-        await createCheckoutSession(
-          'price_1QtJ3TGTXKQOsgzn1U1g0kje',
-          'subscription',
-          session.access_token
-        );
-      } catch (stripeError) {
-        console.error('Error initiating subscription:', stripeError);
-        // Don't block the flow if payment fails
-      }
+      // Redirect to Stripe checkout with trial period
+      window.location.href = getStripeCheckoutUrl('monthly');
     } catch (error) {
       console.error('Error saving user data:', error);
       setError('Failed to save user data. Please try again.');
