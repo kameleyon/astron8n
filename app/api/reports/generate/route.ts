@@ -117,7 +117,7 @@ async function createPDF(content: string, userName: string) {
     color: rgb(0.3, 0.3, 0.3),
   });
 
-  firstPage.drawText('• cardology.com - Birth Card and Yearly Spread', {
+  firstPage.drawText('• thecardsoflife.com - Birth Card and Yearly Spread', {
     x: margin + 20,
     y: pageHeight - 260,
     size: 12,
@@ -397,7 +397,6 @@ export async function POST(req: Request) {
       ...userDataFields
     };
 
-
     // Check OpenRouter API key
     const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
     if (!OPENROUTER_API_KEY) {
@@ -407,7 +406,68 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generate report content
+    // First, use perplexity to search for transit data
+    console.log('Starting transit data search...');
+    let transitData;
+    try {
+      const perplexityResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
+          'X-Title': 'AstroGenie Transit Data'
+        },
+        body: JSON.stringify({
+          model: 'perplexity/llama-2-70b-chat',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert astrologer tasked with searching for current astrological data. Focus on finding accurate transit dates, aspects, and cardology information.'
+            },
+            {
+              role: 'user',
+              content: `Search for the following information:
+
+              1. Current and upcoming 30-day planetary transits
+              2. Major aspects forming between planets
+              3. Current and upcoming retrograde periods
+              4. Important sign changes for planets
+              5. Lunar phases and eclipses if any
+              6. Current Birth Card influences
+              7. Yearly Spread interpretations
+              
+              Format the data in a clear, structured way that can be used in an astrological report.`
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      });
+
+      console.log('Transit data response status:', perplexityResponse.status);
+      const perplexityData = await perplexityResponse.json();
+      console.log('Transit data response:', JSON.stringify(perplexityData, null, 2));
+
+      if (!perplexityResponse.ok) {
+        throw new Error(`Transit data API error: ${perplexityData.error || perplexityResponse.statusText}`);
+      }
+
+      if (!perplexityData.choices?.[0]?.message?.content) {
+        throw new Error('Invalid transit data response format');
+      }
+
+      transitData = perplexityData.choices[0].message.content;
+      console.log('Transit data retrieved successfully');
+    } catch (error: unknown) {
+      console.error('Error getting transit data:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('Transit data error details:', errorMessage);
+      throw new Error(`Failed to get transit data: ${errorMessage}`);
+    }
+
+    // Now generate the report
+    console.log('Starting report generation...');
     let reportContent;
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -419,90 +479,58 @@ export async function POST(req: Request) {
           'X-Title': 'AstroGenie Report Generator'
         },
         body: JSON.stringify({
-          model: 'perplexity/llama-3.1-sonar-large-128k-online',
+          model: 'openai/gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
-              content: `You are an expert astrologer and spiritual guide specializing in creating personalized reports that combine multiple modalities including astrology, human design, numerology, life path, natal chart (including degrees, houses, and planets), cardology (birth card), and upcoming 30-day transits. Your reports are detailed, comprehensive, and immersive, written in a flowing narrative style rather than a segmented format. Your tone is expertly knowledgeable, warm, and engaging.
-
-To ensure accuracy in your transit predictions:
-1. Retrieve upcoming 30-day transits from astro.com:
-   - Go to "Extended Chart Selection"
-   - Pull natal transits for the next 30 days
-   - Use these exact transit dates and aspects in your analysis
-
-2. Get cardology data from cardology.com:
-   - Look up the Birth Card and Yearly Spread
-   - Incorporate this information into your analysis
-
-This ensures your transit predictions and cardology interpretations are precise and timely.`
+              content: 'You are an expert astrologer and spiritual guide specializing in creating personalized reports. Your reports are detailed, comprehensive, and immersive, written in a flowing narrative style.'
             },
             {
               role: 'user',
-              content: `Generate a personalized, in-depth 30-day astrological and energetic forecast using the following data:
-              Birth Chart: ${JSON.stringify(combinedData.birth_chart, null, 2)}
-              Human Design: ${JSON.stringify(combinedData.human_design, null, 2)}
-              Numerology: ${JSON.stringify(combinedData.numerology, null, 2)}
-              Life Path: ${JSON.stringify(combinedData.life_path, null, 2)}
-              Cardology: ${JSON.stringify(combinedData.cardology, null, 2)}
+              content: `Generate a personalized, in-depth 30-day astrological forecast using the following data:
 
-              Structure the report as follows:
+              Transit Data:
+              ${transitData}
 
-              1. Introduction: Setting the Stage
-              - Brief but powerful introduction setting the theme for the next 30 days
-              - Highlight the energetic shift shaped by natal chart, life path, personal cycles, and upcoming transits
-              - Set the tone for the month's theme (growth, transformation, breakthroughs, reflection, or action)
+              Personal Data:
+              ${JSON.stringify(combinedData, null, 2)}
 
-              2. Core Analysis & Cosmic Influences
-              - Analyze key planetary transits and their interaction with natal placements
-              - Provide Human Design guidance based on type and authority
-              - Include I Ching hexagram interpretation for the month
-              - Integrate numerology and Life Path insights
-              - Incorporate Birth Card and yearly influence analysis
-
-              3. Love, Money, & Health Forecasts
-              - Love & Relationships: Venus transits, 7th House activations
-              - Money & Career: 2nd House transits, Jupiter/Saturn influences
-              - Health & Well-being: 6th and 12th House transits, energy levels
-
-              4. Key Dates & Action Steps
-              - Best days for career, love, investments, health
-              - Days to avoid major decisions or actions
-              - Specific guidance for navigating challenges
-
-              5. Final Words & Integration
-              - Monthly theme reflection
-              - Affirmation/mantra for the month
-              - Guidance for mid-month review
-
-              Write in a flowing narrative style, blending insights seamlessly rather than listing separate sections. Ensure all systems (astrology, human design, numerology, etc.) feel interconnected in one cohesive story. Format the response in markdown with elegant section transitions.`
+              Format the report in markdown with elegant section transitions, covering:
+              1. Monthly theme and overview
+              2. Key planetary influences and aspects
+              3. Love, career, and health forecasts
+              4. Important dates and guidance
+              5. Final reflections and mantras`
             }
           ],
           temperature: 0.7,
-          max_tokens: 4000
+          max_tokens: 2000
         })
       });
 
+      console.log('Report generation response status:', response.status);
+      const data = await response.json();
+      console.log('Report generation response:', JSON.stringify(data, null, 2));
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`API error: ${errorData.error || response.statusText}`);
+        throw new Error(`Report generation API error: ${data.error || response.statusText}`);
       }
 
-      const data = await response.json();
       if (!data.choices?.[0]?.message?.content) {
-        throw new Error('Invalid response format from API');
+        throw new Error('Invalid report generation response format');
       }
 
       reportContent = data.choices[0].message.content;
-    } catch (error) {
-      console.error('Error generating report content:', error);
-      return NextResponse.json(
-        { error: 'Failed to generate report content' },
-        { status: 500 }
-      );
+      console.log('Report generated successfully');
+    } catch (error: unknown) {
+      console.error('Error generating report:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('Report generation error details:', errorMessage);
+      throw new Error(`Failed to generate report: ${errorMessage}`);
     }
 
     // Create PDF
+    console.log('Creating PDF...');
     const pdfBytes = await createPDF(reportContent, userName);
 
     // Save report to database
@@ -531,15 +559,18 @@ This ensures your transit predictions and cardology interpretations are precise 
       throw metadataError;
     }
 
+    console.log('Report saved successfully');
     return NextResponse.json({
       success: true,
       fileName,
       pdfBytes: Buffer.from(pdfBytes).toString('base64')
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in report generation:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Error details:', errorMessage);
     return NextResponse.json(
-      { error: 'Failed to generate report' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
