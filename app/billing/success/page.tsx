@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText, CheckCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-export default function BillingSuccessPage() {
+function BillingSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -69,7 +69,7 @@ export default function BillingSuccessPage() {
                 <CheckCircle className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Subscription Activated!</h1>
-              <p className="text-gray-600 mb-4">Your subscription has been successfully activated. You now have access to 17,000 credits per month.</p>
+              <p className="text-gray-600 mb-4">Your subscription has been successfully activated. You now have access to 17,000 credits per month, after your 3 days trial.</p>
               <button
                 onClick={() => router.push('/dashboard')}
                 className="w-full py-3 px-6 bg-primary text-white rounded-xl hover:bg-opacity-90 transition-all duration-300"
@@ -81,5 +81,25 @@ export default function BillingSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BillingSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-secondary to-accent p-4">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Loading...</h1>
+              <p className="text-gray-600">Please wait while we check your subscription status...</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <BillingSuccessContent />
+    </Suspense>
   );
 }
