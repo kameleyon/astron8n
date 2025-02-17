@@ -157,7 +157,7 @@ export default function BirthChartModal({
       onSubmit({
         name: formData.name,
         date: formData.date,
-        time: formData.hasUnknownBirthTime ? "" : formData.time,
+        time: formData.hasUnknownBirthTime ? "12:00" : formData.time, // Default to noon if time unknown
         location: selectedLocation.name,
         latitude: selectedLocation.lat,
         longitude: selectedLocation.lng,
@@ -167,7 +167,7 @@ export default function BirthChartModal({
       // Trigger Stripe payment for subscription
       try {
         await createCheckoutSession(
-          'price_1QcV8VGTXKQOsgznhGV8qUmM',
+          'price_1QtJ3TGTXKQOsgzn1U1g0kje',
           'subscription',
           session.access_token
         );
