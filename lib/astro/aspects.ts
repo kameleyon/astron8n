@@ -1,4 +1,4 @@
-import { PlanetPosition, PlanetName } from '../types/birth-chart'
+import { PlanetPosition, PlanetName } from '../../types/birth-chart'
 import { normalizeAngle, getDistance } from './patterns/utils'
 
 interface Aspect {
@@ -13,12 +13,12 @@ interface Aspect {
 
 // Standard aspect configurations based on Swiss Ephemeris approach
 const aspectTypes: Record<number, [string, number, 'harmonious' | 'challenging' | 'neutral']> = {
-  0: ["CONJUNCTION", 12, "neutral"],
-  60: ["SEXTILE", 7, "harmonious"],
-  90: ["SQUARE", 9, "challenging"],
-  120: ["TRINE", 9, "harmonious"],
-  150: ["QUINCUNX", 3, "challenging"],
-  180: ["OPPOSITION", 10, "challenging"]
+  0: ["Conjunction", 12, "neutral"],
+  60: ["Sextile", 7, "harmonious"],
+  90: ["Square", 9, "challenging"],
+  120: ["Trine", 9, "harmonious"],
+  150: ["Quincunx", 3, "challenging"],
+  180: ["Opposition", 10, "challenging"]
 }
 
 /**
