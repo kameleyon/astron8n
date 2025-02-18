@@ -427,21 +427,45 @@ export async function POST(req: Request) {
           messages: [
             {
               role: 'system',
-              content: 'You are an expert astrologer tasked with searching for current astrological data. Focus on finding accurate transit dates, aspects, and cardology information.'
+              content: `You are an expert astrologer with real-time astronomical knowledge. Your task is to provide precise, current astrological data with specific dates and times. Focus on factual astronomical positions and transitions.
+
+Required output format:
+1. Current celestial positions (exact degrees)
+2. Upcoming transits (exact dates and times)
+3. Retrograde periods (start/end dates)
+4. Lunar phases and eclipses
+5. Notable aspects and configurations
+
+Each data point must include:
+- Exact dates (DD/MM/YYYY)
+- Precise degrees for planetary positions
+- Specific timing for transitions
+- Duration for longer events`
             },
             {
               role: 'user',
-              content: `Search for the following information:
+              content: `Generate a structured astrological report for the next 30 days starting from ${new Date().toLocaleDateString('en-GB')}. Include:
 
-              1. Current and upcoming 30-day planetary transits
-              2. Major aspects forming between planets
-              3. Current and upcoming retrograde periods
-              4. Important sign changes for planets
-              5. Lunar phases and eclipses if any
-              6. Current Birth Card influences
-              7. Yearly Spread interpretations
-              
-              Format the data in markdown with clear headings and bullet points.`
+1. PLANETARY POSITIONS
+- Current positions (degrees/minutes)
+- Sign placements
+- House positions
+
+2. TRANSITS (next 30 days)
+- All planetary ingresses
+- Major aspect formations
+- Retrograde stations
+- Lunar phases and nodes
+
+3. CARDOLOGY INFLUENCES
+- Current planetary rulers
+- Active birth cards
+- Yearly spread positions
+
+Format in strict markdown with:
+# [Main Sections]
+## [Subsections]
+- [Detailed points with exact dates]`
             }
           ],
           temperature: 0.7,
@@ -482,25 +506,29 @@ export async function POST(req: Request) {
         if (retryCount === maxRetries) {
           // If all retries failed, use a fallback transit data template
           console.log('Using fallback transit data after all retries failed');
-          transitData = `# Current Astrological Transits
-          
+          transitData = `# Current Astrological Data
+
 ## Planetary Positions
-- Sun in current zodiac sign
-- Moon moving through the signs
-- Mercury in its current position
-- Venus in its current phase
-- Mars in its current sign
-- Jupiter continuing its journey
-- Saturn maintaining its influence
+- Sun: Current zodiac sign (approximate degrees)
+- Moon: Current zodiac sign (approximate degrees)
+- Mercury: Current position and motion
+- Venus: Current phase and sign
+- Mars: Current zodiac placement
+- Jupiter: Continuing transit
+- Saturn: Current influence
 
-## Important Aspects
-- Major planetary aspects in effect
-- Upcoming significant alignments
+## Expected Transits
+- Next New Moon: Approximate date
+- Next Full Moon: Approximate date
+- Notable planetary aspects forming
+- Potential retrograde periods
 
-## Monthly Overview
-- General cosmic weather
-- Key dates to note
-- Potential opportunities and challenges`;
+## General Influences
+- Primary astrological themes
+- Key dates for observation
+- Significant alignments
+
+Note: This is approximate data due to API limitations. For precise calculations, please refer to current ephemeris data.`;
           break;
         }
         
@@ -533,33 +561,91 @@ export async function POST(req: Request) {
           messages: [
             {
               role: 'system',
-              content: 'You are an expert astrologer and spiritual guide specializing in creating personalized reports. Your reports are detailed, comprehensive, and immersive, written in a flowing narrative style using markdown formatting.'
+              content: `You are an expert metaphysical advisor specializing in personalized interpretations that seamlessly integrate:
+- Western astrology
+- I Ching divination
+- Human Design
+- Numerology
+- Cardology
+
+You begin each reading by casting an I Ching hexagram through the traditional coin method, interpreting its meaning within the context of the client's current transits and natal placements. Your interpretations weave together insights from all systems to create a cohesive narrative.
+
+Writing style requirements:
+1. Clear, engaging narrative flow
+2. Professional yet accessible language
+3. Specific, actionable guidance
+4. Balanced perspective on challenges/opportunities
+5. Integration of all metaphysical systems`
             },
             {
               role: 'user',
-              content: `Generate a personalized, in-depth 30-day astrological forecast using the following data:
+              content: `Create a comprehensive 30-day forecast by following these steps:
 
-              Transit Data:
-              ${transitData}
+1. Cast an I Ching hexagram using the traditional coin method
+2. Interpret the hexagram in context of the following data:
 
-              Personal Data:
-              ${JSON.stringify(combinedData, null, 2)}
+Transit Data:
+${transitData}
 
-              Format the report in markdown with:
-              - # for main section headings
-              - ## for subsection headings
-              - Bullet points for lists
-              - Proper paragraph breaks
-              - Do not use any emojis or special characters
+Personal Data:
+${JSON.stringify(combinedData, null, 2)}
 
-              Cover these sections:
-              1. Monthly theme and overview
-              2. Key planetary influences and aspects
-              3. Love, career, and health forecasts
-              4. Important dates and guidance
-              5. Final reflections and mantras
+Structure the report as follows:
 
-              Important: Do not include any emojis, astrological symbols, or special Unicode characters in the report.`
+# Brief Overview
+- I Ching hexagram interpretation
+- Monthly theme and key energies
+- Integration with transit impacts
+
+# Comprehensive Analysis
+## Love Life
+- Relationship dynamics
+- Romantic opportunities
+- Personal magnetism periods
+
+## Career Path
+- Professional developments
+- Leadership opportunities
+- Strategic timing for initiatives
+
+## Financial Outlook
+- Money flow patterns
+- Investment timing
+- Resource management
+
+## Health & Vitality
+- Physical energy cycles
+- Emotional wellbeing
+- Stress management
+
+# Timing Guide
+## Best Days For
+- Important conversations
+- Major decisions
+- Financial transactions
+- Personal initiatives
+- Social events
+
+## Watch Out Days
+- Challenging aspects
+- Potential obstacles
+- Energy dips
+- Mercury retrograde impacts
+
+# Key Dates and Points
+- Chronological timeline of significant events
+- Power days and their meanings
+- Critical decision points
+- Opportunity windows
+
+# Integration and Closing
+- Synthesis of all insights
+- Personal power phrases
+- Action steps for maximum benefit
+- Final guidance messages
+
+Format: Use clean markdown without special characters or emojis.
+Length: Minimum 2000 words with detailed analysis.`
             }
           ],
           temperature: 0.7,
