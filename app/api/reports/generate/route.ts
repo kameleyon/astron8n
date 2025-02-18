@@ -435,6 +435,8 @@ Required output format:
 3. Retrograde periods (start/end dates)
 4. Lunar phases and eclipses
 5. Notable aspects and configurations
+6. Use astro.com for upcoming astrological transists
+7. Use thecardsoflife.com/all-life-cards for cardology 
 
 Each data point must include:
 - Exact dates (DD/MM/YYYY)
@@ -456,6 +458,7 @@ Each data point must include:
 - Major aspect formations
 - Retrograde stations
 - Lunar phases and nodes
+- Upcoming eclipses if any
 
 3. CARDOLOGY INFLUENCES
 - Current planetary rulers
@@ -568,21 +571,22 @@ Note: This is approximate data due to API limitations. For precise calculations,
 - Numerology
 - Cardology
 
-You begin each reading by casting an I Ching hexagram through the traditional coin method, interpreting its meaning within the context of the client's current transits and natal placements. Your interpretations weave together insights from all systems to create a cohesive narrative.
+You begin each reading by casting an I Ching hexagram through the traditional coin method, cast an ichin reading with initial hexagram, transition lines, and final hexagram, and interpreting its meaning within the context of the client's current transits and natal placements. Your interpretations weave together insights from all systems to create a cohesive narrative.
 
 Writing style requirements:
 1. Clear, engaging narrative flow
 2. Professional yet accessible language
 3. Specific, actionable guidance
 4. Balanced perspective on challenges/opportunities
-5. Integration of all metaphysical systems`
+5. Integration of all metaphysical systems
+6. DO NOT MENTION THAT YOU USE I CHING, HUMAN DESIGN CARDOLOGY AND NUMEROLOGY - NEVER`
             },
             {
               role: 'user',
               content: `Create a comprehensive 30-day forecast by following these steps:
 
-1. Cast an I Ching hexagram using the traditional coin method
-2. Interpret the hexagram in context of the following data:
+1. Cast an I Ching with initial hexagram, transition lines, and final hexagram using the traditional coin method
+2. Interpret the I ching reading in context of the following data:
 
 Transit Data:
 ${transitData}
@@ -593,30 +597,39 @@ ${JSON.stringify(combinedData, null, 2)}
 Structure the report as follows:
 
 # Brief Overview
-- I Ching hexagram interpretation
+- I Ching interpretation, cast an ichin reading with initial hexagram, transition lines, and final hexagram: get the interpretation but do not mention that you use iching 
 - Monthly theme and key energies
 - Integration with transit impacts
+- Write a comprehensive, detailed, captivating covering the overview for the upcoming 30 days, inspiring the user to look forward to the rest of the report and wanting to find out more. 
+- always start with a catchy captivating hook and end with thought provoking idea to keep them engaged and wanting to learn more. 
+
+# Key Planetary Influences and Aspects
+- List the important upcoming aspects, including starting and end dates, their degrees and how it will affect the natal chart, house, planet and aspect and degree and why. 
+- cast an i ching reading for each that you will implement in your interpretation. 
+- Write a detailed paragraphe for each
 
 # Comprehensive Analysis
 ## Love Life
-- Relationship dynamics
-- Romantic opportunities
+- Relationship dynamics and specific planetary aspecting influencing them
+- Possible upcoming Romantic opportunities
+- Cast an i ching reading for each that you will include in your interpretation. 
 - Personal magnetism periods
+- What the focus will be and things to avoid or watch out for. 
 
-## Career Path
-- Professional developments
-- Leadership opportunities
-- Strategic timing for initiatives
+## Career or business path
+- Professional developments and specific planetary aspecting influencing them
+- Leadership and deal upcoming opportunities
+- Strategic timing for initiatives 
 
 ## Financial Outlook
-- Money flow patterns
+- Money flow patterns and specific planetary aspecting influencing them
 - Investment timing
 - Resource management
 
-## Health & Vitality
-- Physical energy cycles
-- Emotional wellbeing
-- Stress management
+## Health & General Mood 
+- Physical energy cycles and specific planetary aspecting influencing them
+- Emotional wellbeing and specific planetary aspecting influencing them
+- Stress management and specific planetary aspecting influencing them
 
 # Timing Guide
 ## Best Days For
@@ -644,8 +657,17 @@ Structure the report as follows:
 - Action steps for maximum benefit
 - Final guidance messages
 
-Format: Use clean markdown without special characters or emojis.
-Length: Minimum 2000 words with detailed analysis.`
+Format: Use clean markdown without emojis.
+Do not mention i ching, human design, life path. Just include their interpretation seemlessly on how their influence in the report without mentioning them. 
+Make it comprehensive, detailed, elaborate captivating and written in a warm, familiarity, welcoming tone.
+Include how the upcoming transits will impact their natal chart thus their life, be honest no sugar coating. 
+Include degree, house, aspects influencing their natal chart and how the can take advantage or overcome the challenges they present. 
+
+Format in strict markdown with:
+# [Main Sections]
+## [Subsections]
+- [Detailed points with exact dates] NO EMOJIS
+Length: Minimum 5000 words with detailed analysis.`
             }
           ],
           temperature: 0.7,
