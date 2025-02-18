@@ -290,26 +290,62 @@ export async function POST(req: Request) {
       formatted: string;
     }
 
-    // Import calculator from birthchartpack
-    const { calculateBirthChart } = await import('../../../../birthchartpack/lib/services/astro/calculator');
-    const birthChartData = await calculateBirthChart({
-      name: userProfile.full_name,
-      date: userProfile.birth_date,
-      time: userProfile.birth_time || '12:00', // Default to noon if time unknown
-      location: userProfile.birth_location,
-      latitude: userProfile.latitude,
-      longitude: userProfile.longitude,
-      houseSystem: 'PLACIDUS'
-    });
+    // Import calculator from birthchartpack with error handling
+    let birthChartData;
+    try {
+      const { calculateBirthChart } = await import('../../../../birthchartpack/lib/services/astro/calculator');
+      
+      // Validate required birth data
+      if (!userProfile.birth_date) {
+        throw new Error('Birth date is required');
+      }
+      
+      if (!userProfile.birth_location || !userProfile.latitude || !userProfile.longitude) {
+        throw new Error('Birth location details are incomplete');
+      }
+      
+      birthChartData = await calculateBirthChart({
+        name: userProfile.full_name,
+        date: userProfile.birth_date,
+        time: userProfile.birth_time || '12:00', // Default to noon if time unknown
+        location: userProfile.birth_location,
+        latitude: userProfile.latitude,
+        longitude: userProfile.longitude,
+        houseSystem: 'PLACIDUS'
+      });
+      
+      if (!birthChartData || !birthChartData.planets || !birthChartData.ascendant) {
+        throw new Error('Birth chart calculation returned invalid data');
+      }
+      
+    } catch (error) {
+      console.error('Error calculating birth chart:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to calculate birth chart';
+      throw new Error(`Birth chart calculation failed: ${errorMessage}`);
+    }
 
-    // Format birth chart data for report
+    // Find essential planets
+    const sunPlanet = birthChartData.planets.find((p: Planet) => p.name === 'Sun');
+    const moonPlanet = birthChartData.planets.find((p: Planet) => p.name === 'Moon');
+
+    // Validate essential data is present
+    if (!sunPlanet?.sign || !moonPlanet?.sign || !birthChartData.ascendant?.sign) {
+      console.error('Essential birth chart data is missing', {
+        hasSunSign: !!sunPlanet?.sign,
+        hasMoonSign: !!moonPlanet?.sign,
+        hasAscendantSign: !!birthChartData.ascendant?.sign
+      });
+      throw new Error('Unable to generate report: Missing essential birth chart data');
+    }
+
+    // Format birth chart data after validation
     const birthChart = {
-      sun_sign: birthChartData.planets.find((p: Planet) => p.name === 'Sun')?.sign || 'Unknown',
-      moon_sign: birthChartData.planets.find((p: Planet) => p.name === 'Moon')?.sign || 'Unknown',
+      sun_sign: sunPlanet.sign,
+      moon_sign: moonPlanet.sign,
       rising_sign: birthChartData.ascendant.sign,
-      houses: birthChartData.houses,
-      aspects: birthChartData.aspects,
-      planets: birthChartData.planets
+      houses: birthChartData.houses || [],
+      aspects: birthChartData.aspects || [],
+      planets: birthChartData.planets || []
     };
 
     // Initialize default user data
@@ -365,11 +401,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // First, use perplexity to search for transit data
+    // First, use perplexity to search for transit data with timeout and retry
     console.log('Starting transit data search...');
     let transitData;
-    try {
-      const perplexityResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    let retryCount = 0;
+    const maxRetries = 3;
+    const timeout = 30000; // 30 seconds timeout
+
+    while (retryCount < maxRetries) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        const perplexityResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          signal: controller.signal,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
@@ -378,7 +423,7 @@ export async function POST(req: Request) {
           'X-Title': 'AstroGenie Transit Data'
         },
         body: JSON.stringify({
-          model: 'perplexity/llama-3.1-sonar-large-128k-online',
+          model: 'perplexity/llama-3.1-sonar-small-128k-online',
           messages: [
             {
               role: 'system',
@@ -404,32 +449,78 @@ export async function POST(req: Request) {
         })
       });
 
-      console.log('Transit data response status:', perplexityResponse.status);
-      const perplexityData = await perplexityResponse.json();
-      console.log('Transit data response:', JSON.stringify(perplexityData, null, 2));
+        clearTimeout(timeoutId);
+        
+        console.log('Transit data response status:', perplexityResponse.status);
+        const perplexityData = await perplexityResponse.json();
+        
+        if (!perplexityResponse.ok) {
+          const error = perplexityData.error || perplexityResponse.statusText;
+          if (error.includes('rate limit') || error.includes('429')) {
+            throw new Error('Rate limit exceeded');
+          }
+          throw new Error(`Transit data API error: ${error}`);
+        }
 
-      if (!perplexityResponse.ok) {
-        throw new Error(`Transit data API error: ${perplexityData.error || perplexityResponse.statusText}`);
+        if (!perplexityData.choices?.[0]?.message?.content) {
+          throw new Error('Invalid transit data response format');
+        }
+
+        transitData = perplexityData.choices[0].message.content;
+        console.log('Transit data retrieved successfully');
+        break; // Success, exit retry loop
+        
+      } catch (error: unknown) {
+        retryCount++;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error(`Transit data attempt ${retryCount} failed:`, errorMessage);
+        
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error('Request timed out');
+        }
+        
+        if (retryCount === maxRetries) {
+          // If all retries failed, use a fallback transit data template
+          console.log('Using fallback transit data after all retries failed');
+          transitData = `# Current Astrological Transits
+          
+## Planetary Positions
+- Sun in current zodiac sign
+- Moon moving through the signs
+- Mercury in its current position
+- Venus in its current phase
+- Mars in its current sign
+- Jupiter continuing its journey
+- Saturn maintaining its influence
+
+## Important Aspects
+- Major planetary aspects in effect
+- Upcoming significant alignments
+
+## Monthly Overview
+- General cosmic weather
+- Key dates to note
+- Potential opportunities and challenges`;
+          break;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
       }
-
-      if (!perplexityData.choices?.[0]?.message?.content) {
-        throw new Error('Invalid transit data response format');
-      }
-
-      transitData = perplexityData.choices[0].message.content;
-      console.log('Transit data retrieved successfully');
-    } catch (error: unknown) {
-      console.error('Error getting transit data:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      console.error('Transit data error details:', errorMessage);
-      throw new Error(`Failed to get transit data: ${errorMessage}`);
     }
 
-    // Now generate the report
+    // Now generate the report with timeout and retry
     console.log('Starting report generation...');
     let reportContent;
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          signal: controller.signal,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
@@ -438,7 +529,7 @@ export async function POST(req: Request) {
           'X-Title': 'AstroGenie Report Generator'
         },
         body: JSON.stringify({
-          model: 'openai/gpt-4o-2024-11-20',
+          model: 'meta-llama/llama-3.3-70b-instruct',
           messages: [
             {
               role: 'system',
@@ -459,13 +550,16 @@ export async function POST(req: Request) {
               - ## for subsection headings
               - Bullet points for lists
               - Proper paragraph breaks
+              - Do not use any emojis or special characters
 
               Cover these sections:
               1. Monthly theme and overview
               2. Key planetary influences and aspects
               3. Love, career, and health forecasts
               4. Important dates and guidance
-              5. Final reflections and mantras`
+              5. Final reflections and mantras
+
+              Important: Do not include any emojis, astrological symbols, or special Unicode characters in the report.`
             }
           ],
           temperature: 0.7,
@@ -473,61 +567,114 @@ export async function POST(req: Request) {
         })
       });
 
-      console.log('Report generation response status:', response.status);
-      const data = await response.json();
-      console.log('Report generation response:', JSON.stringify(data, null, 2));
+        clearTimeout(timeoutId);
+        
+        console.log('Report generation response status:', response.status);
+        const data = await response.json();
+        
+        if (!response.ok) {
+          const error = data.error || response.statusText;
+          if (error.includes('rate limit') || error.includes('429')) {
+            throw new Error('Rate limit exceeded');
+          }
+          throw new Error(`Report generation API error: ${error}`);
+        }
 
-      if (!response.ok) {
-        throw new Error(`Report generation API error: ${data.error || response.statusText}`);
+        if (!data.choices?.[0]?.message?.content) {
+          throw new Error('Invalid report generation response format');
+        }
+
+        reportContent = data.choices[0].message.content;
+        console.log('Report generated successfully');
+        break; // Success, exit retry loop
+        
+      } catch (error: unknown) {
+        retryCount++;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error(`Report generation attempt ${retryCount} failed:`, errorMessage);
+        
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error('Request timed out');
+        }
+        
+        if (retryCount === maxRetries) {
+          throw new Error(`Failed to generate report after ${maxRetries} attempts: ${errorMessage}`);
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
       }
-
-      if (!data.choices?.[0]?.message?.content) {
-        throw new Error('Invalid report generation response format');
-      }
-
-      reportContent = data.choices[0].message.content;
-      console.log('Report generated successfully');
-    } catch (error: unknown) {
-      console.error('Error generating report:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      console.error('Report generation error details:', errorMessage);
-      throw new Error(`Failed to generate report: ${errorMessage}`);
     }
 
     // Create PDF
     console.log('Creating PDF...');
     const pdfBytes = await createPDF(reportContent, userName);
 
-    // Save report to database
-    const fileName = `${userName}30DayReport${new Date().toISOString().split('T')[0]}.pdf`;
-    const { error: uploadError } = await supabase
-      .storage
-      .from('reports')
-      .upload(`${userId}/${fileName}`, pdfBytes);
-
-    if (uploadError) {
-      throw uploadError;
+    // Save report to database with unique timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = `${userName}-30DayReport-${timestamp}.pdf`;
+    
+    // Try to upload with unique name
+    let uploadAttempt = 1;
+    let uploadError;
+    
+    while (uploadAttempt <= 3) {
+      const currentFileName = uploadAttempt === 1 ? 
+        fileName : 
+        fileName.replace('.pdf', `-${uploadAttempt}.pdf`);
+        
+      const { error } = await supabase
+        .storage
+        .from('reports')
+        .upload(`${userId}/${currentFileName}`, pdfBytes, {
+          upsert: false // Ensure we don't overwrite existing files
+        });
+      
+      if (!error) {
+        // Upload successful
+        uploadError = null;
+        break;
+      }
+      
+      if (error.message !== 'The resource already exists') {
+        // If it's not a duplicate error, throw it
+        uploadError = error;
+        break;
+      }
+      
+      uploadAttempt++;
     }
 
-    // Save report metadata
+    if (uploadError) {
+      console.error('Error uploading report:', uploadError);
+      throw new Error(`Failed to save report: ${uploadError.message}`);
+    }
+
+    // Save report metadata with the final successful filename
+    let finalFileName = fileName;
+    if (uploadAttempt > 1) {
+      finalFileName = fileName.replace('.pdf', `-${uploadAttempt}.pdf`);
+    }
+
     const { error: metadataError } = await supabase
       .from('user_reports')
       .insert({
         user_id: userId,
         report_type: '30-day',
-        file_name: fileName,
+        file_name: finalFileName,
         content: reportContent,
         created_at: new Date().toISOString()
       });
 
     if (metadataError) {
-      throw metadataError;
+      console.error('Error saving report metadata:', metadataError);
+      throw new Error(`Failed to save report metadata: ${metadataError.message}`);
     }
 
     console.log('Report saved successfully');
     return NextResponse.json({
       success: true,
-      fileName,
+      fileName: finalFileName,
       pdfBytes: Buffer.from(pdfBytes).toString('base64')
     });
   } catch (error: unknown) {
