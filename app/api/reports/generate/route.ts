@@ -98,52 +98,53 @@ async function createPDF(content: string, userName: string) {
 
     // Format based on markdown
     if (line.startsWith('# ')) {
-      // Add some space before main headers
-      y -= 20;
+      // Add extra space before main headers
+      y -= 40;
       
       // Main header with background
       currentPage.drawRectangle({
-        x: margin - 10,
-        y: y - 5,
-        width: contentWidth + 20,
-        height: 40,
+        x: margin - 15,
+        y: y - 8,
+        width: contentWidth + 30,
+        height: 50,
         color: rgb(0.95, 0.95, 0.9),
       });
       
       currentPage.drawText(line.substring(2), {
         x: margin,
         y: y,
-        size: 24,
+        size: 28,
         font: helveticaBold,
         color: rgb(218/255, 99/255, 0/255),
       });
-      y -= 45;
+      y -= 60;
     } else if (line.startsWith('## ')) {
-      // Sub header with underline
-      y -= 15;
+      // Add space before subheaders
+      y -= 30;
+      
       currentPage.drawText(line.substring(3), {
         x: margin,
         y: y,
-        size: 18,
+        size: 22,
         font: helveticaBold,
         color: rgb(218/255, 99/255, 0/255),
       });
       
       // Draw underline
       currentPage.drawLine({
-        start: { x: margin, y: y - 5 },
-        end: { x: margin + contentWidth, y: y - 5 },
-        thickness: 1,
+        start: { x: margin, y: y - 8 },
+        end: { x: margin + contentWidth, y: y - 8 },
+        thickness: 2,
         color: rgb(0.8, 0.8, 0.8),
       });
       
-      y -= 30;
+      y -= 40;
     } else if (line.startsWith('- ')) {
-      // Bullet points with proper indentation
+      // Bullet points with enhanced indentation and spacing
       currentPage.drawText('•', {
-        x: margin + 10,
+        x: margin + 15,
         y: y,
-        size: 12,
+        size: 14,
         font: helvetica,
         color: rgb(218/255, 99/255, 0/255),
       });
@@ -152,7 +153,7 @@ async function createPDF(content: string, userName: string) {
       const bulletText = line.substring(2);
       const words = bulletText.split(' ');
       let currentLine = '';
-      let xPos = margin + 30;
+      let xPos = margin + 40;
       
       for (const word of words) {
         const testLine = currentLine + word + ' ';
@@ -184,10 +185,10 @@ async function createPDF(content: string, userName: string) {
         });
       }
       
-      y -= 25;
+      y -= 30;
     } else if (line.trim() === '') {
       // Empty line spacing
-      y -= 15;
+      y -= 20;
     } else {
       // Regular text with proper wrapping
       const words = line.split(' ');
@@ -552,39 +553,31 @@ Note: This is approximate data due to API limitations. For precise calculations,
         
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           signal: controller.signal,
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
-          'X-Title': 'AstroGenie Report Generator'
-        },
-        body: JSON.stringify({
-          model: 'meta-llama/llama-3.3-70b-instruct',
-          messages: [
-            {
-              role: 'system',
-              content: `You are an expert metaphysical advisor specializing in personalized interpretations that seamlessly integrate:
-- Western astrology
-- I Ching divination
-- Human Design
-- Numerology
-- Cardology
-
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
+            'X-Title': 'AstroGenie Report Generator'
+          },
+          body: JSON.stringify({
+            model: 'meta-llama/llama-3.3-70b-instruct',
+            messages: [
+              {
+                role: 'system',
+                content: `You are an expert metaphysical advisor specializing in personalized interpretations that seamlessly integrate multiple systems of wisdom such as astrology human design numerology and cardology. Your task is to analyze the provided astrological data and create a comprehensive forecast that weaves together insights from various traditions.
 You begin each reading by casting an I Ching hexagram through the traditional coin method, cast an ichin reading with initial hexagram, transition lines, and final hexagram, and interpreting its meaning within the context of the client's current transits and natal placements. Your interpretations weave together insights from all systems to create a cohesive narrative.
-
 Writing style requirements:
 1. Clear, engaging narrative flow
 2. Professional yet accessible language
 3. Specific, actionable guidance
 4. Balanced perspective on challenges/opportunities
-5. Integration of all metaphysical systems
-6. DO NOT MENTION THAT YOU USE I CHING, HUMAN DESIGN CARDOLOGY AND NUMEROLOGY - NEVER`
-            },
-            {
-              role: 'user',
-              content: `Create a comprehensive 30-day forecast by following these steps:
-
+5. Seamless integration of multiple wisdom traditions
+6. Never explicitly mention the systems or traditions being used`
+              },
+              {
+                role: 'user',
+                content: `Create a comprehensive 30-day forecast using the following data:
 1. Cast an I Ching with initial hexagram, transition lines, and final hexagram using the traditional coin method
 2. Interpret the I ching reading in context of the following data:
 
@@ -662,18 +655,16 @@ Do not mention i ching, human design, life path. Just include their interpretati
 Make it comprehensive, detailed, elaborate captivating and written in a warm, familiarity, welcoming tone.
 Include how the upcoming transits will impact their natal chart thus their life, be honest no sugar coating. 
 Include degree, house, aspects influencing their natal chart and how the can take advantage or overcome the challenges they present. 
-
-Format in strict markdown with:
-# [Main Sections]
-## [Subsections]
-- [Detailed points with exact dates] NO EMOJIS
+Make it comprehensive, detailed, and captivating with a warm, familiar tone.
+Include specific dates, degrees, and house positions for all aspects.
+Provide clear guidance on how to work with challenging aspects.
 Length: Minimum 5000 words with detailed analysis.`
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2000
-        })
-      });
+              }
+            ],
+            temperature: 0.7,
+            max_tokens: 10000
+          })
+        });
 
         clearTimeout(timeoutId);
         
