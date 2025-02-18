@@ -37,44 +37,29 @@ async function createPDF(content: string, userName: string) {
   // Draw header background
   firstPage.drawRectangle({
     x: 0,
-    y: pageHeight - 150,
+    y: pageHeight - 100,
     width: pageWidth,
-    height: 150,
-    color: rgb(0.95, 0.95, 1), // Light blue background
+    height: 100,
+    color: rgb(0.95, 0.95, 0.9),
   });
 
-  // Add title with larger size and centered
+  // Add title with centered styling
   const titleText = 'AstroGenie Report';
-  const titleWidth = helveticaBold.widthOfTextAtSize(titleText, 40);
+  const titleWidth = helveticaBold.widthOfTextAtSize(titleText, 32);
   firstPage.drawText(titleText, {
     x: (pageWidth - titleWidth) / 2,
-    y: pageHeight - 80,
-    size: 40,
+    y: pageHeight - 50,
+    size: 32,
     font: helveticaBold,
-    color: rgb(0.2, 0.2, 0.8), // Dark blue text
+    color: rgb(218/255, 99/255, 0/255),
   });
 
   // Add subtitle
   const subtitleText = 'Comprehensive 30-Day Focus and Action Plan';
-  const subtitleWidth = helvetica.widthOfTextAtSize(subtitleText, 18);
+  const subtitleWidth = helvetica.widthOfTextAtSize(subtitleText, 14);
   firstPage.drawText(subtitleText, {
     x: (pageWidth - subtitleWidth) / 2,
-    y: pageHeight - 120,
-    size: 18,
-    font: helvetica,
-    color: rgb(0.4, 0.4, 0.4),
-  });
-
-  // Add date with better formatting
-  const dateText = new Date().toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-  const dateWidth = helvetica.widthOfTextAtSize(dateText, 14);
-  firstPage.drawText(dateText, {
-    x: (pageWidth - dateWidth) / 2,
-    y: pageHeight - 145,
+    y: pageHeight - 75,
     size: 14,
     font: helvetica,
     color: rgb(0.4, 0.4, 0.4),
@@ -82,51 +67,25 @@ async function createPDF(content: string, userName: string) {
 
   // Add user name with better styling
   const userText = `Prepared for: ${userName}`;
-  const userWidth = helveticaBold.widthOfTextAtSize(userText, 16);
+  const userWidth = helveticaBold.widthOfTextAtSize(userText, 14);
   firstPage.drawText(userText, {
     x: (pageWidth - userWidth) / 2,
-    y: pageHeight - 170,
-    size: 16,
+    y: pageHeight - 95,
+    size: 14,
     font: helveticaBold,
     color: rgb(0.2, 0.2, 0.2),
   });
 
   // Add divider line
   firstPage.drawLine({
-    start: { x: margin, y: pageHeight - 190 },
-    end: { x: pageWidth - margin, y: pageHeight - 190 },
+    start: { x: margin, y: pageHeight - 120 },
+    end: { x: pageWidth - margin, y: pageHeight - 120 },
     thickness: 1,
     color: rgb(0.8, 0.8, 0.8),
   });
 
-  // Add websites reference
-  const websitesText = 'Transit data sourced from:';
-  firstPage.drawText(websitesText, {
-    x: margin,
-    y: pageHeight - 220,
-    size: 12,
-    font: helveticaBold,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-
-  firstPage.drawText('• astro.com - Extended Chart Selection (30-day transits)', {
-    x: margin + 20,
-    y: pageHeight - 240,
-    size: 12,
-    font: helvetica,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-
-  firstPage.drawText('• thecardsoflife.com - Birth Card and Yearly Spread', {
-    x: margin + 20,
-    y: pageHeight - 260,
-    size: 12,
-    font: helvetica,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-
   let currentPage = firstPage;
-  let y = pageHeight - 300; // Start below website references
+  let y = pageHeight - 160; // Start content closer to header
   
   // Parse and format content
   const lines = content.split('\n');
@@ -148,7 +107,7 @@ async function createPDF(content: string, userName: string) {
         y: y - 5,
         width: contentWidth + 20,
         height: 40,
-        color: rgb(0.95, 0.95, 1),
+        color: rgb(0.95, 0.95, 0.9),
       });
       
       currentPage.drawText(line.substring(2), {
@@ -156,7 +115,7 @@ async function createPDF(content: string, userName: string) {
         y: y,
         size: 24,
         font: helveticaBold,
-        color: rgb(0.2, 0.2, 0.8),
+        color: rgb(218/255, 99/255, 0/255),
       });
       y -= 45;
     } else if (line.startsWith('## ')) {
@@ -167,7 +126,7 @@ async function createPDF(content: string, userName: string) {
         y: y,
         size: 18,
         font: helveticaBold,
-        color: rgb(0.3, 0.3, 0.3),
+        color: rgb(218/255, 99/255, 0/255),
       });
       
       // Draw underline
@@ -186,7 +145,7 @@ async function createPDF(content: string, userName: string) {
         y: y,
         size: 12,
         font: helvetica,
-        color: rgb(0.2, 0.2, 0.8),
+        color: rgb(218/255, 99/255, 0/255),
       });
       
       // Wrap bullet point text
@@ -419,7 +378,7 @@ export async function POST(req: Request) {
           'X-Title': 'AstroGenie Transit Data'
         },
         body: JSON.stringify({
-          model: 'perplexity/llama-2-70b-chat',
+          model: 'perplexity/llama-3.1-sonar-large-128k-online',
           messages: [
             {
               role: 'system',
@@ -437,7 +396,7 @@ export async function POST(req: Request) {
               6. Current Birth Card influences
               7. Yearly Spread interpretations
               
-              Format the data in a clear, structured way that can be used in an astrological report.`
+              Format the data in markdown with clear headings and bullet points.`
             }
           ],
           temperature: 0.7,
@@ -479,11 +438,11 @@ export async function POST(req: Request) {
           'X-Title': 'AstroGenie Report Generator'
         },
         body: JSON.stringify({
-          model: 'openai/gpt-3.5-turbo',
+          model: 'openai/gpt-4o-2024-11-20',
           messages: [
             {
               role: 'system',
-              content: 'You are an expert astrologer and spiritual guide specializing in creating personalized reports. Your reports are detailed, comprehensive, and immersive, written in a flowing narrative style.'
+              content: 'You are an expert astrologer and spiritual guide specializing in creating personalized reports. Your reports are detailed, comprehensive, and immersive, written in a flowing narrative style using markdown formatting.'
             },
             {
               role: 'user',
@@ -495,7 +454,13 @@ export async function POST(req: Request) {
               Personal Data:
               ${JSON.stringify(combinedData, null, 2)}
 
-              Format the report in markdown with elegant section transitions, covering:
+              Format the report in markdown with:
+              - # for main section headings
+              - ## for subsection headings
+              - Bullet points for lists
+              - Proper paragraph breaks
+
+              Cover these sections:
               1. Monthly theme and overview
               2. Key planetary influences and aspects
               3. Love, career, and health forecasts
