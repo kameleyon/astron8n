@@ -91,7 +91,13 @@ function ReportSuccessContent() {
                 <FileText className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Report Generated!</h1>
-              <p className="text-gray-600">Your report has been generated and downloaded. You can also find it in your profile under the Reports section.</p>
+              <p className="text-gray-600 mb-6">Your report has been generated and downloaded. You can also find it in your profile under the Reports section.</p>
+              <button
+                onClick={() => router.push('/profile#reports')}
+                className="bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              >
+                View Report
+              </button>
             </>
           )}
         </div>

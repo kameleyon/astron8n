@@ -20,7 +20,7 @@ const getSupabaseClient = () => {
   );
 };
 
-async function createPDF(content: string, userName: string) {
+const createPDF = async (content: string, userName: string) => {
   const pdfDoc = await PDFDocument.create();
   const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -230,7 +230,7 @@ async function createPDF(content: string, userName: string) {
   }
 
   return await pdfDoc.save();
-}
+};
 
 export async function POST(req: Request) {
   try {
@@ -402,149 +402,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // First, use perplexity to search for transit data with timeout and retry
-    console.log('Starting transit data search...');
-    let transitData;
-    let retryCount = 0;
-    const maxRetries = 3;
-    const timeout = 30000; // 30 seconds timeout
-
-    while (retryCount < maxRetries) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-        
-        const perplexityResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          signal: controller.signal,
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
-          'X-Title': 'AstroGenie Transit Data'
-        },
-        body: JSON.stringify({
-          model: 'perplexity/llama-3.1-sonar-small-128k-online',
-          messages: [
-            {
-              role: 'system',
-              content: `You are an expert astrologer with real-time astronomical knowledge. Your task is to provide precise, current astrological data with specific dates and times. Focus on factual astronomical positions and transitions.
-
-Required output format:
-1. Current celestial positions (exact degrees)
-2. Upcoming transits (exact dates and times)
-3. Retrograde periods (start/end dates)
-4. Lunar phases and eclipses
-5. Notable aspects and configurations
-6. Use astro.com for upcoming astrological transists
-7. Use thecardsoflife.com/all-life-cards for cardology 
-
-Each data point must include:
-- Exact dates (DD/MM/YYYY)
-- Precise degrees for planetary positions
-- Specific timing for transitions
-- Duration for longer events`
-            },
-            {
-              role: 'user',
-              content: `Gather a comprehensive and details astrological aspects and transits for the next 30 days starting from ${new Date().toLocaleDateString('en-GB')}. Include:
-
-1. PLANETARY POSITIONS
-- Current positions (degrees/minutes)
-- Sign placements
-- House positions
-
-2. TRANSITS (next 30 days)
-- All planetary ingresses
-- Major aspect formations
-- Retrograde stations
-- Lunar phases and nodes
-- Upcoming eclipses if any
-
-3. CARDOLOGY INFLUENCES
-- Current planetary rulers
-- Active birth cards
-- Yearly spread positions
-
-Format in strict markdown with:
-# [Main Sections]
-## [Subsections]
-- [Detailed points with exact dates]`
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2000
-        })
-      });
-
-        clearTimeout(timeoutId);
-        
-        console.log('Transit data response status:', perplexityResponse.status);
-        const perplexityData = await perplexityResponse.json();
-        
-        if (!perplexityResponse.ok) {
-          const error = perplexityData.error || perplexityResponse.statusText;
-          if (error.includes('rate limit') || error.includes('429')) {
-            throw new Error('Rate limit exceeded');
-          }
-          throw new Error(`Transit data API error: ${error}`);
-        }
-
-        if (!perplexityData.choices?.[0]?.message?.content) {
-          throw new Error('Invalid transit data response format');
-        }
-
-        transitData = perplexityData.choices[0].message.content;
-        console.log('Transit data retrieved successfully');
-        break; // Success, exit retry loop
-        
-      } catch (error: unknown) {
-        retryCount++;
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        console.error(`Transit data attempt ${retryCount} failed:`, errorMessage);
-        
-        if (error instanceof Error && error.name === 'AbortError') {
-          console.error('Request timed out');
-        }
-        
-        if (retryCount === maxRetries) {
-          // If all retries failed, use a fallback transit data template
-          console.log('Using fallback transit data after all retries failed');
-          transitData = `# Current Astrological Data
-
-## Planetary Positions
-- Sun: Current zodiac sign (approximate degrees)
-- Moon: Current zodiac sign (approximate degrees)
-- Mercury: Current position and motion
-- Venus: Current phase and sign
-- Mars: Current zodiac placement
-- Jupiter: Continuing transit
-- Saturn: Current influence
-
-## Expected Transits
-- Next New Moon: Approximate date
-- Next Full Moon: Approximate date
-- Notable planetary aspects forming
-- Potential retrograde periods
-
-## General Influences
-- Primary astrological themes
-- Key dates for observation
-- Significant alignments
-
-Note: This is approximate data due to API limitations. For precise calculations, please refer to current ephemeris data.`;
-          break;
-        }
-        
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
-      }
-    }
-
-    // Now generate the report with timeout and retry
+    // Generate the report with timeout and retry
     console.log('Starting report generation...');
     let reportContent;
-    retryCount = 0;
+    const maxRetries = 3;
+    const timeout = 30000; // 30 seconds timeout
+    let retryCount = 0;
 
     while (retryCount < maxRetries) {
       try {
@@ -565,12 +428,13 @@ Note: This is approximate data due to API limitations. For precise calculations,
             messages: [
               {
                 role: 'system',
-                content: `You are an expert metaphysical advisor who creates personalized, comprehensive 30‑day forecasts by blending a variety of interpretative traditions into a single, coherent narrative. Your task is to analyze the provided data and offer an in‑depth forecast that integrates insights derived from various systems, while never explicitly mentioning any of their names. Instead, present the interpretations as a unified insight into the energies and influences that will shape the upcoming month.
+                content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, calculate current planetary positions and upcoming transits, and offer an in‑depth forecast that integrates all insights into a single, coherent narrative.
 
 Your report should include the following:
+- Calculate and analyze current planetary positions and upcoming transits for the next 30 days
 - A method of divination, I Ching using the traditional coin method to generate an initial hexagram, transition lines, and a final hexagram. Integrate this reading into the overall narrative without naming the method.
-- An analysis of how upcoming planetary transits (Moon phases, North Node, Retrogrades, Eclipses, South nodes, and other important or powerful aspects or transits) will interact with the client’s natal chart (include specific degrees, houses, aspects, retrograde, dates, and any challenging influences) and the resulting impact on different life areas.
-- An integrated interpretation of the influences that shape the client’s personal design, life purpose, energetic blueprint, and inherent patterns—presented fluidly without reference to the specific methodologies.
+- An analysis of how upcoming planetary transits (Moon phases, North Node, Retrogrades, Eclipses, South nodes, and other important or powerful aspects or transits) will interact with the client's natal chart (include specific degrees, houses, aspects, retrograde, dates, and any challenging influences) and the resulting impact on different life areas.
+- An integrated interpretation of the influences that shape the client's personal design, life purpose, energetic blueprint, and inherent patterns—presented fluidly without reference to the specific methodologies.
 - A comprehensive synthesis that provides actionable guidance on love, career, finances, health, and timing for key decisions and events.
 - A captivating, warm, welcoming and accessible tone that is both honest and empowering.
 
@@ -579,7 +443,7 @@ Structure the report as follows:
 # Main Overview
 - Begin with a light hearted, captivating or even thought provoking hook that draws the reader in.
 - Offer an integrated interpretation of the I Ching reading (include the initial hexagram, transition lines, and final hexagram without naming the method IChing). (one elaborate paragraph)
-- Write the upcoming main theme and key energies based on the influence of the ${transitData} on the user's natal chart ${JSON.stringify(combinedData, null, 2)}. Introduce how upcoming planetary influences will affect the client’s natal chart and life path. (one paragraphe).
+- Calculate and write the upcoming main theme and key energies based on current planetary positions and how upcoming transits will affect the client's natal chart ${JSON.stringify(combinedData, null, 2)} and life path. Include exact dates and degrees. (one paragraph)
 - End this section introducing the upcoming section. 
 - End this section with a thought‑provoking statement to entice further reading.
 
@@ -633,15 +497,12 @@ Guidelines:
 - Be direct and honest about both opportunities and challenges.
 - Make each section comprehensive, detailed and elaborated do not hesitated to make it heartfelt when needed, or empowering if needed. But always remains straightforward, tell the truth, no sugarcoating.
 - Seamlessly blend all interpretations so that the various influences appear as a natural part of one integrated narrative, without naming the underlying systems explicitly.`
-    },
+              },
               {
                 role: 'user',
                 content: `Create a comprehensive 30-day forecast using the following data:
 1. Generate a divinatory reading using the traditional coin method to create an initial hexagram, transition lines, and final hexagram.
 2. Interpret the reading in the context of the following data:
-
-Transit Data:
-${transitData}
 
 Personal Data:
 ${JSON.stringify(combinedData, null, 2)}

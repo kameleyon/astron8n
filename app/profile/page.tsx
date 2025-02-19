@@ -28,6 +28,15 @@ interface BirthChartFormData {
   hasUnknownBirthTime: boolean;
 }
 
+interface Report {
+  id: string;
+  user_id: string;
+  report_type: string;
+  file_name: string;
+  content: string;
+  created_at: string;
+}
+
 interface UserProfile {
   id: string;
   full_name: string;
@@ -77,6 +86,59 @@ export default function ProfilePage() {
   const [error, setError] = useState("");
   const [email, setEmail] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const reportsPerPage = 7;
+
+  // Calculate pagination
+  const totalPages = Math.ceil((reports?.length || 0) / reportsPerPage);
+  const startIndex = (currentPage - 1) * reportsPerPage;
+  const endIndex = startIndex + reportsPerPage;
+  const currentReports = reports.slice(startIndex, endIndex);
+
+  // Function to handle report downloads
+  const handleDownloadReport = async (fileName: string): Promise<void> => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/auth');
+        return;
+      }
+
+      const response = await fetch('/api/reports/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ fileName }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download report');
+      }
+
+      const data = await response.json();
+      
+      // Convert base64 to blob and download
+      const pdfBytes = atob(data.pdfBytes);
+      const pdfBlob = new Blob(
+        [new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)))],
+        { type: 'application/pdf' }
+      );
+      const downloadUrl = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      console.error('Error downloading report:', err);
+      setError(err instanceof Error ? err.message : 'Failed to download report');
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,6 +152,19 @@ export default function ProfilePage() {
         }
 
         setEmail(user.email || null);
+
+        // Fetch reports
+        const { data: reportsData, error: reportsError } = await supabase
+          .from('user_reports')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (reportsError) {
+          console.error('Error fetching reports:', reportsError);
+        } else {
+          setReports(reportsData || []);
+        }
 
         const { data, error } = await supabase
           .from("user_profiles")
@@ -488,16 +563,86 @@ export default function ProfilePage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="reports">
+              <TabsContent value="reports" id="reports">
                 <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
                   <CardContent className="p-6">
                     <h2 className="text-xl font-semibold text-primary mb-4">
                       Reports
                     </h2>
-                    <p className="text-gray-600">
-                      Here you can find all your downloaded reports.
-                    </p>
-                    {/* Add logic to display reports */}
+                    <div className="space-y-4">
+                      {/* Reports list */}
+                      <div className="space-y-2">
+                        {reports?.length > 0 ? (
+                          <>
+                            {currentReports.map((report) => (
+                              <div
+                                key={report.id}
+                                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-100"
+                              >
+                                <div className="flex items-center space-x-3">
+                                  <FileText className="h-5 w-5 text-primary" />
+                                  <div>
+                                    <p className="font-medium text-gray-900">
+                                      {report.report_type === '30-day' ? '30-Day Forecast' : report.report_type}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                      {new Date(report.created_at).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleDownloadReport(report.file_name)}
+                                  className="text-primary hover:text-primary/80 font-medium text-sm"
+                                >
+                                  Download
+                                </button>
+                              </div>
+                            ))}
+                            
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                              <div className="flex justify-center items-center space-x-2 mt-6">
+                                <button
+                                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                  disabled={currentPage === 1}
+                                  className="p-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  Previous
+                                </button>
+                                
+                                <div className="flex items-center space-x-1">
+                                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                    <button
+                                      key={page}
+                                      onClick={() => setCurrentPage(page)}
+                                      className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                        currentPage === page
+                                          ? 'bg-primary text-white'
+                                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                                      }`}
+                                    >
+                                      {page}
+                                    </button>
+                                  ))}
+                                </div>
+                                
+                                <button
+                                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                  disabled={currentPage === totalPages}
+                                  className="p-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-gray-600 text-center py-4">
+                            No reports available yet.
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
