@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -11,7 +11,13 @@ function ReportSuccessContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Guard to ensure report generation is only triggered once
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
     const generateReport = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -23,7 +29,7 @@ function ReportSuccessContent() {
         const reportType = searchParams?.get('report_type') || '30-days';
         const userId = session.user.id;
 
-        // Generate report
+        // Call the report generation endpoint
         const response = await fetch('/api/reports/generate', {
           method: 'POST',
           headers: {
@@ -44,9 +50,10 @@ function ReportSuccessContent() {
 
         const data = await response.json();
 
-        // Download the PDF
+        // Download the PDF (decoded from Base64)
         const pdfBytes = atob(data.pdfBytes);
-        const pdfBlob = new Blob([new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)))], { type: 'application/pdf' });
+        const byteArray = new Uint8Array(pdfBytes.split('').map(char => char.charCodeAt(0)));
+        const pdfBlob = new Blob([byteArray], { type: 'application/pdf' });
         const downloadUrl = window.URL.createObjectURL(pdfBlob);
         const link = document.createElement('a');
         link.href = downloadUrl;
@@ -91,7 +98,9 @@ function ReportSuccessContent() {
                 <FileText className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Report Generated!</h1>
-              <p className="text-gray-600 mb-6">Your report has been generated and downloaded. You can also find it in your profile under the Reports section.</p>
+              <p className="text-gray-600 mb-6">
+                Your report has been generated and downloaded. You can also find it in your profile under the Reports section.
+              </p>
               <button
                 onClick={() => router.push('/profile#reports')}
                 className="bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-6 rounded-lg transition-colors"

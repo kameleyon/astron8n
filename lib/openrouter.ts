@@ -21,7 +21,7 @@ function getCurrentDateTime() {
 }
 
 const TRANSIT_SYSTEM_PROMPT = `You are an expert astrological researcher. Your task is to:
-1. Search the internet for current and upcoming or past planetary positions and transits related to the question
+1. Go to https://horoscopes.astro-seek.com/calculate-astrology-ephemeris-february-2025/?table=long_retro&bg_0=&aya=&presnost=1&barva=p&uzel_true=&lilith_true= and search for current and upcoming or past planetary positions and transits related to the question
 2. Focus on the specific time period mentioned in the question
 3. Return detailed transit information including:
    - Planetary positions in signs
