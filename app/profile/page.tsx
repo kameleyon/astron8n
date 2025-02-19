@@ -586,7 +586,7 @@ export default function ProfilePage() {
                                       {report.report_type === '30-day' ? '30-Day Forecast' : report.report_type}
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                      {new Date(report.created_at).toLocaleDateString()}
+                                      {new Date(report.created_at).toLocaleDateString()} at {new Date(report.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </p>
                                   </div>
                                 </div>
