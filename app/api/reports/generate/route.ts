@@ -42,7 +42,7 @@ async function createPDF(content: string, userName: string) {
   // Create the first page
   const firstPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let y = pageHeight - 50;
-  
+
 
   // Try to embed the logo from public/orangelogo.png
   try {
@@ -84,29 +84,36 @@ async function createPDF(content: string, userName: string) {
   });
   y -= 35;
 
-  // Draw the subtitle
-  const subTitle = 'Comprehensive upcoming 30-Day Focus and Action Plan';
-  const subTitleWidth = helvetica.widthOfTextAtSize(subTitle, 14);
-  firstPage.drawText(subTitle, {
-    x: (pageWidth - subTitleWidth) / 2,
-    y: y,
-    size: 14,
-    font: helvetica,
-    color: rgb(0.4, 0.4, 0.4),
-  });
-  y -= 25;
+   // Draw the subtitle
+   const subTitle = 'Comprehensive upcoming 30-Day Focus and Action Plan';
+   const subTitleWidth = helvetica.widthOfTextAtSize(subTitle, 14);
+   firstPage.drawText(subTitle, {
+     x: (pageWidth - subTitleWidth) / 2,
+     y: y,
+     size: 14,
+     font: helvetica,
+     color: rgb(0.4, 0.4, 0.4),
+   });
+   y -= 25;
+ 
+   // Date range
+   const dateRangeText = `From ${todayStr} to ${endDateStr}`;
+   const dateRangeWidth = helvetica.widthOfTextAtSize(dateRangeText, 12);
+   firstPage.drawText(dateRangeText, {
+     x: (pageWidth - dateRangeWidth) / 2,
+     y: y,
+     size: 12,
+     font: helvetica,
+     color: rgb(0.2, 0.2, 0.2),
+   });
+   y -= 20;
 
-  // Date range
-  const dateRangeText = ``;
-  const dateRangeWidth = helvetica.widthOfTextAtSize(dateRangeText, 12);
-  firstPage.drawText(dateRangeText, {
-    x: (pageWidth - dateRangeWidth) / 2,
-    y: y,
-    size: 12,
-    font: helvetica,
-    color: rgb(0.2, 0.2, 0.2),
-  });
-  y -= 20;
+
+
+
+
+
+
 
 
   // Draw the divider line at current y (minus a little extra if you want spacing)
@@ -123,6 +130,7 @@ y = lineY - 50; // move your y pointer below the line
   let currentPage = firstPage;
 
   // Split the text content by lines
+
   const lines = content.split('\n');
   for (const line of lines) {
     // Check if we need a new page
@@ -137,6 +145,15 @@ y = lineY - 50; // move your y pointer below the line
       // Remove the rectangle background
       // Just print the text
       y -= 30;
+
+
+
+
+
+
+
+
+
       currentPage.drawText(line.substring(2), {
         x: margin,
         y,
@@ -147,12 +164,22 @@ y = lineY - 50; // move your y pointer below the line
       y -= 40;
     } else if (line.startsWith('## ')) {
       y -= 20;
+
+
       currentPage.drawText(line.substring(3), {
         x: margin,
         y,
         size: 20,
         font: helveticaBold,
         color: rgb(254/255, 142/255, 12/255),
+
+
+
+
+
+
+
+
       });
       // No underline or background
       y -= 30;
@@ -166,6 +193,7 @@ y = lineY - 50; // move your y pointer below the line
         color: rgb(254/255, 142/255, 12/255),
       });
 
+
       const bulletText = line.substring(2);
       const words = bulletText.split(' ');
       let currentLine = '';
@@ -174,6 +202,7 @@ y = lineY - 50; // move your y pointer below the line
       for (const word of words) {
         const testLine = currentLine + word + ' ';
         const textWidth = helvetica.widthOfTextAtSize(testLine, 12);
+
         if (xPos + textWidth > pageWidth - margin) {
           currentPage.drawText(currentLine, {
             x: xPos,
@@ -312,9 +341,11 @@ export async function POST(req: Request) {
     try {
       const { calculateBirthChart } = await import('../../../../birthchartpack/lib/services/astro/calculator');
 
+
       if (!userProfile.birth_date) {
         throw new Error('Birth date is required');
       }
+
       if (!userProfile.birth_location || !userProfile.latitude || !userProfile.longitude) {
         throw new Error('Birth location details are incomplete');
       }
@@ -332,6 +363,7 @@ export async function POST(req: Request) {
       if (!birthChartData || !birthChartData.planets || !birthChartData.ascendant) {
         throw new Error('Birth chart calculation returned invalid data');
       }
+
     } catch (error) {
       console.error('Error calculating birth chart:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to calculate birth chart';
@@ -341,6 +373,7 @@ export async function POST(req: Request) {
     // Extract key planets
     const sunPlanet = birthChartData.planets.find((p: Planet) => p.name === 'Sun');
     const moonPlanet = birthChartData.planets.find((p: Planet) => p.name === 'Moon');
+
 
     if (!sunPlanet?.sign || !moonPlanet?.sign || !birthChartData.ascendant?.sign) {
       console.error('Essential birth chart data is missing', {
@@ -370,6 +403,7 @@ export async function POST(req: Request) {
     };
 
     const { data: existingData } = await supabase
+
       .from('user_data')
       .select('human_design, numerology, life_path, cardology')
       .eq('user_id', userId)
@@ -404,6 +438,7 @@ export async function POST(req: Request) {
       ...userDataFields
     };
 
+
     const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
     if (!OPENROUTER_API_KEY) {
       return NextResponse.json(
@@ -415,6 +450,8 @@ export async function POST(req: Request) {
     // 1) Fetch transit data from perplexity
     console.log('Starting transit data search...');
     let transitData: string | undefined;
+
+
     let retryCount = 0;
     const maxRetries = 3;
     const timeout = 30000; // 30 seconds
@@ -583,6 +620,7 @@ Structure the report as follows:
 - Calculate and write the upcoming main theme and key energies based on current planetary positions and how upcoming transits will affect the client's natal chart ${JSON.stringify(combinedData, null, 2)} and life path. Include exact dates and degrees. (one paragraph)
 - End this section introducing the upcoming section. 
 
+
 # Key Planetary Influences and Aspects
 Start by listing:
 Astrology transits for the next 30 days
@@ -647,7 +685,7 @@ Introduce in a short paragraph that we are going to go into more details.
 
 Guidelines:
 - Use clean markdown formatting without emojis.
-- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 5000 words.
+- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 5500 words.
 - Maintain a warm, engaging, casual language with a touch of urban expression and familiar tone where user feel cozy and at home or hearing their best friend talking.
 - Use their name throughout the report, address them directly like they where your best friend. 
 - Be direct and honest about both opportunities and challenges.
@@ -700,6 +738,7 @@ Follow these structure guidelines:
         reportContent = data.choices[0].message.content;
         console.log('Report generated successfully');
         break; // success
+
       } catch (error: unknown) {
         retryCount++;
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -713,6 +752,7 @@ Follow these structure guidelines:
           throw new Error(`Failed to generate report after ${maxRetries} attempts: ${errorMessage}`);
         }
 
+
         await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
       }
     }
@@ -724,6 +764,7 @@ Follow these structure guidelines:
     // Save report to Supabase Storage
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `${userName}-30DayReport-${timestamp}.pdf`;
+
 
     let uploadAttempt = 1;
     let uploadError;
@@ -741,11 +782,13 @@ Follow these structure guidelines:
         });
 
       if (!error) {
+
         uploadError = null;
         break;
       }
 
       if (error.message !== 'The resource already exists') {
+
         uploadError = error;
         break;
       }
@@ -789,6 +832,7 @@ Follow these structure guidelines:
   } catch (error: unknown) {
     console.error('Error in report generation:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
