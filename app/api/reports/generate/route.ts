@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
+import fetch from 'node-fetch';
 
 // Initialize Supabase client inside the route handler to avoid build-time errors
 function getSupabaseClient() {
@@ -503,20 +504,20 @@ export async function POST(req: Request) {
             'Content-Type': 'application/json',
             'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
             'X-Title': 'AstroGenie Transit Data'
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-2.0-flash-thinking-exp:free',
-            messages: [
-              {
-                role: 'system',
-                content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
-Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today's date (February 19, 2025).
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.0-flash-thinking-exp:free',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
+
+Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today's date from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
 
 To achieve this, meticulously examine EACH of the following links:
 
-- Retrograde Planets: https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025
-- Solar and Lunar Eclipses: https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025
-- Astrology Aspects Search Engine: https://horoscopes.astro-seek.com/astrology-aspects-online-search-engine
+- Retrograde Planets: https://astrostyle.com/2025-retrogrades-in-astrology-dates-and-planets/ or https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025
+- Solar and Lunar Eclipses: https://www.farmersalmanac.com/lunar-and-solar-eclipses or https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025
 - Monthly Calendar - January 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-january-2025
 - Monthly Calendar - February 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-february-2025
 - Monthly Calendar - March 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-march-2025
@@ -532,61 +533,40 @@ To achieve this, meticulously examine EACH of the following links:
 
 Instructions for each link:
 
-1. From the first link (https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025), extract all retrograde start and/or end dates falling within the next 30 days.
-2. From the second link (https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025), extract any solar and lunar eclipses within the next 30 days.
-3. From the third link (https://horoscopes.astro-seek.com/astrology-aspects-online-search-engine), extract major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles.
-4. From the monthly calendar links, extract daily planetary transits and aspects, ensuring no events are missed.
+1. From the monthly calendar links, extract daily planetary transits and aspects, extract all retrograde start and/or end dates falling within the next 30 days, include also all the solar and lunar eclipses and, major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles, ensuring no events are missed.
+2. IDENTIFY THE RETROGRADE FIRST STARTING, ENDING, OR IN PROGRESS. 
+3. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
 
-You need to get
-1. Current celestial positions (exact degrees)
-2. Upcoming transits (exact dates and times)
-3. Retrograde periods (start/end dates)
-4. Lunar phases and eclipses
-5. Notable aspects and configurations
-6. Use astro.com for upcoming astrological transists
-7. Use thecardsoflife.com/all-life-cards for cardology
-8. Planets coming out of retrograde period and moving forwards
-9. Upcoming eclipses
-10. North nodes and south nodes
-11. Lilith transits (exact dates and times) 
 
 Required output
 Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
-[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - why it is important.
-
-
-Each data point must include:
-- Exact dates (DD/MM/YYYY)
-- Precise degrees for planetary positions
-- Specific timing for transitions
-- Duration for longer events`
-              },
-              {
-                role: 'user',
-                content: `Gather a comprehensive and detailed astrological aspects and transits for the next 30 days starting from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
-                
-                Include:
-Required output
-Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
-[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - why it is important.
-
+[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - add how important it is and any important events that happened in the past during this astrological transits, events, and/or aspects.
 
 Each data point must include:
 - Exact dates (DD/MM/YYYY)
 - Precise degrees for planetary positions
 - Specific timing for transitions
 - Duration for longer events
+- WRITE THEM ALL
+- WRITE THEM IN CHRONOLOGICAL ORDER
 
-Format in strict markdown with:
-# [Main Sections]
-## [Subsections]
-- [Detailed points with exact dates]`
-              }
-            ],
-            temperature: 0.2,
-            max_tokens: 2000
-          })
-        });
+Format your response exactly like this:
+
+Upcoming 30-day Astrology Transits and Aspects:
+###[Date]:     
+[Event include sign and degrees+minutes, with exact time]
+
+`
+          },
+          {
+            role: 'user',
+            content: 'Generate the transit data following the format specified above.'
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 15000
+      })
+    });
 
         clearTimeout(timeoutId);
 
@@ -655,14 +635,14 @@ Format in strict markdown with:
             'X-Title': 'AstroGenie Report Generator'
           },
           body: JSON.stringify({
-            model: 'qwen/qwen-plus',
+            model: 'meta-llama/llama-3.3-70b-instruct',
             messages: [
               {
                 role: 'system',
                 content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, including the user's name, the user's combined natal chart data, and the next 30 days of transits. Provide an in‑depth forecast that integrates all insights into a single, coherent narrative.
 
 Your report should include:
-- 30-day planetary positions and upcoming transits
+- 30-day planetary positions and upcoming transits from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
 - Use the I Ching as a method of divination which means using the traditional coin method for an initial hexagram, transition lines, and a final hexagram. Integrate it seamlessly without naming the method.
 - An analysis of how upcoming planetary transits (Moon phases, nodes, Retrogrades, Eclipses, etc.) will interact with the client's natal chart (include specific degrees, houses, aspects, dates, etc.).
 - Integrate user name references throughout to create a personal connection, welcoming and captivating.
@@ -671,6 +651,7 @@ Your report should include:
 - A comprehensive synthesis that provides actionable guidance on love, career, finances, health, and timing for key decisions and events.
 - A captivating, warm, welcoming tone and casual language and it's ok to use urban language that is both empathic, honest and empowering.
 - DO NOT USE ASTERIX (*) OR (**)
+- Address the user when you talk, address the user directly in the report
 
 Use a warm, friendly, honest tone. Be empowering but direct. Merge all interpretations into one cohesive narrative. Avoid explicitly naming systems like I Ching, Human Design, or Cardology by name.
 
@@ -686,16 +667,34 @@ Structure the report as follows:
 # Key Planetary Influences and Aspects
 Start by listing:
 Astrology transits for the next 30 days
-${transitData}
+show the full content of ${transitData} data following the format specified a follow:
+Format your response exactly like this:
 
----------------------------
-Aspect Analysis
-- Based on the astrological transits and aspects noted in the previous section Go over each and every single one of of them and write for each a paragraph elaborating in detail how they will impact and influence they will have on the user's natal chart ${JSON.stringify(combinedData, null, 2)}, the aspect they will create on their birth chart and in which house and what degree and minuted. include why they are playing an important role on the user's natal chart for this period and for each of them a clear explanation of their effects on the user's natal charts in one paragraphe each
+Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
+[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - add how important it is and any important events that happened in the past during this astrological transits, events, and/or aspects.
+
+Each data point must include:
+- Exact dates (DD/MM/YYYY)
+- Precise degrees for planetary positions
+- Specific timing for transitions
+- Duration for longer events
+- Make sure you include retrograde ending, in progress, or upcoming... include the sign, the user's house, the degree and the aspect they make with the user's natal chart 
+- Make sure you include any solar/luna eclipse ending, in progress, or upcoming... include the sign, the user's house, the degree and the aspect they make with the user's natal chart (if any)
+
+Format your response exactly like this:
+
+Upcoming 30-day Astrology Transits and Aspects:
+###[Date]:     
+[Event include sign and degrees+minutes, with exact time] [write for each a paragraph elaborating in detail how they will impact and influence they will have on the user's natal chart ${JSON.stringify(combinedData, null, 2)}, the aspect they will create on their birth chart and in which house and what degree and minuted. include why they are playing an important role on the user's natal chart for this period and for each of them a clear explanation of their effects on the user's natal charts, are making any aspects with user's natal chart in what house include degree and minutes]
+
+[Continue chronologically for each date with events].
+
 - make this section very detailed, comprehensive and knowledgeable
 
 
 # In Deph Analysis
-Introduce in a short paragraph that we are going to go into more details. 
+Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
+
 ## Love Life
 - Check for Venus upcoming transit and how it will impact the user's birth chart ${JSON.stringify(combinedData, null, 2)}; Include the in relationship and signle aspect. Check the emotions the mood during that period of time. 
 - Include insights on potential romantic opportunities and periods of enhanced personal magnetism based on the user's natal chart and houses ${JSON.stringify(combinedData, null, 2)} influence by the upcoming transist. 
@@ -741,7 +740,7 @@ Introduce in a short paragraph that we are going to go into more details.
 
 Guidelines:
 - Use clean markdown formatting without emojis and do not put the asterix * or **.
-- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 5500 words.
+- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 600 words.
 - Maintain a warm, engaging, casual language with a touch of urban expression and familiar tone where user feel cozy and at home or hearing their best friend talking.
 - Use their name throughout the report, address them directly like they where your best friend. 
 - Be direct and honest about both opportunities and challenges.
@@ -769,8 +768,8 @@ Follow these structure guidelines:
 5. Remember to not mention I ching, Human Design, Life Path, and Cardology.`
               }
             ],
-            temperature: 0.7,
-            max_tokens: 10000
+            temperature: 0.8,
+            max_tokens: 20000
           })
         });
 
