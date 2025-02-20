@@ -4,29 +4,42 @@
 
 ## Overview
 
-AstroGenie is a modern, AI-powered astrological platform that combines traditional astrological wisdom with cutting-edge artificial intelligence. Our platform offers personalized astrological insights, birth chart analysis, and real-time consultations through an intuitive chat interface.
+AstroGenie is a modern, AI-powered astrological platform that combines traditional astrological wisdom with cutting-edge artificial intelligence. Our platform offers personalized astrological insights, birth chart analysis, real-time consultations, and detailed astrological reports through an intuitive interface.
 
 ## Features
 
 ### Core Features
 
 - **Interactive Birth Chart Analysis**
-  - Detailed planetary positions
-  - House interpretations
-  - Aspect analysis
+  - Detailed planetary positions and aspects
+  - House interpretations with visual wheel
+  - Dynamic aspect analysis
   - Personalized readings
+  - Interactive birth chart wheel
+  - Special features and patterns detection
 
 - **AI-Powered Chat Interface**
   - Real-time astrological consultations
   - Natural language interactions
   - Personalized responses based on birth data
   - Credit-based conversation system
+  - Chat history tracking
+  - Multi-model AI integration (Gemini + Qwen)
+
+- **Comprehensive Reports**
+  - 30-day personalized forecasts
+  - Transit analysis with house positions
+  - Detailed aspect interpretations
+  - PDF report generation
+  - Automated report storage
+  - Custom report formatting
 
 - **User Profile Management**
   - Secure birth data storage
   - Customizable preferences
   - History tracking
   - Credit management
+  - API key management
 
 ### Advanced Features
 
@@ -34,12 +47,41 @@ AstroGenie is a modern, AI-powered astrological platform that combines tradition
   - Precise birth location detection
   - Timezone handling
   - Coordinates validation
+  - Interactive location search
 
 - **Credit System**
   - Trial credits for new users
   - Token-based usage tracking
   - Subscription management
   - Pay-as-you-go options
+  - Usage analytics
+
+- **Transit Analysis**
+  - Real-time planetary positions
+  - Aspect calculations
+  - House position tracking
+  - Retrograde monitoring
+  - Eclipse predictions
+
+## Project Structure
+
+```
+├── app/                      # Next.js 13+ app directory
+│   ├── api/                 # API routes
+│   ├── birth-chart/         # Birth chart components
+│   ├── reports/            # Report generation
+│   └── chat-history/       # Chat interface
+├── birthchartpack/          # Astrological calculations package
+│   ├── lib/                # Core calculation logic
+│   └── ephe/              # Swiss Ephemeris data
+├── api-package/             # Shared API utilities
+├── components/              # Reusable React components
+├── lib/                     # Utility functions and services
+│   ├── astro/             # Astrological utilities
+│   ├── services/          # Backend services
+│   └── utils/             # Helper functions
+└── public/                  # Static assets
+```
 
 ## Technologies
 
@@ -54,11 +96,18 @@ AstroGenie is a modern, AI-powered astrological platform that combines tradition
   - Supabase (Authentication & Database)
   - OpenRouter API Integration
   - Swiss Ephemeris
+  - PDF Generation (pdf-lib)
+
+- **AI Models**
+  - Google Gemini (Transit Analysis)
+  - Qwen (Chat Interface)
+  - Custom Prompt Engineering
 
 - **Infrastructure**
   - Vercel Deployment
   - PostgreSQL Database
   - Stripe Payment Integration
+  - Supabase Storage
 
 ## Getting Started
 
@@ -117,34 +166,46 @@ AstroGenie uses a token-based credit system:
   - Credits deducted per AI interaction
   - Real-time balance tracking
   - Automatic trial expiration
+  - Report generation costs
 
 - **Subscription Options**:
   - Monthly credit packages
   - Premium features access
   - Rollover credits for paid users
+  - Custom enterprise plans
 
 ## Usage
 
 1. **Sign Up/Login**
    - Create an account or log in
    - Enter birth details for personalized readings
+   - Set up API keys if needed
 
 2. **Birth Chart Analysis**
    - Input birth date, time, and location
    - View detailed chart interpretation
    - Explore planetary positions and aspects
+   - Analyze special patterns
 
-3. **AI Consultation**
+3. **Report Generation**
+   - Generate 30-day forecasts
+   - View transit analysis
+   - Download PDF reports
+   - Access report history
+
+4. **AI Consultation**
    - Chat with AstroGenie
    - Ask specific questions
    - Receive personalized guidance
    - Monitor credit usage
+   - View chat history
 
-4. **Profile Management**
+5. **Profile Management**
    - Update personal information
    - View consultation history
    - Manage subscription
    - Track credit balance
+   - Manage API keys
 
 ## Security
 
@@ -152,6 +213,32 @@ AstroGenie uses a token-based credit system:
 - Encrypted user information
 - GDPR compliant
 - Regular security audits
+- API key rotation
+- Rate limiting
+
+## Development
+
+### Key Components
+
+- **birthchartpack**: Core astrological calculations package
+  - Swiss Ephemeris integration
+  - Planetary calculations
+  - House system implementations
+  - Aspect calculations
+
+- **api-package**: Shared API utilities
+  - Type definitions
+  - Validation logic
+  - Common calculations
+  - API interfaces
+
+### Code Style
+
+- TypeScript for type safety
+- ESLint configuration
+- Prettier formatting
+- Component-based architecture
+- Custom hooks for reusability
 
 ## Contributing
 

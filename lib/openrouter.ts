@@ -20,11 +20,17 @@ function getCurrentDateTime() {
   };
 }
 
-const TRANSIT_SYSTEM_PROMPT = `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
+function createTransitSystemPrompt(birthChart?: any) {
+  return `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
 
 Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
 Format your response exactly like this example:
 
+Month
+Date
+Event, in Sign, Degrees/Minutes (House position and aspects with natal chart)
+
+Example:
 February 2025
 19
 Sun enters Pisces at 10:07 AM, 0°00' Pisces (House 8, trine natal Venus)
@@ -68,6 +74,7 @@ Instructions for each link:
    - The exact time in UTC
    - The exact degrees and minutes of the planets involved
    - The house position of the transiting planet
+   - Any aspects formed with the natal chart ${birthChart ? JSON.stringify(birthChart, null, 2) : ''}
 3. IDENTIFY THE RETROGRADE FIRST STARTING, ENDING, OR IN PROGRESS. 
 4. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
 
@@ -81,6 +88,7 @@ Do not deviate from this format. Use the exact same structure and formatting as 
 
 Do not give interpretations or readings. Just provide the technical astrological data.
 Current Date and Time: ${getCurrentDateTime().date} at ${getCurrentDateTime().time}`;
+}
 
 const CHAT_SYSTEM_PROMPT = `You are AstroGenie, An Expert, Knowledgeable, Master in divination using ichin as a base for your reading. You have access to detailed information about the user including:
 - Complete birth chart with planetary positions, signs, degrees, and houses
@@ -214,11 +222,30 @@ async function makeOpenRouterRequest(
 
 async function getAstrologicalTransits(
   question: string,
-  apiKey: string
+  apiKey: string,
+  userProfile?: {
+    birth_chart?: {
+      planets?: {
+        sun?: { sign: string; degree: number; house: number };
+        moon?: { sign: string; degree: number; house: number };
+        mercury?: { sign: string; degree: number; house: number };
+        venus?: { sign: string; degree: number; house: number };
+        mars?: { sign: string; degree: number; house: number };
+        jupiter?: { sign: string; degree: number; house: number };
+        saturn?: { sign: string; degree: number; house: number };
+        uranus?: { sign: string; degree: number; house: number };
+        neptune?: { sign: string; degree: number; house: number };
+        pluto?: { sign: string; degree: number; house: number };
+      };
+    };
+  }
 ): Promise<string> {
+  // Create the system prompt with the user's birth chart data
+  const systemPrompt = createTransitSystemPrompt(userProfile?.birth_chart);
+
   const response = await makeOpenRouterRequest(
     [{ role: "user", content: `Research current and upcoming planetary transits relevant to this question: ${question}` }],
-    TRANSIT_SYSTEM_PROMPT,
+    systemPrompt,
     "google/gemini-2.0-flash-thinking-exp:free",
     apiKey
   );
@@ -349,7 +376,7 @@ ${userProfile.birth_card.meaning ? `Meaning: ${userProfile.birth_card.meaning}` 
     
     if (timeBasedKeywords.test(lastMessage.content)) {
       try {
-        transitInfo = await getAstrologicalTransits(lastMessage.content, apiKey);
+        transitInfo = await getAstrologicalTransits(lastMessage.content, apiKey, userProfile);
         transitInfo = `\n\nCurrent Transit Information:\n${transitInfo}`;
       } catch (error) {
         console.error('Error fetching transits:', error);
