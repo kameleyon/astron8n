@@ -505,17 +505,39 @@ export async function POST(req: Request) {
             'X-Title': 'AstroGenie Transit Data'
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.0-flash-001',
+            model: 'google/gemini-2.0-flash-thinking-exp:free',
             messages: [
               {
                 role: 'system',
-                content: `You are an expert astrologer with real-time astronomical knowledge. Your task is to provide precise, current astrological data with specific dates and times. Focus on factual astronomical positions and transitions.
+                content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
+Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today's date (February 19, 2025).
 
-              Go to https://horoscopes.astro-seek.com/calculate-astrology-ephemeris-february-2025/?table=long_retro&bg_0=&aya=&presnost=1&barva=p&uzel_true=&lilith_true= and search for the next 30 days astrological transits.
-              Go to https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025 and look for all the retrograded planets and all planets moving forwards out of retrograde for the next 30 days astrological transits.
-              Go to https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025 and check if we have any eclipse for the next 30 days astrological transits.
+To achieve this, meticulously examine EACH of the following links:
 
-Required output format:
+- Retrograde Planets: https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025
+- Solar and Lunar Eclipses: https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025
+- Astrology Aspects Search Engine: https://horoscopes.astro-seek.com/astrology-aspects-online-search-engine
+- Monthly Calendar - January 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-january-2025
+- Monthly Calendar - February 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-february-2025
+- Monthly Calendar - March 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-march-2025
+- Monthly Calendar - April 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-april-2025
+- Monthly Calendar - May 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-may-2025
+- Monthly Calendar - June 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-june-2025
+- Monthly Calendar - July 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-july-2025
+- Monthly Calendar - August 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-august-2025
+- Monthly Calendar - September 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-september-2025
+- Monthly Calendar - October 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-october-2025
+- Monthly Calendar - November 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-november-2025
+- Monthly Calendar - December 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-december-2025
+
+Instructions for each link:
+
+1. From the first link (https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025), extract all retrograde start and/or end dates falling within the next 30 days.
+2. From the second link (https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025), extract any solar and lunar eclipses within the next 30 days.
+3. From the third link (https://horoscopes.astro-seek.com/astrology-aspects-online-search-engine), extract major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles.
+4. From the monthly calendar links, extract daily planetary transits and aspects, ensuring no events are missed.
+
+You need to get
 1. Current celestial positions (exact degrees)
 2. Upcoming transits (exact dates and times)
 3. Retrograde periods (start/end dates)
@@ -525,6 +547,14 @@ Required output format:
 7. Use thecardsoflife.com/all-life-cards for cardology
 8. Planets coming out of retrograde period and moving forwards
 9. Upcoming eclipses
+10. North nodes and south nodes
+11. Lilith transits (exact dates and times) 
+
+Required output
+Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
+[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - why it is important.
+
+
 Each data point must include:
 - Exact dates (DD/MM/YYYY)
 - Precise degrees for planetary positions
@@ -533,25 +563,20 @@ Each data point must include:
               },
               {
                 role: 'user',
-                content: `Gather a comprehensive and detailed astrological aspects and transits for the next 30 days starting from ${new Date().toLocaleDateString('en-GB')}. 
+                content: `Gather a comprehensive and detailed astrological aspects and transits for the next 30 days starting from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
                 
                 Include:
-1. PLANETARY POSITIONS
-- Current positions (degrees/minutes)
-- Sign placements
-- House positions
-2. TRANSITS (next 30 days)
-- All planetary ingresses include sign and the period of time they will remains in that sign
-- All Major aspects formations including the degrees/minutes
-- All planetary Retrograde stations in which sign and degrees/minutes
-- All planetary moving forward after being retrograted in which sign include degrees/minutes
-- Lunar phases and nodes in which signs include degrees/minutes
-- Any stellium please mentions the planets involved in which sign, include degrees/minutes as well
-- Upcoming eclipses (if any) in what sign and degrees/minutes what are they bringing and how long will be their effect 
-3. CARDOLOGY INFLUENCES
-- Current planetary rulers
-- Active birth cards
-- Yearly spread positions
+Required output
+Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
+[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - why it is important.
+
+
+Each data point must include:
+- Exact dates (DD/MM/YYYY)
+- Precise degrees for planetary positions
+- Specific timing for transitions
+- Duration for longer events
+
 Format in strict markdown with:
 # [Main Sections]
 ## [Subsections]
@@ -630,7 +655,7 @@ Format in strict markdown with:
             'X-Title': 'AstroGenie Report Generator'
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.0-flash-001',
+            model: 'qwen/qwen-plus',
             messages: [
               {
                 role: 'system',
@@ -644,7 +669,8 @@ Your report should include:
 - Provide guidance on love, career, finances, health, and timing for key decisions.
 - An integrated interpretation of the influences that shape the client's personal design, life purpose, energetic blueprint, and inherent patterns—presented fluidly without reference to the specific methodologies.
 - A comprehensive synthesis that provides actionable guidance on love, career, finances, health, and timing for key decisions and events.
-- A captivating, warm, welcoming and casual tone that is both honest and empowering.
+- A captivating, warm, welcoming tone and casual language and it's ok to use urban language that is both empathic, honest and empowering.
+- DO NOT USE ASTERIX (*) OR (**)
 
 Use a warm, friendly, honest tone. Be empowering but direct. Merge all interpretations into one cohesive narrative. Avoid explicitly naming systems like I Ching, Human Design, or Cardology by name.
 
@@ -660,13 +686,7 @@ Structure the report as follows:
 # Key Planetary Influences and Aspects
 Start by listing:
 Astrology transits for the next 30 days
-- All planetary ingresses include sign and the period of time they will remains in that sign
-- All Major aspects formations including the degrees/minutes
-- All planetary Retrograde stations in which sign and degrees/minutes
-- All planetary moving forward after being retrograted in which sign include degrees/minutes
-- Lunar phases and nodes in which signs include degrees/minutes
-- Any stellium please mentions the planets involved in which sign, include degrees/minutes as well
-- Upcoming eclipses (if any) in what sign and degrees/minutes what are they bringing and how long will be their effect 
+${transitData}
 
 ---------------------------
 Aspect Analysis
@@ -720,7 +740,7 @@ Introduce in a short paragraph that we are going to go into more details.
 - Conclude with a thought‑provoking statement that leaves the reader inspired and ready to engage with the coming month.
 
 Guidelines:
-- Use clean markdown formatting without emojis.
+- Use clean markdown formatting without emojis and do not put the asterix * or **.
 - Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 5500 words.
 - Maintain a warm, engaging, casual language with a touch of urban expression and familiar tone where user feel cozy and at home or hearing their best friend talking.
 - Use their name throughout the report, address them directly like they where your best friend. 

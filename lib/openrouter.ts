@@ -21,7 +21,7 @@ function getCurrentDateTime() {
 }
 
 const TRANSIT_SYSTEM_PROMPT = `You are an expert astrological researcher. Your task is to:
-1. Go to https://horoscopes.astro-seek.com/calculate-astrology-ephemeris-february-2025/?table=long_retro&bg_0=&aya=&presnost=1&barva=p&uzel_true=&lilith_true= and search for current and upcoming or past planetary positions and transits related to the question
+1. Search the internet for current, upcoming or past planetary positions, aspects and transits related to the question - Search also for astrological events, retrograde, comming out of retrograde, eclipse events and the sign they happen, their degrees/minutes that have a direct influence on the inquery. 
 2. Focus on the specific time period mentioned in the question
 3. Return detailed transit information including:
    - Planetary positions in signs
@@ -169,7 +169,7 @@ async function getAstrologicalTransits(
   const response = await makeOpenRouterRequest(
     [{ role: "user", content: `Research current and upcoming planetary transits relevant to this question: ${question}` }],
     TRANSIT_SYSTEM_PROMPT,
-    "perplexity/llama-3.1-sonar-small-128k-online",
+    "google/gemini-2.0-flash-thinking-exp:free",
     apiKey
   );
   
