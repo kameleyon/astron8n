@@ -512,9 +512,33 @@ export async function POST(req: Request) {
             role: 'system',
             content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
 
-Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today's date from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
+Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
 
-To achieve this, meticulously examine EACH of the following links:
+Format your response exactly like this example:
+
+Retrograde and Direct Planets:
+Mars Direct: February 24, 2025
+Venus Retrograde: Starts March 2, 2025
+Mercury Retrograde: Starts March 15, 2025
+Mercury Direct: March 1, 2025
+
+Solar and Lunar Eclipses:
+March 14, 2025: Total Lunar Eclipse in Virgo at 06:59 UTC
+
+Daily Planetary Transits and Aspects:
+February 2025
+
+February 19, 2025:
+Sun enters Pisces at 10:07 AM
+February 20, 2025:
+Mercury Sextile Jupiter at 8:13 PM
+February 23, 2025:
+Neptune Conjunct North Node at 3:47 AM
+Mercury Square Mars at 4:57 PM
+
+[Continue with exact dates, times, and positions for all events]
+
+To gather this data, examine these sources:
 
 - Retrograde Planets: https://astrostyle.com/2025-retrogrades-in-astrology-dates-and-planets/ or https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025
 - Solar and Lunar Eclipses: https://www.farmersalmanac.com/lunar-and-solar-eclipses or https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025
@@ -538,23 +562,12 @@ Instructions for each link:
 3. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
 
 
-Required output
-Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
-[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - add how important it is and any important events that happened in the past during this astrological transits, events, and/or aspects.
+IMPORTANT: Follow the format of the example above EXACTLY, including the sections for:
+1. Retrograde and Direct Planets
+2. Solar and Lunar Eclipses
+3. Daily Planetary Transits and Aspects (organized by month)
 
-Each data point must include:
-- Exact dates (DD/MM/YYYY)
-- Precise degrees for planetary positions
-- Specific timing for transitions
-- Duration for longer events
-- WRITE THEM ALL
-- WRITE THEM IN CHRONOLOGICAL ORDER
-
-Format your response exactly like this:
-
-Upcoming 30-day Astrology Transits and Aspects:
-###[Date]:     
-[Event include sign and degrees+minutes, with exact time]
+Do not deviate from this format. Use the exact same structure and formatting as shown in the example.
 
 `
           },
@@ -571,7 +584,7 @@ Upcoming 30-day Astrology Transits and Aspects:
         clearTimeout(timeoutId);
 
         console.log('Transit data response status:', perplexityResponse.status);
-        const perplexityData = await perplexityResponse.json();
+        const perplexityData = await perplexityResponse.json() as { error?: string, choices?: Array<{ message?: { content?: string } }> };
 
         if (!perplexityResponse.ok) {
           const error = perplexityData.error || perplexityResponse.statusText;
@@ -586,6 +599,9 @@ Upcoming 30-day Astrology Transits and Aspects:
         }
 
         transitData = perplexityData.choices[0].message.content;
+        console.log('=== TRANSIT DATA FROM GEMINI ===');
+        console.log(transitData);
+        console.log('=== END TRANSIT DATA ===');
         console.log('Transit data retrieved successfully');
         break;
       } catch (error: unknown) {
@@ -642,6 +658,7 @@ Upcoming 30-day Astrology Transits and Aspects:
                 content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, including the user's name, the user's combined natal chart data, and the next 30 days of transits. Provide an in‑depth forecast that integrates all insights into a single, coherent narrative.
 
 Your report should include:
+
 - 30-day planetary positions and upcoming transits from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
 - Use the I Ching as a method of divination which means using the traditional coin method for an initial hexagram, transition lines, and a final hexagram. Integrate it seamlessly without naming the method.
 - An analysis of how upcoming planetary transits (Moon phases, nodes, Retrogrades, Eclipses, etc.) will interact with the client's natal chart (include specific degrees, houses, aspects, dates, etc.).
@@ -665,21 +682,8 @@ Structure the report as follows:
 
 
 # Key Planetary Influences and Aspects
-Start by listing:
-Astrology transits for the next 30 days
-show the full content of ${transitData} data following the format specified a follow:
-Format your response exactly like this:
-
-Combine all extracted information into a single, well-organized list. Format the list chronologically by date, Ascending:
-[Date]: Event and/or transits and/or aspects, signs, degrees/minutes - add how important it is and any important events that happened in the past during this astrological transits, events, and/or aspects.
-
-Each data point must include:
-- Exact dates (DD/MM/YYYY)
-- Precise degrees for planetary positions
-- Specific timing for transitions
-- Duration for longer events
-- Make sure you include retrograde ending, in progress, or upcoming... include the sign, the user's house, the degree and the aspect they make with the user's natal chart 
-- Make sure you include any solar/luna eclipse ending, in progress, or upcoming... include the sign, the user's house, the degree and the aspect they make with the user's natal chart (if any)
+Here is the complete transit data extracted by Gemini:
+${transitData}
 
 Format your response exactly like this:
 
@@ -746,6 +750,7 @@ Guidelines:
 - Be direct and honest about both opportunities and challenges.
 - Make each section comprehensive, detailed and elaborated do not hesitated to make it heartfelt when needed, or empowering if needed. But always remains straightforward, tell the truth, no sugarcoating.
 - Seamlessly blend all interpretations so that the various influences appear as a natural part of one integrated narrative, without naming the underlying systems explicitly.`
+    
              
               },
               {
@@ -769,14 +774,14 @@ Follow these structure guidelines:
               }
             ],
             temperature: 0.8,
-            max_tokens: 20000
+            max_tokens: 80000
           })
         });
 
         clearTimeout(timeoutId);
 
         console.log('Report generation response status:', response.status);
-        const data = await response.json();
+        const data = await response.json() as { error?: string, choices?: Array<{ message?: { content?: string } }> };
 
         if (!response.ok) {
           const error = data.error || response.statusText;
@@ -791,6 +796,10 @@ Follow these structure guidelines:
         }
 
         reportContent = data.choices[0].message.content;
+        console.log('=== REPORT CONTENT ===');
+        console.log('Transit Data passed to LLama:', transitData);
+        console.log('Final Report Content:', reportContent);
+        console.log('=== END REPORT CONTENT ===');
         console.log('Report generated successfully');
         break; // success
 

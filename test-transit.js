@@ -5,7 +5,7 @@ async function getTransitData() {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer ',
         'Content-Type': 'application/json',
         'HTTP-Referer': 'http://localhost:3000',
         'X-Title': 'AstroGenie Transit Data'
