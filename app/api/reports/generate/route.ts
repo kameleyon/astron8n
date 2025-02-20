@@ -234,42 +234,76 @@ y = lineY - 50; // move your y pointer below the line
       // Blank line
       y -= 20;
     } else {
-      // Regular paragraph text with wrapping
-      const words = line.split(' ');
-      let currentLine = '';
-      let xPos = margin;
+  // Regular paragraph text with wrapping
+  let currentLine = '';
+  let xPos = margin;
+  let isBold = false;
+  let text = line;
 
-      for (const word of words) {
-        const testLine = currentLine + word + ' ';
-        const textWidth = helvetica.widthOfTextAtSize(testLine, 12);
-
-        if (xPos + textWidth > pageWidth - margin) {
-          currentPage.drawText(currentLine, {
-            x: xPos,
-            y,
-            size: 12,
-            font: helvetica,
-            color: rgb(0, 0, 0),
-          });
-          currentLine = word + ' ';
-          y -= 20;
-          xPos = margin;
-        } else {
-          currentLine = testLine;
-        }
+  // Handle markdown bold formatting
+  if (text.includes('**')) {
+    const parts = text.split('**');
+    // If we have an odd number of parts, the last part shouldn't be bold
+    const lastPart = parts.length % 2 === 1 ? parts.pop() : '';
+    // Join pairs of parts (text between ** markers)
+    const processedParts = [];
+    for (let i = 0; i < parts.length; i += 2) {
+      if (i + 1 < parts.length) {
+        // This is text that was between ** markers, should be bold
+        processedParts.push(parts[i] + parts[i + 1]);
+      } else {
+        processedParts.push(parts[i]);
       }
+    }
+    text = processedParts.join('') + (lastPart || '');
+    isBold = parts.length > 1; // If we had ** markers, make it bold
+  }
 
-      if (currentLine.trim()) {
-        currentPage.drawText(currentLine, {
-          x: xPos,
-          y,
-          size: 12,
-          font: helvetica,
-          color: rgb(0, 0, 0),
-        });
-      }
+  // Handle ### formatting
+  if (text.startsWith('###')) {
+    text = text.substring(3);
+    isBold = true;
+  }
 
+  const words = text.split(' ');
+  for (const word of words) {
+    const testLine = currentLine + word + ' ';
+    const textWidth = (isBold ? helveticaBold : helvetica).widthOfTextAtSize(testLine, 12);
+
+    if (xPos + textWidth > pageWidth - margin) {
+      currentPage.drawText(currentLine, {
+        x: xPos,
+        y,
+        size: 12,
+        font: isBold ? helveticaBold : helvetica,
+        color: rgb(0, 0, 0),
+      });
+      currentLine = word + ' ';
       y -= 20;
+      xPos = margin;
+    } else {
+      currentLine = testLine;
+    }
+  }
+
+  if (currentLine.trim()) {
+    currentPage.drawText(currentLine, {
+      x: xPos,
+      y,
+      size: 12,
+      font: isBold ? helveticaBold : helvetica,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  // Add extra spacing at bottom of page
+  y -= 30;
+
+  // Check if we're too close to bottom margin
+  if (y < margin + 50) {
+    currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+    y = pageHeight - margin;
+  }
     }
   }
 
@@ -576,7 +610,7 @@ Format in strict markdown with:
 
     // 2) Generate the final 30-day forecast with llama
     console.log('Starting report generation...');
-    let reportContent: string;
+    let reportContent: string = '';
     retryCount = 0;
 
     while (retryCount < maxRetries) {
