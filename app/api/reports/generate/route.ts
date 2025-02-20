@@ -23,7 +23,7 @@ function getSupabaseClient() {
   );
 }
 
-async function createPDF(content: string, userName: string) {
+async function createPDF(content: string, firstName: string) {
   const pdfDoc = await PDFDocument.create();
   const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -336,7 +336,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { userId, userName, reportType } = await req.json();
+    const { userId, reportType } = await req.json();
 
     if (userId !== user.id) {
       return NextResponse.json(
@@ -345,7 +345,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get user profile data
+    // Get user profile data and extract first name
     const { data: userProfile, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
@@ -353,6 +353,16 @@ export async function POST(req: Request) {
       .single();
 
     if (profileError || !userProfile) {
+      return NextResponse.json(
+        { error: 'User profile not found' },
+        { status: 404 }
+      );
+    }
+
+    // Extract first name from full name
+    const firstName = userProfile.full_name?.split(' ')[0] || 'User';
+
+    if (!userProfile) {
       return NextResponse.json(
         { error: 'User profile not found' },
         { status: 404 }
@@ -513,28 +523,24 @@ export async function POST(req: Request) {
             content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
 
 Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
-
 Format your response exactly like this example:
 
-Retrograde and Direct Planets:
-Mars Direct: February 24, 2025
-Venus Retrograde: Starts March 2, 2025
-Mercury Retrograde: Starts March 15, 2025
-Mercury Direct: March 1, 2025
-
-Solar and Lunar Eclipses:
-March 14, 2025: Total Lunar Eclipse in Virgo at 06:59 UTC
-
-Daily Planetary Transits and Aspects:
 February 2025
+19
+Sun enters Pisces at 10:07 AM, 0°00' Pisces (House 8, trine natal Venus)
+20
+Mercury Sextile Jupiter at 8:13 PM, Mercury at 15°45' Aquarius, Jupiter at 15°45' Aries (Mercury in House 7 sextile natal Mars)
+23
+Neptune Conjunct North Node at 3:47 AM, 25°12' Pisces (House 8, square natal Saturn)
+Mercury Square Mars at 4:57 PM, Mercury at 18°30' Aquarius, Mars at 18°30' Taurus (Mercury in House 7 opposing natal Jupiter)
 
-February 19, 2025:
-Sun enters Pisces at 10:07 AM
-February 20, 2025:
-Mercury Sextile Jupiter at 8:13 PM
-February 23, 2025:
-Neptune Conjunct North Node at 3:47 AM
-Mercury Square Mars at 4:57 PM
+March 2025
+2
+Venus stations Retrograde at 28°45' Aries (House 9, trine natal Sun)
+14
+Total Lunar Eclipse at 24°15' Virgo (House 2, conjunct natal Moon)
+15
+Mercury stations Retrograde at 5°30' Aries (House 9, square natal Mercury)
 
 [Continue with exact dates, times, and positions for all events]
 
@@ -558,11 +564,20 @@ To gather this data, examine these sources:
 Instructions for each link:
 
 1. From the monthly calendar links, extract daily planetary transits and aspects, extract all retrograde start and/or end dates falling within the next 30 days, include also all the solar and lunar eclipses and, major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles, ensuring no events are missed.
-2. IDENTIFY THE RETROGRADE FIRST STARTING, ENDING, OR IN PROGRESS. 
-3. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
+2. For each event, include:
+   - The exact time in UTC
+   - The exact degrees and minutes of the planets involved
+   - The house position of the transiting planet
+   - Any aspects formed with the natal chart ${JSON.stringify(combinedData, null, 2)}
+3. IDENTIFY THE RETROGRADE FIRST STARTING, ENDING, OR IN PROGRESS. 
+4. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
 
 
-IMPORTANT: Follow the format of the example above EXACTLY, including the sections for:
+IMPORTANT: Follow the format of the example above EXACTLY, structure as followed:
+[Month Year]
+- [Date (MM/DD)]: [Event including sign and degrees/minutes]
+[Aspect with user's natal chart and in which house of the user's natal chart]: [How this aspect will impact the user's life during this transit.]
+
 1. Retrograde and Direct Planets
 2. Solar and Lunar Eclipses
 3. Daily Planetary Transits and Aspects (organized by month)
@@ -682,18 +697,10 @@ Structure the report as follows:
 
 
 # Key Planetary Influences and Aspects
-Here is the complete transit data extracted by Gemini:
+In this section, include a verbatim copy and paste all of the Transit Data provided above. Do not summarize or modify it in any way. For each one write a short paragraphe elaborating on how each will impact your natal chart.
+Here is the complete transit:
 ${transitData}
 
-Format your response exactly like this:
-
-Upcoming 30-day Astrology Transits and Aspects:
-###[Date]:     
-[Event include sign and degrees+minutes, with exact time] [write for each a paragraph elaborating in detail how they will impact and influence they will have on the user's natal chart ${JSON.stringify(combinedData, null, 2)}, the aspect they will create on their birth chart and in which house and what degree and minuted. include why they are playing an important role on the user's natal chart for this period and for each of them a clear explanation of their effects on the user's natal charts, are making any aspects with user's natal chart in what house include degree and minutes]
-
-[Continue chronologically for each date with events].
-
-- make this section very detailed, comprehensive and knowledgeable
 
 
 # In Deph Analysis
@@ -744,7 +751,7 @@ Introduce in a one welcoming, captivating paragraph that you are going to go int
 
 Guidelines:
 - Use clean markdown formatting without emojis and do not put the asterix * or **.
-- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 600 words.
+- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 5500 words.
 - Maintain a warm, engaging, casual language with a touch of urban expression and familiar tone where user feel cozy and at home or hearing their best friend talking.
 - Use their name throughout the report, address them directly like they where your best friend. 
 - Be direct and honest about both opportunities and challenges.
@@ -757,7 +764,7 @@ Guidelines:
                 role: 'user',
                 content: `Create a comprehensive 30-day forecast using the following data:
 
-User Name: ${userName}
+User Name: ${firstName}
 
 Personal Data:
 ${JSON.stringify(combinedData, null, 2)}
@@ -766,9 +773,9 @@ Transit Data:
 ${transitData}
 
 Follow these structure guidelines:
-1. Open with a warmed and welcomed greeting to ${userName}, forging a personal connection.
+1. Open with a warmed and welcomed greeting to ${firstName}, forging a personal connection.
 2. Generate the I Ching divinatory reading (initial hexagram, transition lines, final hexagram) but do not mention the method by name.
-3. Include how the next 30 days of transits specifically affect ${userName}'s chart.
+3. Include how the next 30 days of transits specifically affect ${firstName}'s chart.
 4. Provide a deep, comprehensive, detailed, and knowledgeable analysis for love, career, finances, health, and timing.
 5. Remember to not mention I ching, Human Design, Life Path, and Cardology.`
               }
@@ -823,11 +830,11 @@ Follow these structure guidelines:
 
     // Create PDF from the final report
     console.log('Creating PDF...');
-    const pdfBytes = await createPDF(reportContent, userName);
+    const pdfBytes = await createPDF(reportContent, firstName);
 
     // Save report to Supabase Storage
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `${userName}-30DayReport-${timestamp}.pdf`;
+    const fileName = `${firstName}-30DayReport-${timestamp}.pdf`;
 
 
     let uploadAttempt = 1;
