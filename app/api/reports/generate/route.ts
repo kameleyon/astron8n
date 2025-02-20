@@ -505,14 +505,14 @@ export async function POST(req: Request) {
             'X-Title': 'AstroGenie Transit Data'
           },
           body: JSON.stringify({
-            model: 'perplexity/llama-3.1-sonar-small-128k-online',
+            model: 'google/gemini-2.0-flash-001',
             messages: [
               {
                 role: 'system',
                 content: `You are an expert astrologer with real-time astronomical knowledge. Your task is to provide precise, current astrological data with specific dates and times. Focus on factual astronomical positions and transitions.
 
               Go to https://horoscopes.astro-seek.com/calculate-astrology-ephemeris-february-2025/?table=long_retro&bg_0=&aya=&presnost=1&barva=p&uzel_true=&lilith_true= and search for the next 30 days astrological transits.
-              Go to https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025 and look for all the retrograded planets  for the next 30 days astrological transits.
+              Go to https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025 and look for all the retrograded planets and all planets moving forwards out of retrograde for the next 30 days astrological transits.
               Go to https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025 and check if we have any eclipse for the next 30 days astrological transits.
 
 Required output format:
@@ -523,6 +523,8 @@ Required output format:
 5. Notable aspects and configurations
 6. Use astro.com for upcoming astrological transists
 7. Use thecardsoflife.com/all-life-cards for cardology
+8. Planets coming out of retrograde period and moving forwards
+9. Upcoming eclipses
 Each data point must include:
 - Exact dates (DD/MM/YYYY)
 - Precise degrees for planetary positions
@@ -628,7 +630,7 @@ Format in strict markdown with:
             'X-Title': 'AstroGenie Report Generator'
           },
           body: JSON.stringify({
-            model: 'meta-llama/llama-3.3-70b-instruct',
+            model: 'google/gemini-2.0-flash-001',
             messages: [
               {
                 role: 'system',
