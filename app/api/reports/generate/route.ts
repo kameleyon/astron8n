@@ -44,7 +44,6 @@ async function createPDF(content: string, firstName: string) {
   const firstPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let y = pageHeight - 50;
 
-
   // Try to embed the logo from public/orangelogo.png
   try {
     const logoPath = path.join(process.cwd(), 'public', 'orangelogo.png');
@@ -52,19 +51,19 @@ async function createPDF(content: string, firstName: string) {
     const logoImage = await pdfDoc.embedPng(logoBytes);
     const logoDims = logoImage.scale(0.25);
 
-   // Get the width of the page
-  const pageWidth = firstPage.getWidth();
+    // Get the width of the page
+    const pageWidth = firstPage.getWidth();
 
-  // Calculate the x position to center the logo
-  const centeredX = (pageWidth - logoDims.width) / 2;
+    // Calculate the x position to center the logo
+    const centeredX = (pageWidth - logoDims.width) / 2;
 
-  // Draw the logo with the centered x coordinate
-  firstPage.drawImage(logoImage, {
-    x: centeredX,
-    y: y - logoDims.height, // adjust y as needed
-    width: logoDims.width,
-    height: logoDims.height,
-  });
+    // Draw the logo with the centered x coordinate
+    firstPage.drawImage(logoImage, {
+      x: centeredX,
+      y: y - logoDims.height,
+      width: logoDims.width,
+      height: logoDims.height,
+    });
 
     // Adjust y position to avoid overlap with the logo
     y -= logoDims.height + 30;
@@ -85,66 +84,51 @@ async function createPDF(content: string, firstName: string) {
   });
   y -= 35;
 
-   // Draw the subtitle
-   const subTitle = 'Comprehensive upcoming 30-Day Focus and Action Plan';
-   const subTitleWidth = helvetica.widthOfTextAtSize(subTitle, 14);
-   firstPage.drawText(subTitle, {
-     x: (pageWidth - subTitleWidth) / 2,
-     y: y,
-     size: 14,
-     font: helvetica,
-     color: rgb(0.4, 0.4, 0.4),
-   });
-   y -= 25;
- 
-   // Date range
-   const dateRangeText = `From ${todayStr} to ${endDateStr}`;
-   const dateRangeWidth = helvetica.widthOfTextAtSize(dateRangeText, 12);
-   firstPage.drawText(dateRangeText, {
-     x: (pageWidth - dateRangeWidth) / 2,
-     y: y,
-     size: 12,
-     font: helvetica,
-     color: rgb(0.2, 0.2, 0.2),
-   });
-   y -= 20;
+  // Draw the subtitle
+  const subTitle = 'Comprehensive upcoming 30-Day Focus and Action Plan';
+  const subTitleWidth = helvetica.widthOfTextAtSize(subTitle, 14);
+  firstPage.drawText(subTitle, {
+    x: (pageWidth - subTitleWidth) / 2,
+    y: y,
+    size: 14,
+    font: helvetica,
+    color: rgb(0.4, 0.4, 0.4),
+  });
+  y -= 25;
 
+  // Date range
+  const dateRangeText = `From ${todayStr} to ${endDateStr}`;
+  const dateRangeWidth = helvetica.widthOfTextAtSize(dateRangeText, 12);
+  firstPage.drawText(dateRangeText, {
+    x: (pageWidth - dateRangeWidth) / 2,
+    y: y,
+    size: 12,
+    font: helvetica,
+    color: rgb(0.2, 0.2, 0.2),
+  });
+  y -= 20;
 
+  // Draw the divider line
+  const lineY = y - 10;
+  firstPage.drawLine({
+    start: { x: margin, y: lineY },
+    end: { x: pageWidth - margin, y: lineY },
+    thickness: 1,
+    color: rgb(0.8, 0.8, 0.8),
+  });
+  y = lineY - 50;
 
-
-
-
-
-
-
-  // Draw the divider line at current y (minus a little extra if you want spacing)
-const lineY = y - 10; // move 10 more points below
-firstPage.drawLine({
-  start: { x: margin, y: lineY },
-  end: { x: pageWidth - margin, y: lineY },
-  thickness: 1,
-  color: rgb(0.8, 0.8, 0.8),
-});
-y = lineY - 50; // move your y pointer below the line
-
-  // Now we’ll parse the final content and place it below the top section
+  // Parse and place content
   let currentPage = firstPage;
-
-  // Split the text content by lines
-
   const lines = content.split('\n');
+
   for (const line of lines) {
-    // Check if we need a new page
     if (y < margin + 50) {
       currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
       y = pageHeight - margin;
     }
 
-    // Markdown-style formatting
-    // In your for-loop where you parse lines:
     if (line.startsWith('# ')) {
-      // Remove the rectangle background
-      // Just print the text
       y -= 30;
       currentPage.drawText(line.substring(2), {
         x: margin,
@@ -163,10 +147,8 @@ y = lineY - 50; // move your y pointer below the line
         font: helveticaBold,
         color: rgb(254/255, 142/255, 12/255),
       });
-      // No underline or background
       y -= 30;
     } else if (line.startsWith('- ')) {
-      // Bullet points
       currentPage.drawText('•', {
         x: margin + 15,
         y,
@@ -174,7 +156,6 @@ y = lineY - 50; // move your y pointer below the line
         font: helvetica,
         color: rgb(254/255, 142/255, 12/255),
       });
-
 
       const bulletText = line.substring(2);
       const words = bulletText.split(' ');
@@ -213,89 +194,82 @@ y = lineY - 50; // move your y pointer below the line
 
       y -= 30;
     } else if (line.trim() === '') {
-      // Blank line
       y -= 20;
     } else {
-  // Regular paragraph text with wrapping
-  let currentLine = '';
-  let xPos = margin;
-  let isBold = false;
-  let text = line;
+      let currentLine = '';
+      let xPos = margin;
+      let isBold = false;
+      let text = line;
 
-  // Handle markdown bold formatting
-  if (text.includes('**')) {
-    const parts = text.split('**');
-    // If we have an odd number of parts, the last part shouldn't be bold
-    const lastPart = parts.length % 2 === 1 ? parts.pop() : '';
-    // Join pairs of parts (text between ** markers)
-    const processedParts = [];
-    for (let i = 0; i < parts.length; i += 2) {
-      if (i + 1 < parts.length) {
-        // This is text that was between ** markers, should be bold
-        processedParts.push(parts[i] + parts[i + 1]);
-      } else {
-        processedParts.push(parts[i]);
+      if (text.includes('**')) {
+        const parts = text.split('**');
+        const lastPart = parts.length % 2 === 1 ? parts.pop() : '';
+        const processedParts = [];
+        for (let i = 0; i < parts.length; i += 2) {
+          if (i + 1 < parts.length) {
+            processedParts.push(parts[i] + parts[i + 1]);
+          } else {
+            processedParts.push(parts[i]);
+          }
+        }
+        text = processedParts.join('') + (lastPart || '');
+        isBold = parts.length > 1;
+      }
+
+      if (text.startsWith('###')) {
+        text = text.substring(3);
+        isBold = true;
+      }
+
+      const words = text.split(' ');
+      for (const word of words) {
+        const testLine = currentLine + word + ' ';
+        const textWidth = (isBold ? helveticaBold : helvetica).widthOfTextAtSize(testLine, 12);
+
+        if (xPos + textWidth > pageWidth - margin) {
+          currentPage.drawText(currentLine, {
+            x: xPos,
+            y,
+            size: 12,
+            font: isBold ? helveticaBold : helvetica,
+            color: rgb(0, 0, 0),
+          });
+          currentLine = word + ' ';
+          y -= 20;
+          xPos = margin;
+        } else {
+          currentLine = testLine;
+        }
+      }
+
+      if (currentLine.trim()) {
+        currentPage.drawText(currentLine, {
+          x: xPos,
+          y,
+          size: 12,
+          font: isBold ? helveticaBold : helvetica,
+          color: rgb(0, 0, 0),
+        });
+      }
+
+      y -= 30;
+
+      if (y < margin + 50) {
+        currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+        y = pageHeight - margin;
       }
     }
-    text = processedParts.join('') + (lastPart || '');
-    isBold = parts.length > 1; // If we had ** markers, make it bold
   }
 
-  // Handle ### formatting
-  if (text.startsWith('###')) {
-    text = text.substring(3);
-    isBold = true;
-  }
-
-  const words = text.split(' ');
-  for (const word of words) {
-    const testLine = currentLine + word + ' ';
-    const textWidth = (isBold ? helveticaBold : helvetica).widthOfTextAtSize(testLine, 12);
-
-    if (xPos + textWidth > pageWidth - margin) {
-      currentPage.drawText(currentLine, {
-        x: xPos,
-        y,
-        size: 12,
-        font: isBold ? helveticaBold : helvetica,
-        color: rgb(0, 0, 0),
-      });
-      currentLine = word + ' ';
-      y -= 20;
-      xPos = margin;
-    } else {
-      currentLine = testLine;
-    }
-  }
-
-  if (currentLine.trim()) {
-    currentPage.drawText(currentLine, {
-      x: xPos,
-      y,
-      size: 12,
-      font: isBold ? helveticaBold : helvetica,
-      color: rgb(0, 0, 0),
-    });
-  }
-
-  // Add extra spacing at bottom of page
-  y -= 30;
-
-  // Check if we're too close to bottom margin
-  if (y < margin + 50) {
-    currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
-    y = pageHeight - margin;
-  }
-    }
-  }
-
-  // Return the PDF bytes
   return await pdfDoc.save();
 }
 
 export async function POST(req: Request) {
   try {
-    // Verify auth header
+    // Initialize Supabase client
+    const supabase = getSupabaseClient();
+
+    // Get auth header and verify format
     const authHeader = req.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -304,15 +278,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verify the access token
+    // Extract and verify access token
     const accessToken = authHeader.split(' ')[1];
-    const supabase = getSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
+    let user;
+    
+    try {
+      const { data, error: authError } = await supabase.auth.getUser(accessToken);
+      
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
 
-    if (authError || !user) {
-      console.error('Auth error:', authError);
+      if (!data?.user) {
+        throw new Error('User not found');
+      }
+
+      user = data.user;
+    } catch (error) {
+      console.error('Authentication failed:', error);
       return NextResponse.json(
-        { error: 'Invalid authentication token' },
+        { error: 'Invalid or expired authentication token' },
         { status: 401 }
       );
     }
@@ -326,7 +312,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get user profile data and extract first name
+    // Get user profile data
     const { data: userProfile, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
@@ -343,13 +329,6 @@ export async function POST(req: Request) {
     // Extract first name from full name
     const firstName = userProfile.full_name?.split(' ')[0] || 'User';
 
-    if (!userProfile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
-    }
-
     // Define types for birth chart data
     interface Planet {
       name: string;
@@ -362,11 +341,10 @@ export async function POST(req: Request) {
       formatted: string;
     }
 
-    // Calculate the user’s birth chart
+    // Calculate birth chart
     let birthChartData;
     try {
       const { calculateBirthChart } = await import('../../../../birthchartpack/lib/services/astro/calculator');
-
 
       if (!userProfile.birth_date) {
         throw new Error('Birth date is required');
@@ -389,7 +367,6 @@ export async function POST(req: Request) {
       if (!birthChartData || !birthChartData.planets || !birthChartData.ascendant) {
         throw new Error('Birth chart calculation returned invalid data');
       }
-
     } catch (error) {
       console.error('Error calculating birth chart:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to calculate birth chart';
@@ -400,7 +377,6 @@ export async function POST(req: Request) {
     const sunPlanet = birthChartData.planets.find((p: Planet) => p.name === 'Sun');
     const moonPlanet = birthChartData.planets.find((p: Planet) => p.name === 'Moon');
 
-
     if (!sunPlanet?.sign || !moonPlanet?.sign || !birthChartData.ascendant?.sign) {
       console.error('Essential birth chart data is missing', {
         hasSunSign: !!sunPlanet?.sign,
@@ -410,7 +386,7 @@ export async function POST(req: Request) {
       throw new Error('Unable to generate report: Missing essential birth chart data');
     }
 
-    // Build a simplified birthChart object
+    // Build birth chart object
     const birthChart = {
       sun_sign: sunPlanet.sign,
       moon_sign: moonPlanet.sign,
@@ -420,7 +396,7 @@ export async function POST(req: Request) {
       planets: birthChartData.planets || []
     };
 
-    // Attempt to fetch user data
+    // Get user data
     let userDataFields = {
       human_design: {},
       numerology: {},
@@ -429,7 +405,6 @@ export async function POST(req: Request) {
     };
 
     const { data: existingData } = await supabase
-
       .from('user_data')
       .select('human_design, numerology, life_path, cardology')
       .eq('user_id', userId)
@@ -438,7 +413,6 @@ export async function POST(req: Request) {
     if (existingData) {
       userDataFields = existingData;
     } else {
-      // Create new user_data row if needed
       const { data: newData, error: insertError } = await supabase
         .from('user_data')
         .insert([{
@@ -458,13 +432,13 @@ export async function POST(req: Request) {
       }
     }
 
-    // Combine birth chart with user data
+    // Combine data
     const combinedData = {
       birth_chart: birthChart,
       ...userDataFields
     };
 
-
+    // Check OpenRouter API key
     const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
     if (!OPENROUTER_API_KEY) {
       return NextResponse.json(
@@ -473,14 +447,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1) Fetch transit data from perplexity
+    // Fetch transit data
     console.log('Starting transit data search...');
     let transitData: string | undefined;
-
-
     let retryCount = 0;
     const maxRetries = 3;
-    const timeout = 30000; // 30 seconds
+    const timeout = 30000;
 
     while (retryCount < maxRetries) {
       try {
@@ -495,36 +467,46 @@ export async function POST(req: Request) {
             'Content-Type': 'application/json',
             'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
             'X-Title': 'AstroGenie Transit Data'
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-thinking-exp:free',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.0-flash-thinking-exp:free',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a Master data analyst who can search the internet and gather data and organize them in a chronological manner. You will follow the instruction as directed.
 
-Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
+CRITICAL: You must check and list ALL retrograde periods in these three categories:
+
+1. Currently in Retrograde (list with exact dates and times):
+- Mars: Currently retrograde since Dec 6, 2024 at 06°10' Pisces, goes direct Feb 24, 2025 at 17°00' Leo
+- Jupiter: Currently retrograde since Oct 9, 2024 at 21°20' Sagittarius, goes direct Feb 4, 2025 at 11°16' Sagittarius
+- Uranus: Currently retrograde since Sep 1, 2024 at 27°15' Taurus, goes direct Jan 30, 2025 at 23°15' Taurus
+- North Node: Ongoing retrograde in Leo
+
+2. Going Retrograde in next 30 days (list with exact dates and times):
+- Mercury: Starts retrograde Mar 15, 2025 at 09°35' Aries
+- Venus: Starts retrograde Mar 2, 2025 at 10°50' Aries
+
+3. Coming out of Retrograde in next 30 days (list with exact dates and times):
+- Mars: Goes direct Feb 24, 2025 at 17°00' Leo
+- Jupiter: Goes direct Feb 4, 2025 at 11°16' Sagittarius
+- Uranus: Goes direct Jan 30, 2025 at 23°15' Taurus
+
+For each retrograde event, you MUST include:
+- Exact date and time in UTC
+- Exact degrees and minutes
+- Sign position
+- Whether going retrograde or direct
+
+For each planet/point, determine if it is:
+1. Currently in retrograde
+2. Going retrograde in the next 30 days
+3. Coming out of retrograde (going direct) in the next 30 days
+
+You MUST include ALL relevant retrograde periods in your output.
+
+Create a detailed list of all upcoming astrology events and planetary retrogrades, coming out of retrograde and in transits and/or any aspects going on for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
 Format your response following this exact structure:
-
-**Retrograde and Direct Planets:
-- February 24th, 2025: Mars goes direct at 18°29 in Leo at 13:38 UTC
-- March 1st, 2025: Venus goes retrograde at 18°29 in Libra at 13:38 UTC
-- March 15th, 2025: Mercury goes retrograde at 18°29 in Aries at 13:38 UTC
-
-**Solar and Lunar Eclipses:
-- March 5th, 2025: Partial Solar eclipse at 18°29 in Aries 13:38 UTC
-
-**Daily Planetary Transits and Aspects:
-
-February 2025
-- February 22th, 2025: Mercury Conjunct at 18°29 in Cancer at 13:38 UTC
-- February 24th, 2025: Mars goes direct at 18°29 in Leo at 13:38 UTC
-
-March 2025
-- March 1st, 2025: Venus goes retrograde at 18°29 in Capricorn at 13:38 UTC
-- March 5th, 2025: Partial Solar eclipse at 18°29 in Aries 13:38 UTC
-
-[Continue with exact dates, times, and positions for all events]
 
 To gather this data, examine these sources:
 
@@ -545,7 +527,7 @@ To gather this data, examine these sources:
 
 Instructions for each link:
 
-1. From the monthly calendar links, extract daily planetary transits and aspects, extract all retrograde start and/or end dates falling within the next 30 days, include also all the solar and lunar eclipses and, major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles, ensuring no events are missed.
+1. From the monthly calendar links, Solar and Lunar Eclipses links and, Retrograde Planets links extract daily planetary transits and aspects, extract all retrograde start and/or end dates falling within the next 30 days, include also all the solar and lunar eclipses and, major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles, ensuring no events are missed.
 2. For each event, include:
    - The exact time in UTC
    - The exact degrees and minutes of the planets involved
@@ -579,19 +561,17 @@ For each event, include:
 - House position
 - Aspects to natal chart
 
-Do not deviate from this format. Use the exact same structure and formatting as shown in the example.
-
-`
-          },
-          {
-            role: 'user',
-            content: 'Generate the transit data following the format specified above.'
-          }
-        ],
-        temperature: 0.2,
-        max_tokens: 25000
-      })
-    });
+Do not deviate from this format. Use the exact same structure and formatting as shown in the example.`
+              },
+              {
+                role: 'user',
+                content: 'Generate the transit data following the format specified above.'
+              }
+            ],
+            temperature: 0.2,
+            max_tokens: 25000
+          })
+        });
 
         clearTimeout(timeoutId);
 
@@ -599,11 +579,11 @@ Do not deviate from this format. Use the exact same structure and formatting as 
         const perplexityData = await perplexityResponse.json() as { error?: string, choices?: Array<{ message?: { content?: string } }> };
 
         if (!perplexityResponse.ok) {
-          const error = perplexityData.error || perplexityResponse.statusText;
-          if (error.includes('rate limit') || error.includes('429')) {
+          const errorMessage = typeof perplexityData.error === 'string' ? perplexityData.error : perplexityResponse.statusText;
+          if (errorMessage.includes('rate limit') || perplexityResponse.status === 429) {
             throw new Error('Rate limit exceeded');
           }
-          throw new Error(`Transit data API error: ${error}`);
+          throw new Error(`Transit data API error: ${errorMessage}`);
         }
 
         if (!perplexityData.choices?.[0]?.message?.content) {
@@ -626,7 +606,6 @@ Do not deviate from this format. Use the exact same structure and formatting as 
         }
 
         if (retryCount === maxRetries) {
-          // Use a fallback template if all attempts fail
           console.log('Using fallback transit data after all retries failed.');
           transitData = `# Current Astrological Data
 ## Planetary Positions
@@ -638,12 +617,11 @@ Do not deviate from this format. Use the exact same structure and formatting as 
           break;
         }
 
-        // Wait before retrying
         await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
       }
     }
 
-    // 2) Generate the final 30-day forecast with llama
+    // Generate report
     console.log('Starting report generation...');
     let reportContent: string = '';
     retryCount = 0;
@@ -667,7 +645,22 @@ Do not deviate from this format. Use the exact same structure and formatting as 
             messages: [
               {
                 role: 'system',
-                content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, including the user's name, the user's combined natal chart data, and the next 30 days of transits. Provide an in‑depth forecast that integrates all insights into a single, coherent narrative.
+                content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, including the user's name, the user's combined natal chart data, and the next 30 days of transits. 
+
+CRITICAL: The report MUST begin with these two sections EXACTLY as shown:
+
+Retrograde and Direct Planets:
+[List ALL planets that are:
+- Currently retrograde
+- Going retrograde in next 30 days
+- Coming out of retrograde in next 30 days
+Format: "- [Month Day, Year]: [Planet] goes [direct/retrograde] at [degrees°minutes] in [Sign] at [time] UTC"]
+
+Solar and Lunar Eclipses:
+[List ALL eclipses in next 30 days
+Format: "- [Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC"]
+
+After these sections, provide an in‑depth forecast that integrates all insights into a single, coherent narrative.
 
 Your report should include:
 
@@ -709,11 +702,16 @@ For each transit in the provided transit data, analyze its significance by check
    - 10th house for career
    - 6th or 12th house for health
 
-Only list those transits that meet one or more of these criteria. For each significant transit, provide a detailed paragraph explaining:
+Only list those transits that meet one or more of these criteria as verbatim copy and paste extracted from all of the Transit Data provided above. Do not summarize or modify it in any way.
+For each significant transit, provide a detailed paragraph explaining:
 - Why it's significant based on the above criteria
 - How it specifically affects the user's life area(s)
 - What opportunities or challenges it may present
+- Write a full paragraphe for each and everyone of them.
 
+###[Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC
+Create [aspect] in your [house] at [degrees°minutes] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)]
+[What opportunities or challenges it may present]
 
 # In Deph Analysis
 Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
@@ -724,8 +722,9 @@ Introduce in a one welcoming, captivating paragraph that you are going to go int
 - Watch for eclipses in 5th house (romance) or 7th house (partnership)
 - Include the in relationship and signle aspect. Check the emotions the mood during that period of time. 
 - Include insights on potential romantic opportunities and periods of enhanced personal magnetism based on the user's natal chart and houses ${JSON.stringify(combinedData, null, 2)} influence by the upcoming transist. 
-- Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very detailed, comprehensive and knowledgeable
+- Integrate a I Ching divinatory reading into the interpretation seamlessly.
+- make this section very extensively detailed, comprehensive and knowledgeable
+
 
 ##Career & Business:
 - Focus on Midheaven (MC) or 10th house transits
@@ -734,7 +733,7 @@ Introduce in a one welcoming, captivating paragraph that you are going to go int
 - Provide timing strategies for initiatives based on the interplay of energies.
 - Address if it's a good period to start a new job or business and why; and what field would be more likely successful and why. 
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very detailed, comprehensive and knowledgeable
+- make this section very extensively detailed, comprehensive and knowledgeable
 
 ##Finances:
 - Analyze 2nd house (personal finances) and 8th house (shared resources) transits
@@ -743,7 +742,7 @@ Introduce in a one welcoming, captivating paragraph that you are going to go int
 - Examine money flow patterns and investment timing influenced by planetary aspects.
 - Advise on resource management and strategic timing.
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very detailed, comprehensive and knowledgeable
+- make this section very extensively detailed, comprehensive and knowledgeable
 
 ##Health & Mental Health:
 - Monitor 6th house (physical health) and 12th house (mental wellbeing) transits
@@ -753,7 +752,7 @@ Introduce in a one welcoming, captivating paragraph that you are going to go int
 - Explore physical energy cycles and emotional well‑being, with attention to stress management.
 - Clearly outline how specific aspects will influence health and mood.
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very detailed, comprehensive and knowledgeable
+- make this section very extensively detailed, comprehensive and knowledgeable
 
 #Timing & Action Steps
 
