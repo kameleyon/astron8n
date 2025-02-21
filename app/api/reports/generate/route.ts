@@ -146,15 +146,6 @@ y = lineY - 50; // move your y pointer below the line
       // Remove the rectangle background
       // Just print the text
       y -= 30;
-
-
-
-
-
-
-
-
-
       currentPage.drawText(line.substring(2), {
         x: margin,
         y,
@@ -165,22 +156,12 @@ y = lineY - 50; // move your y pointer below the line
       y -= 40;
     } else if (line.startsWith('## ')) {
       y -= 20;
-
-
       currentPage.drawText(line.substring(3), {
         x: margin,
         y,
         size: 20,
         font: helveticaBold,
         color: rgb(254/255, 142/255, 12/255),
-
-
-
-
-
-
-
-
       });
       // No underline or background
       y -= 30;
@@ -523,24 +504,25 @@ export async function POST(req: Request) {
             content: `You are a Master data analyst who can search the internet and gather data and organised them in a chronological manner. You will follow the instruction as directed.
 
 Create a detailed list of all upcoming astrology events and planetary transits for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
-Format your response exactly like this example:
+Format your response following this exact structure:
+
+**Retrograde and Direct Planets:
+- February 24th, 2025: Mars goes direct at 18°29 in Leo at 13:38 UTC
+- March 1st, 2025: Venus goes retrograde at 18°29 in Libra at 13:38 UTC
+- March 15th, 2025: Mercury goes retrograde at 18°29 in Aries at 13:38 UTC
+
+**Solar and Lunar Eclipses:
+- March 5th, 2025: Partial Solar eclipse at 18°29 in Aries 13:38 UTC
+
+**Daily Planetary Transits and Aspects:
 
 February 2025
-19
-Sun enters Pisces at 10:07 AM, 0°00' Pisces (House 8, trine natal Venus)
-20
-Mercury Sextile Jupiter at 8:13 PM, Mercury at 15°45' Aquarius, Jupiter at 15°45' Aries (Mercury in House 7 sextile natal Mars)
-23
-Neptune Conjunct North Node at 3:47 AM, 25°12' Pisces (House 8, square natal Saturn)
-Mercury Square Mars at 4:57 PM, Mercury at 18°30' Aquarius, Mars at 18°30' Taurus (Mercury in House 7 opposing natal Jupiter)
+- February 22th, 2025: Mercury Conjunct at 18°29 in Cancer at 13:38 UTC
+- February 24th, 2025: Mars goes direct at 18°29 in Leo at 13:38 UTC
 
 March 2025
-2
-Venus stations Retrograde at 28°45' Aries (House 9, trine natal Sun)
-14
-Total Lunar Eclipse at 24°15' Virgo (House 2, conjunct natal Moon)
-15
-Mercury stations Retrograde at 5°30' Aries (House 9, square natal Mercury)
+- March 1st, 2025: Venus goes retrograde at 18°29 in Capricorn at 13:38 UTC
+- March 5th, 2025: Partial Solar eclipse at 18°29 in Aries 13:38 UTC
 
 [Continue with exact dates, times, and positions for all events]
 
@@ -573,14 +555,29 @@ Instructions for each link:
 4. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
 
 
-IMPORTANT: Follow the format of the example above EXACTLY, structure as followed:
-[Month Year]
-- [Date (MM/DD)]: [Event including sign and degrees/minutes]
-[Aspect with user's natal chart and in which house of the user's natal chart]: [How this aspect will impact the user's life during this transit.]
+IMPORTANT: Follow this structure exactly:
 
-1. Retrograde and Direct Planets
-2. Solar and Lunar Eclipses
-3. Daily Planetary Transits and Aspects (organized by month)
+1. Start with "**Retrograde and Direct Planets:" section
+   - List all planets going direct or retrograde
+   - Format: "- [Month Day, Year]: [Planet] goes [direct/retrograde] at [degrees°minutes] in [Sign] at [time] UTC"
+   - Include ALL retrograde events (starting, ending, and ongoing)
+   - Pay special attention to planets coming out of retrograde
+
+2. Follow with "**Solar and Lunar Eclipses:" section
+   - List all eclipses
+   - Format: "- [Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC"
+
+3. End with "**Daily Planetary Transits and Aspects:" section
+   - Organize by month
+   - Format month header as "[Month Year]"
+   - Format each entry as "- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC"
+   - Include house positions and aspects to natal chart
+
+For each event, include:
+- Exact time in UTC
+- Exact degrees and minutes
+- House position
+- Aspects to natal chart
 
 Do not deviate from this format. Use the exact same structure and formatting as shown in the example.
 
@@ -591,8 +588,8 @@ Do not deviate from this format. Use the exact same structure and formatting as 
             content: 'Generate the transit data following the format specified above.'
           }
         ],
-        temperature: 0.1,
-        max_tokens: 15000
+        temperature: 0.2,
+        max_tokens: 25000
       })
     });
 
@@ -666,7 +663,7 @@ Do not deviate from this format. Use the exact same structure and formatting as 
             'X-Title': 'AstroGenie Report Generator'
           },
           body: JSON.stringify({
-            model: 'meta-llama/llama-3.3-70b-instruct',
+            model: 'qwen/qwen-plus',
             messages: [
               {
                 role: 'system',
@@ -697,61 +694,119 @@ Structure the report as follows:
 
 
 # Key Planetary Influences and Aspects
-In this section, include a verbatim copy and paste all of the Transit Data provided above. Do not summarize or modify it in any way. For each one write a short paragraphe elaborating on how each will impact your natal chart.
-Here is the complete transit:
-${transitData}
+Extract but do not print a verbatim copy and paste all of the Transit Data provided above from ${transitData}. Do not summarize or modify it in any way.
+For each transit in the provided transit data, analyze its significance by checking if:
 
+1. It involves:
+   - A planet changing signs
+   - A planet going retrograde (beginning retrograde motion)
+   - A planet moving direct (ending retrograde motion/coming out of retrograde)
+   - An eclipse
+2. It forms a major aspect (conjunction, opposition, square, trine, sextile) with natal planets within a 3° orb
+3. It involves the user's:
+   - 5th, 7th, or 8th house for love
+   - 2nd or 8th house for finances
+   - 10th house for career
+   - 6th or 12th house for health
+
+Only list those transits that meet one or more of these criteria. For each significant transit, provide a detailed paragraph explaining:
+- Why it's significant based on the above criteria
+- How it specifically affects the user's life area(s)
+- What opportunities or challenges it may present
 
 
 # In Deph Analysis
 Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
 
-## Love Life
-- Check for Venus upcoming transit and how it will impact the user's birth chart ${JSON.stringify(combinedData, null, 2)}; Include the in relationship and signle aspect. Check the emotions the mood during that period of time. 
+##Love & Relationships:
+- Emphasize Venus transits (ingresses, retrogrades) or aspects to natal Venus/7th house
+- Note Mars influences on passion and conflict
+- Watch for eclipses in 5th house (romance) or 7th house (partnership)
+- Include the in relationship and signle aspect. Check the emotions the mood during that period of time. 
 - Include insights on potential romantic opportunities and periods of enhanced personal magnetism based on the user's natal chart and houses ${JSON.stringify(combinedData, null, 2)} influence by the upcoming transist. 
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
 - make this section very detailed, comprehensive and knowledgeable
 
-## Career or Business Path
-- Discuss professional developments, leadership qualities, and key opportunities.
+##Career & Business:
+- Focus on Midheaven (MC) or 10th house transits
+- Highlight Saturn/Jupiter aspects to natal MC or 10th house planets
+- Note Mercury's role in negotiations and business communications
 - Provide timing strategies for initiatives based on the interplay of energies.
 - Address if it's a good period to start a new job or business and why; and what field would be more likely successful and why. 
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
 - make this section very detailed, comprehensive and knowledgeable
 
-## Financial Outlook
+##Finances:
+- Analyze 2nd house (personal finances) and 8th house (shared resources) transits
+- Track Venus aspects for money matters
+- Watch Jupiter transits to 2nd house for income opportunities
 - Examine money flow patterns and investment timing influenced by planetary aspects.
 - Advise on resource management and strategic timing.
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
 - make this section very detailed, comprehensive and knowledgeable
 
-## Health & Mental Health 
+##Health & Mental Health:
+- Monitor 6th house (physical health) and 12th house (mental wellbeing) transits
+- Note Mars aspects for energy levels
+- Track Saturn for chronic conditions
+- Watch eclipses/lunations in 6th/12th houses
 - Explore physical energy cycles and emotional well‑being, with attention to stress management.
 - Clearly outline how specific aspects will influence health and mood.
 - Integrate a I Ching divinatory reading into the interpretation seamlessly. 
 - make this section very detailed, comprehensive and knowledgeable
 
-# Timing Guide
-## Best Days For
-- Important conversations, major decisions, financial transactions, personal initiatives, travel and social events
-- Organize as a list
-  
-## Watch Out Days
-- Highlight challenging aspects, potential obstacles, energy dips, and cautionary periods.
-- Organize as a list
-  
-# Key Dates and Points
-- Provide a chronological timeline of significant events, power days, and critical decision points.
-- Detail opportunity windows with clear explanations.
+#Timing & Action Steps
+
+For each transit period, analyze the following conditions to determine optimal timing:
+
+##Favorable Periods (List specific dates for each that applies):
+- Venus direct in harmonious aspect: Best for love, relationships, finances
+- Mercury direct + good aspects: Ideal for communication, contracts, business deals
+- Mars direct + strong aspects: Perfect for new initiatives, physical activities
+- Jupiter making favorable aspects: Opportunities for growth, luck, expansion
+- New Moon/Full Moon in favorable houses: Fresh starts or culminations
+- Harmonious aspects to natal planets: Personal power days
+
+##Challenging Periods (List specific dates for each that applies):
+- Mercury retrograde: Communication issues, delay signing contracts
+- Mars retrograde: Low energy, avoid new projects
+- Eclipses in challenging houses: Major life changes needing careful handling
+- Hard aspects to natal planets: Extra patience and planning needed
+- Saturn transits: Periods requiring discipline and responsibility
+
+Based on these conditions, here are the specific recommendations:
+
+## Best Days For (Only list dates that strongly align):
+- Meeting someone new (Venus/Jupiter favorable)
+- Rekindling Love (Venus/Mars harmony)
+- Important Communications (Mercury direct + good aspects)
+- Business Launches (Mars direct + good aspects)
+- Financial Decisions (Venus/Jupiter favorable to 2nd/8th houses)
+- Career Moves (Good aspects to MC/10th house)
+- Travel (Jupiter/9th house favorable)
+- Major Purchases (Venus/Jupiter favorable to 2nd house)
+- Legal Matters (Jupiter favorable to natal planets)
+- Partnership Agreements (Venus/7th house harmony)
+
+##Watch Out Days (Only list dates with clear challenging aspects):
+- High Conflict Potential (Mars hard aspects)
+- Legal Complications (Jupiter/Saturn stress)
+- Financial Risks (Venus/Jupiter stress to 2nd/8th houses)
+- Relationship Tension (Venus/Mars/7th house stress)
+- Energy/Health Challenges (Mars/6th house stress)
+- Career/Business Caution (Hard aspects to MC/10th house)
+
+Note: Only include dates that show clear astrological correlations based on the transit data. Skip any categories where no strong astrological indicators are present during this period.
+
 
 # Before I go...
 - Synthesize all insights into a final, empowering summary, make it as detailed as possible. 
 - Include important reminder 
-- Conclude with a thought‑provoking statement that leaves the reader inspired and ready to engage with the coming month.
+- Conclude with a bold thought‑provoking statement that leaves the reader in awe, inspired and wanting to know more.
 
 Guidelines:
 - Use clean markdown formatting without emojis and do not put the asterix * or **.
-- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 5500 words.
+- Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 6000 words.
 - Maintain a warm, engaging, casual language with a touch of urban expression and familiar tone where user feel cozy and at home or hearing their best friend talking.
 - Use their name throughout the report, address them directly like they where your best friend. 
 - Be direct and honest about both opportunities and challenges.
@@ -777,7 +832,8 @@ Follow these structure guidelines:
 2. Generate the I Ching divinatory reading (initial hexagram, transition lines, final hexagram) but do not mention the method by name.
 3. Include how the next 30 days of transits specifically affect ${firstName}'s chart.
 4. Provide a deep, comprehensive, detailed, and knowledgeable analysis for love, career, finances, health, and timing.
-5. Remember to not mention I ching, Human Design, Life Path, and Cardology.`
+5. Remember to not mention I ching, Human Design, Life Path, and Cardology.
+6. At the end of your report, include a section titled "Appendix: Raw Transit Data" and verbatim copy and paste all of the Transit Data provided above. Do not summarize or modify it in any way.`
               }
             ],
             temperature: 0.8,
