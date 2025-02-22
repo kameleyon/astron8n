@@ -447,184 +447,345 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch transit data
-    console.log('Starting transit data search...');
-    let transitData: string | undefined;
-    let retryCount = 0;
+    // Constants for retry logic
     const maxRetries = 3;
     const timeout = 30000;
 
-    while (retryCount < maxRetries) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
+    // Function to fetch astrological events from database
+    const fetchAstrologicalEvents = async (supabase: any, startDate: Date, endDate: Date) => {
+      // Set timezone to UTC for consistent date handling
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      
+      console.log('Fetching events for date range:', {
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        startUTC: startDate.toUTCString(),
+        endUTC: endDate.toUTCString()
+      });
 
-        const perplexityResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          signal: controller.signal,
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
-            'X-Title': 'AstroGenie Transit Data'
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-2.0-flash-thinking-exp:free',
-            messages: [
-              {
-                role: 'system',
-                content: `You are a Master data analyst who can search the internet and gather data and organize them in a chronological manner. You will follow the instruction as directed.
+      // Fetch retrograde events
+      const retrogradeQuery = supabase
+        .from('retrograde_events')
+        .select('*')
+        .gte('event_date', startDate.toISOString())
+        .lte('event_date', endDate.toISOString())
+        .order('event_date', { ascending: true });
 
-CRITICAL: You must check and list ALL retrograde periods in these three categories:
+      console.log('Executing retrograde query with params:', {
+        table: 'retrograde_events',
+        start: startDate.toISOString(),
+        end: endDate.toISOString()
+      });
+      const { data: retrogradeEvents, error: retrogradeError } = await supabase
+        .from('retrograde_events')
+        .select('*')
+        .gte('event_date', startDate.toISOString())
+        .lte('event_date', endDate.toISOString())
+        .order('event_date', { ascending: true });
 
-1. Currently in Retrograde (list with exact dates and times):
-- Mars: Currently retrograde since Dec 6, 2024 at 06°10' Pisces, goes direct Feb 24, 2025 at 17°00' Leo
-- Jupiter: Currently retrograde since Oct 9, 2024 at 21°20' Sagittarius, goes direct Feb 4, 2025 at 11°16' Sagittarius
-- Uranus: Currently retrograde since Sep 1, 2024 at 27°15' Taurus, goes direct Jan 30, 2025 at 23°15' Taurus
-- North Node: Ongoing retrograde in Leo
+      console.log('Retrograde events found:', retrogradeEvents?.length || 0);
+      console.log('Raw retrograde events:', JSON.stringify(retrogradeEvents, null, 2));
+      if (retrogradeError) {
+        console.error('Error fetching retrograde events:', retrogradeError);
+        throw new Error('Failed to fetch retrograde events');
+      }
 
-2. Going Retrograde in next 30 days (list with exact dates and times):
-- Mercury: Starts retrograde Mar 15, 2025 at 09°35' Aries
-- Venus: Starts retrograde Mar 2, 2025 at 10°50' Aries
+      // Fetch eclipse events
+      console.log('Executing eclipse query with params:', {
+        table: 'eclipse_events',
+        start: startDate.toISOString(),
+        end: endDate.toISOString()
+      });
+      const { data: eclipseEvents, error: eclipseError } = await supabase
+        .from('eclipse_events')
+        .select('*')
+        .gte('event_date', startDate.toISOString())
+        .lte('event_date', endDate.toISOString())
+        .order('event_date', { ascending: true });
 
-3. Coming out of Retrograde in next 30 days (list with exact dates and times):
-- Mars: Goes direct Feb 24, 2025 at 17°00' Leo
-- Jupiter: Goes direct Feb 4, 2025 at 11°16' Sagittarius
-- Uranus: Goes direct Jan 30, 2025 at 23°15' Taurus
+      console.log('Eclipse events found:', eclipseEvents?.length || 0);
+      console.log('Raw eclipse events:', JSON.stringify(eclipseEvents, null, 2));
+      if (eclipseError) {
+        console.error('Error fetching eclipse events:', eclipseError);
+        throw new Error('Failed to fetch eclipse events');
+      }
 
-For each retrograde event, you MUST include:
-- Exact date and time in UTC
-- Exact degrees and minutes
-- Sign position
-- Whether going retrograde or direct
+      // Fetch transit events
+      console.log('Executing transit query with params:', {
+        table: 'transit_events',
+        start: startDate.toISOString(),
+        end: endDate.toISOString()
+      });
+      const { data: transitEvents, error: transitError } = await supabase
+        .from('transit_events')
+        .select('*')
+        .gte('event_date', startDate.toISOString())
+        .lte('event_date', endDate.toISOString())
+        .order('event_date', { ascending: true });
 
-For each planet/point, determine if it is:
-1. Currently in retrograde
-2. Going retrograde in the next 30 days
-3. Coming out of retrograde (going direct) in the next 30 days
+      console.log('Transit events found:', transitEvents?.length || 0);
+      console.log('Raw transit events:', JSON.stringify(transitEvents, null, 2));
 
-You MUST include ALL relevant retrograde periods in your output.
+      if (transitError) {
+        console.error('Error fetching transit events:', transitError);
+        throw new Error('Failed to fetch transit events');
+      }
 
-Create a detailed list of all upcoming astrology events and planetary retrogrades, coming out of retrograde and in transits and/or any aspects going on for the next 30 days, starting from today, ${new Date().toLocaleDateString('en-GB')} to 30 days later. All times must be in Coordinated Universal Time (UTC).
-Format your response following this exact structure:
+      // Helper function to calculate house position
+      const calculateHousePosition = (degrees: number, sign: string, birthChart: any) => {
+        // Convert zodiacal position to absolute degrees
+        const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+        const absoluteDegrees = signOrder.indexOf(sign) * 30 + degrees;
+        
+        // Find house by comparing with house cusps
+        for (let i = 0; i < birthChart.houses.length; i++) {
+          const nextIndex = (i + 1) % birthChart.houses.length;
+          const start = birthChart.houses[i].cusp;
+          const end = birthChart.houses[nextIndex].cusp;
+          if ((start <= absoluteDegrees && absoluteDegrees < end) || 
+              (start > end && (absoluteDegrees >= start || absoluteDegrees < end))) {
+            return i + 1;
+          }
+        }
+        return 1; // Default to 1st house if not found
+      };
 
-To gather this data, examine these sources:
+      // Helper function to check for aspects
+      const checkAspects = (transitDegrees: number, transitSign: string, birthChart: any) => {
+        const aspects: string[] = [];
+        const orb = 3; // 3 degree orb
+        const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+        const transitAbsDegrees = signOrder.indexOf(transitSign) * 30 + transitDegrees;
 
-- Retrograde Planets: https://astrostyle.com/2025-retrogrades-in-astrology-dates-and-planets/ or https://horoscopes.astro-seek.com/retrograde-planets-astrology-calendar-2025
-- Solar and Lunar Eclipses: https://www.farmersalmanac.com/lunar-and-solar-eclipses or https://mooncalendar.astro-seek.com/solar-and-lunar-eclipses-2025
-- Monthly Calendar - January 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-january-2025
-- Monthly Calendar - February 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-february-2025
-- Monthly Calendar - March 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-march-2025
-- Monthly Calendar - April 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-april-2025
-- Monthly Calendar - May 2025: https://horoscopes.astro-seek.com/monthly-astro-calendar-may-2025
-- Monthly Calendar - June 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-june-2025
-- Monthly Calendar - July 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-july-2025
-- Monthly Calendar - August 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-august-2025
-- Monthly Calendar - September 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-september-2025
-- Monthly Calendar - October 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-october-2025
-- Monthly Calendar - November 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-november-2025
-- Monthly Calendar - December 2025:https://horoscopes.astro-seek.com/monthly-astro-calendar-december-2025
-
-Instructions for each link:
-
-1. From the monthly calendar links, Solar and Lunar Eclipses links and, Retrograde Planets links extract daily planetary transits and aspects, extract all retrograde start and/or end dates falling within the next 30 days, include also all the solar and lunar eclipses and, major planetary aspects occurring in the next 30 days. Focus on conjunctions, oppositions, squares, trines, and sextiles, ensuring no events are missed.
-2. For each event, include:
-   - The exact time in UTC
-   - The exact degrees and minutes of the planets involved
-   - The house position of the transiting planet
-   - Any aspects formed with the natal chart ${JSON.stringify(combinedData, null, 2)}
-3. IDENTIFY THE RETROGRADE FIRST STARTING, ENDING, OR IN PROGRESS. 
-4. MAKE SURE YOU INCLUDE THE RETROGRADE IN THE OUTPUT LIST
-
-
-IMPORTANT: Follow this structure exactly:
-
-1. Start with "**Retrograde and Direct Planets:" section
-   - List all planets going direct or retrograde
-   - Format: "- [Month Day, Year]: [Planet] goes [direct/retrograde] at [degrees°minutes] in [Sign] at [time] UTC"
-   - Include ALL retrograde events (starting, ending, and ongoing)
-   - Pay special attention to planets coming out of retrograde
-
-2. Follow with "**Solar and Lunar Eclipses:" section
-   - List all eclipses
-   - Format: "- [Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC"
-
-3. End with "**Daily Planetary Transits and Aspects:" section
-   - Organize by month
-   - Format month header as "[Month Year]"
-   - Format each entry as "- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC"
-   - Include house positions and aspects to natal chart
-
-For each event, include:
-- Exact time in UTC
-- Exact degrees and minutes
-- House position
-- Aspects to natal chart
-
-Do not deviate from this format. Use the exact same structure and formatting as shown in the example.`
-              },
-              {
-                role: 'user',
-                content: 'Generate the transit data following the format specified above.'
-              }
-            ],
-            temperature: 0.2,
-            max_tokens: 25000
-          })
+        birthChart.planets.forEach((planet: any) => {
+          const natalAbsDegrees = signOrder.indexOf(planet.sign) * 30 + planet.longitude;
+          const diff = Math.abs(transitAbsDegrees - natalAbsDegrees);
+          
+          // Check for major aspects
+          if (Math.abs(diff - 0) <= orb || Math.abs(diff - 360) <= orb) aspects.push(`conjunction ${planet.name}`);
+          if (Math.abs(diff - 60) <= orb) aspects.push(`sextile ${planet.name}`);
+          if (Math.abs(diff - 90) <= orb) aspects.push(`square ${planet.name}`);
+          if (Math.abs(diff - 120) <= orb) aspects.push(`trine ${planet.name}`);
+          if (Math.abs(diff - 180) <= orb) aspects.push(`opposition ${planet.name}`);
         });
 
-        clearTimeout(timeoutId);
+        return aspects;
+      };
 
-        console.log('Transit data response status:', perplexityResponse.status);
-        const perplexityData = await perplexityResponse.json() as { error?: string, choices?: Array<{ message?: { content?: string } }> };
+      // Categorize and format events
+      const significantEvents = {
+        signChanges: [] as string[],
+        retrogrades: [] as string[],
+        directs: [] as string[],
+        eclipses: [] as string[],
+        aspects: [] as string[],
+        loveHouse: [] as string[],
+        financeHouse: [] as string[],
+        careerHouse: [] as string[],
+        healthHouse: [] as string[]
+      };
 
-        if (!perplexityResponse.ok) {
-          const errorMessage = typeof perplexityData.error === 'string' ? perplexityData.error : perplexityResponse.statusText;
-          if (errorMessage.includes('rate limit') || perplexityResponse.status === 429) {
-            throw new Error('Rate limit exceeded');
-          }
-          throw new Error(`Transit data API error: ${errorMessage}`);
+      // Process retrograde events
+      retrogradeEvents.forEach((event: any) => {
+        const date = new Date(event.event_date);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        const formattedEvent = `- ${formattedDate}: ${event.planet} goes ${event.event_type} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
+        
+        if (event.event_type === 'retrograde') {
+          significantEvents.retrogrades.push(formattedEvent);
+        } else {
+          significantEvents.directs.push(formattedEvent);
         }
 
-        if (!perplexityData.choices?.[0]?.message?.content) {
-          throw new Error('Invalid transit data response format');
+        // Check house position
+        const house = calculateHousePosition(event.degrees, event.sign, combinedData.birth_chart);
+        if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
+        if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
+        if (house === 10) significantEvents.careerHouse.push(formattedEvent);
+        if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
+
+        // Check aspects
+        const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
+        if (aspects.length > 0) {
+          significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
+        }
+      });
+
+      // Process eclipse events
+      eclipseEvents.forEach((event: any) => {
+        const date = new Date(event.event_date);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        const formattedEvent = `- ${formattedDate}: ${event.eclipse_type.replace('_', ' ')} Eclipse at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
+        
+        significantEvents.eclipses.push(formattedEvent);
+
+        // Check house position
+        const house = calculateHousePosition(event.degrees, event.sign, combinedData.birth_chart);
+        if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
+        if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
+        if (house === 10) significantEvents.careerHouse.push(formattedEvent);
+        if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
+
+        // Check aspects
+        const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
+        if (aspects.length > 0) {
+          significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
+        }
+      });
+
+      // Process transit events
+      const transitsByMonth: { [key: string]: string[] } = {};
+      transitEvents.forEach((event: any) => {
+        const date = new Date(event.event_date);
+        const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        const formattedEvent = `- ${formattedDate}: ${event.event_type} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
+        
+        // Check for sign changes
+        if (event.event_type.includes('enters')) {
+          significantEvents.signChanges.push(formattedEvent);
         }
 
-        transitData = perplexityData.choices[0].message.content;
-        console.log('=== TRANSIT DATA FROM GEMINI ===');
-        console.log(transitData);
-        console.log('=== END TRANSIT DATA ===');
-        console.log('Transit data retrieved successfully');
-        break;
-      } catch (error: unknown) {
-        retryCount++;
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        console.error(`Transit data attempt ${retryCount} failed:`, errorMessage);
+        // Check house position
+        const house = calculateHousePosition(event.degrees, event.sign, combinedData.birth_chart);
+        if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
+        if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
+        if (house === 10) significantEvents.careerHouse.push(formattedEvent);
+        if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
-        if (error instanceof Error && error.name === 'AbortError') {
-          console.error('Request timed out');
+        // Check aspects
+        const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
+        if (aspects.length > 0) {
+          significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
         }
 
-        if (retryCount === maxRetries) {
-          console.log('Using fallback transit data after all retries failed.');
-          transitData = `# Current Astrological Data
+        // Add to monthly transits
+        if (!transitsByMonth[monthYear]) {
+          transitsByMonth[monthYear] = [];
+        }
+        transitsByMonth[monthYear].push(formattedEvent);
+      });
+
+      // Log significant events for debugging
+      console.log('Significant Events Found:', {
+        signChanges: significantEvents.signChanges.length,
+        retrogrades: significantEvents.retrogrades.length,
+        directs: significantEvents.directs.length,
+        eclipses: significantEvents.eclipses.length,
+        aspects: significantEvents.aspects.length,
+        loveHouse: significantEvents.loveHouse.length,
+        financeHouse: significantEvents.financeHouse.length,
+        careerHouse: significantEvents.careerHouse.length,
+        healthHouse: significantEvents.healthHouse.length
+      });
+
+      // Combine all formatted events
+      const transitData = [
+        '**Retrograde and Direct Planets:**',
+        [...significantEvents.retrogrades, ...significantEvents.directs].join('\n'),
+        '',
+        '**Solar and Lunar Eclipses:**',
+        significantEvents.eclipses.join('\n'),
+        '',
+        '**Daily Planetary Transits and Aspects:**',
+        ...Object.entries(transitsByMonth).map(([monthYear, events]) => {
+          return `${monthYear}\n${events.join('\n')}`;
+        })
+      ].join('\n');
+
+      // Log final formatted data
+      console.log('Final formatted transit data:', transitData);
+
+      return { transitData, significantEvents };
+    }
+
+    // Initialize variables
+    let transitData: string = `# Current Astrological Data
 ## Planetary Positions
 - (Approximate or fallback data)
 ## Expected Transits
 - (Approximate or fallback data)
 ## General Influences
 - (Approximate or fallback data)`;
-          break;
-        }
+    let reportContent: string = '';
+    let systemPrompt: string = '';
+    let significantEvents = {
+      signChanges: [] as string[],
+      retrogrades: [] as string[],
+      directs: [] as string[],
+      eclipses: [] as string[],
+      aspects: [] as string[],
+      loveHouse: [] as string[],
+      financeHouse: [] as string[],
+      careerHouse: [] as string[],
+      healthHouse: [] as string[]
+    };
+    let retryCount = 0;
 
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+    // Fetch transit data from database
+    console.log('Starting transit data fetch...');
+    transitData = `# Current Astrological Data
+## Planetary Positions
+- (Approximate or fallback data)
+## Expected Transits
+- (Approximate or fallback data)
+## General Influences
+- (Approximate or fallback data)`;
+
+    try {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30);
+      
+      while (retryCount < maxRetries) {
+        try {
+          const { transitData: fetchedData, significantEvents: fetchedEvents } = await fetchAstrologicalEvents(supabase, startDate, endDate);
+          if (fetchedData) {
+            transitData = fetchedData;
+            significantEvents = fetchedEvents;
+            break;
+          }
+        } catch (error) {
+          retryCount++;
+          console.error(`Transit data attempt ${retryCount} failed:`, error);
+          
+          if (retryCount === maxRetries) {
+            throw error;
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+        }
       }
+      console.log('=== TRANSIT DATA FROM DATABASE ===');
+      console.log(transitData);
+      console.log('=== END TRANSIT DATA ===');
+      console.log('Transit data retrieved successfully');
+    } catch (error) {
+      console.error('Error fetching transit data:', error);
+      transitData = `# Current Astrological Data
+## Planetary Positions
+- (Approximate or fallback data)
+## Expected Transits
+- (Approximate or fallback data)
+## General Influences
+- (Approximate or fallback data)`;
     }
 
     // Generate report
     console.log('Starting report generation...');
-    let reportContent: string = '';
-    retryCount = 0;
 
     while (retryCount < maxRetries) {
       try {
@@ -645,22 +806,35 @@ Do not deviate from this format. Use the exact same structure and formatting as 
             messages: [
               {
                 role: 'system',
-                content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, including the user's name, the user's combined natal chart data, and the next 30 days of transits. 
+                content: `You are an expert metaphysical advisor and astrologer who creates personalized, comprehensive 30‑day forecasts. Your task is to analyze the provided data, including the user's name, the user's combined natal chart data, and the next 30 days of transits.
 
-CRITICAL: The report MUST begin with these two sections EXACTLY as shown:
+The following significant events have been identified in your chart for the next 30 days:
 
-Retrograde and Direct Planets:
-[List ALL planets that are:
-- Currently retrograde
-- Going retrograde in next 30 days
-- Coming out of retrograde in next 30 days
-Format: "- [Month Day, Year]: [Planet] goes [direct/retrograde] at [degrees°minutes] in [Sign] at [time] UTC"]
+Sign Changes and Major Transits:
+${significantEvents.signChanges.join('\n')}
 
-Solar and Lunar Eclipses:
-[List ALL eclipses in next 30 days
-Format: "- [Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC"]
+Retrograde Activity:
+${[...significantEvents.retrogrades, ...significantEvents.directs].join('\n')}
 
-After these sections, provide an in‑depth forecast that integrates all insights into a single, coherent narrative.
+Eclipse Events:
+${significantEvents.eclipses.join('\n')}
+
+Major Aspects to Natal Planets:
+${significantEvents.aspects.join('\n')}
+
+Events by Life Area:
+
+Love and Relationships (5th, 7th, 8th houses):
+${significantEvents.loveHouse.join('\n')}
+
+Financial Matters (2nd, 8th houses):
+${significantEvents.financeHouse.join('\n')}
+
+Career and Professional Life (10th house):
+${significantEvents.careerHouse.join('\n')}
+
+Health and Wellbeing (6th, 12th houses):
+${significantEvents.healthHouse.join('\n')}
 
 Your report should include:
 
@@ -687,27 +861,40 @@ Structure the report as follows:
 
 
 # Key Planetary Influences and Aspects
-Extract but do not print a verbatim copy and paste all of the Transit Data provided above from ${transitData}. Do not summarize or modify it in any way.
-For each transit in the provided transit data, analyze its significance by checking if:
 
-1. It involves:
-   - A planet changing signs
-   - A planet going retrograde (beginning retrograde motion)
-   - A planet moving direct (ending retrograde motion/coming out of retrograde)
-   - An eclipse
-2. It forms a major aspect (conjunction, opposition, square, trine, sextile) with natal planets within a 3° orb
-3. It involves the user's:
-   - 5th, 7th, or 8th house for love
-   - 2nd or 8th house for finances
-   - 10th house for career
-   - 6th or 12th house for health
+The following significant events have been identified in your chart for the next 30 days:
 
-Only list those transits that meet one or more of these criteria as verbatim copy and paste extracted from all of the Transit Data provided above. Do not summarize or modify it in any way.
-For each significant transit, provide a detailed paragraph explaining:
-- Why it's significant based on the above criteria
-- How it specifically affects the user's life area(s)
-- What opportunities or challenges it may present
-- Write a full paragraphe for each and everyone of them.
+## Sign Changes and Major Transits:
+[List all events from significantEvents.signChanges]
+
+## Retrograde Activity:
+[List all events from significantEvents.retrogrades and significantEvents.directs]
+
+## Eclipse Events:
+[List all events from significantEvents.eclipses]
+
+## Major Aspects to Natal Planets:
+[List all events from significantEvents.aspects]
+
+## Events by Life Area:
+
+### Love and Relationships (5th, 7th, 8th houses):
+[List all events from significantEvents.loveHouse]
+
+### Financial Matters (2nd, 8th houses):
+[List all events from significantEvents.financeHouse]
+
+### Career and Professional Life (10th house):
+[List all events from significantEvents.careerHouse]
+
+### Health and Wellbeing (6th, 12th houses):
+[List all events from significantEvents.healthHouse]
+
+For each event listed above, provide a detailed paragraph explaining:
+- The astrological significance of the event
+- How it specifically affects the life area(s) involved
+- What opportunities or challenges it presents
+- Specific advice for working with this energy
 
 ###[Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC
 Create [aspect] in your [house] at [degrees°minutes] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)]
