@@ -864,41 +864,53 @@ Structure the report as follows:
 
 # Major Aspects to Natal Planets
 
-Format each event as follows, organized Chronologically by month:
+Format each event as follows, organized chronologically by month. Include ALL events (transits, retrogrades, planets going direct, directs, eclipses, aspects) in chronological order: (MAKE SURE YOU INCLUDE AND WRITE FOR PLANETS GOING DIRECT, GOING RETROGRADE, AND ECLIPSE)
 
 ## [Month Year]
 
-[Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
-[aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
+[Month Day, Year]: [Event Name (Retrograde/going Direct/Eclipse/Aspect/Transit)] at [degrees°minutes] in [Sign] at [time] UTC
 [Write a natural, flowing paragraph describing how this transit affects the person's life. Include the house position and explain the significance of the aspect in clear, accessible language. Focus on practical impacts and opportunities while maintaining a warm, professional tone.]
 
 Example format:
 February 22, 2025: Neptune-Node Conjunction at 28°40' in Pisces at 03:47:00 UTC
 Neptune forms a powerful conjunction with the North Node in your 12th house, opening spiritual doorways and enhancing your intuitive abilities. This mystical alignment suggests a period of heightened sensitivity to subtle energies and increased connection to your spiritual path. You may experience vivid dreams or receive important spiritual insights. This is an excellent time for meditation, artistic pursuits, or spiritual studies.
 
+February 28, 2025: Mars Direct at 17°0' in Cancer at 02:00:00 UTC
+Mars stations direct in your 4th house of home and family, marking the end of a period of internal reflection about domestic matters. This shift brings renewed energy and momentum to home-related projects and family relationships. You'll feel more confident taking action in these areas, and any tensions within the family dynamic may begin to resolve. The emotional nature of Cancer adds depth and intuition to your actions.
+
+March 14, 2025: Total Lunar Eclipse at 23°58' in Virgo at 03:03:00 UTC
+The Lunar Eclipse in your 6th house marks a significant turning point in matters of health, work, and service. This eclipse may bring sudden revelations about your daily routines or work situation. Pay attention to your body's signals and be ready to make necessary changes to your lifestyle.
+
 
 # In Deph Analysis
 Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
 
 ### Love and Relationships:
+Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
 [List all events from significantEvents.loveHouse]
+make this section very extensively detailed, comprehensive and knowledgeable
 
 ### Financial Matters:
+Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
 [List all events from significantEvents.financeHouse]
+make this section very extensively detailed, comprehensive and knowledgeable
 
 ### Career and Business:
+Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
 [List all events from significantEvents.careerHouse]
+make this section very extensively detailed, comprehensive and knowledgeable
 
 ### Health and Wellbeing:
+Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
 [List all events from significantEvents.healthHouse]
+make this section very extensively detailed, comprehensive and knowledgeable
 
 For each event listed above, provide a detailed paragraph explaining:
 - The astrological significance of the event
 - How it specifically affects the life area(s) involved
 - What opportunities or challenges it presents
 - Specific advice for working with this energy
-- Integrate a I Ching divinatory reading into the interpretation seamlessly.
-- make each section very extensively detailed, comprehensive and knowledgeable
+
 
 Follow this format
 ###[Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC
