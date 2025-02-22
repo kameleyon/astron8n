@@ -586,17 +586,15 @@ export async function POST(req: Request) {
         healthHouse: [] as string[]
       };
 
-      // Process retrograde events
+      // Process retrograde and direct events
       retrogradeEvents.forEach((event: any) => {
         const date = new Date(event.event_date);
-        // Use UTC methods to prevent timezone conversion
-        const formattedDate = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const formattedEvent = `- ${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}: ${event.planet} goes ${event.event_type} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
+        const formattedEvent = `- ${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}: ${event.planet} ${event.event_type === 'retrograde' ? 'turns retrograde' : 'stations direct'} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
         
         if (event.event_type === 'retrograde') {
           significantEvents.retrogrades.push(formattedEvent);
-        } else {
+        } else if (event.event_type === 'direct') {
           significantEvents.directs.push(formattedEvent);
         }
 
@@ -607,10 +605,18 @@ export async function POST(req: Request) {
         if (house === 10) significantEvents.careerHouse.push(formattedEvent);
         if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
-        // Check aspects
+        // Process aspects for all retrograde events and especially for planets going direct
         const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
         if (aspects.length > 0) {
-          significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
+          if (event.event_type === 'direct') {
+            // Add extra emphasis for direct stations
+            significantEvents.aspects.push(`${formattedEvent} (Important planetary shift—${aspects.join(', ')})`);
+          } else {
+            significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
+          }
+        } else if (event.event_type === 'direct') {
+          // Include direct stations even without aspects due to their significance
+          significantEvents.aspects.push(`${formattedEvent} (Important planetary shift—momentum changes)`);
         }
       });
 
@@ -642,6 +648,7 @@ export async function POST(req: Request) {
 
       // Process transit events
       const transitsByMonth: { [key: string]: string[] } = {};
+      // Process transit events
       transitEvents.forEach((event: any) => {
         const date = new Date(event.event_date);
         const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -650,7 +657,41 @@ export async function POST(req: Request) {
           day: 'numeric', 
           year: 'numeric' 
         });
-        const formattedEvent = `- ${formattedDate}: ${event.event_type} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
+
+        // Format event with planet names and aspects
+        let formattedEvent = '';
+        const transitAspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
+        const aspectText = transitAspects.length > 0 ? ` (${transitAspects.map(aspect => {
+          const [aspectType, planetName] = aspect.split(' ');
+          return `${aspectType} to natal ${planetName}`;
+        }).join(', ')})` : '';
+
+        // Only format events that have all required data
+        if (!event.event_type || !event.degrees || !event.minutes || !event.sign || !event.time_utc) {
+          console.log('Skipping event due to missing data:', event);
+          return;
+        }
+
+        // Format event with planet information from database
+        let eventDescription = '';
+        if (event.event_type === 'conjunction' && event.planet1 && event.planet2) {
+          // Handle conjunctions only when both planets are defined
+          eventDescription = `${event.planet1}-${event.planet2} Conjunction`;
+        } else if (event.event_type.includes('enters') && event.planet) {
+          // Handle planet entries
+          eventDescription = `${event.planet} enters`;
+        } else if (event.event_type === 'entered' && event.planet) {
+          // Handle past tense entries
+          eventDescription = `${event.planet} entered`;
+        } else if (event.planet) {
+          // Handle other events
+          eventDescription = `${event.planet} ${event.event_type}`;
+        } else {
+          console.log('Skipping event due to missing planet:', event);
+          return;
+        }
+
+        formattedEvent = `- ${formattedDate}: ${eventDescription} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC${aspectText}`;
         
         // Check for sign changes
         if (event.event_type.includes('enters')) {
@@ -664,10 +705,9 @@ export async function POST(req: Request) {
         if (house === 10) significantEvents.careerHouse.push(formattedEvent);
         if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
-        // Check aspects
-        const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
-        if (aspects.length > 0) {
-          significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
+        // Add to aspects list if there are any
+        if (transitAspects.length > 0) {
+          significantEvents.aspects.push(formattedEvent);
         }
 
         // Add to monthly transits
@@ -690,19 +730,58 @@ export async function POST(req: Request) {
         healthHouse: significantEvents.healthHouse.length
       });
 
-      // Combine all formatted events
-      const transitData = [
-        '**Retrograde and Direct Planets:**',
-        [...significantEvents.retrogrades, ...significantEvents.directs].join('\n'),
-        '',
-        '**Solar and Lunar Eclipses:**',
-        significantEvents.eclipses.join('\n'),
-        '',
-        '**Daily Planetary Transits and Aspects:**',
-        ...Object.entries(transitsByMonth).map(([monthYear, events]) => {
-          return `${monthYear}\n${events.join('\n')}`;
-        })
-      ].join('\n');
+      // Sort all events chronologically by type and date
+      const allEvents = [
+        // 1. Planets Stationing Direct
+        ...significantEvents.directs.map(event => ({ type: 'direct', event })),
+        // 2. Planets Turning Retrograde
+        ...significantEvents.retrogrades.map(event => ({ type: 'retrograde', event })),
+        // 3. Eclipses
+        ...significantEvents.eclipses.map(event => ({ type: 'eclipse', event })),
+        // 4. Major Aspects and Transits
+        ...significantEvents.aspects.map(event => ({ type: 'aspect', event })),
+        ...Object.entries(transitsByMonth).flatMap(([monthYear, events]) => 
+          events.map(event => ({ type: 'transit', event }))
+        )
+      ].map(({ type, event }) => {
+        const dateMatch = event.match(/- ([A-Za-z]+ \d+, \d{4})/);
+        return {
+          type,
+          event,
+          date: dateMatch ? new Date(dateMatch[1]) : new Date(0)
+        };
+      }).sort((a, b) => {
+        // First sort by date
+        const dateCompare = a.date.getTime() - b.date.getTime();
+        if (dateCompare !== 0) return dateCompare;
+        
+        // If same date, sort by event type priority
+        const typePriority: Record<string, number> = {
+          direct: 1,
+          retrograde: 2,
+          eclipse: 3,
+          fullMoon: 4,
+          NewMoon: 5,
+          aspect: 6,
+          transit: 7
+        };
+        return (typePriority[a.type as keyof typeof typePriority] || 99) - (typePriority[b.type as keyof typeof typePriority] || 99);
+      });
+
+      // Group by month
+      const eventsByMonth: { [key: string]: string[] } = {};
+      allEvents.forEach(({ event, date }) => {
+        const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        if (!eventsByMonth[monthYear]) {
+          eventsByMonth[monthYear] = [];
+        }
+        eventsByMonth[monthYear].push(event);
+      });
+
+      // Format the final transit data
+      const transitData = Object.entries(eventsByMonth).map(([monthYear, events]) => {
+        return `## ${monthYear}\n${events.join('\n')}`;
+      }).join('\n\n');
 
       // Log final formatted data
       console.log('Final formatted transit data:', transitData);
@@ -837,13 +916,14 @@ ${significantEvents.healthHouse.join('\n')}
 Your report should include:
 
 - 30-day planetary positions and upcoming transits from ${new Date().toLocaleDateString('en-GB')} to 30 days later. 
-- Use the I Ching as a method of divination which means using the traditional coin method for an initial hexagram, transition lines, and a final hexagram. Integrate it seamlessly without naming the method.
-- An analysis of how upcoming planetary transits (Moon phases, nodes, Retrogrades, Eclipses, etc.) will interact with the client's natal chart (include specific degrees, houses, aspects, dates, etc.).
-- Integrate user name references throughout to create a personal connection, welcoming and captivating.
+- Use the I Ching as a method of divination which means using the traditional coin method for an initial hexagram, transition lines, and a final hexagram. Integrate the overall interpretation of the reading only seamlessly without naming the method.
+- An analysis of how upcoming planetary transits (Moon phases, nodes, Start Retrogrades, End Retrogrades, Eclipses, Transits, Aspects etc.) will interact with the client's natal chart (include specific degrees, signs, houses, aspects, dates, etc.).
+- Address the user directly and Integrate their name throughout the content to create a personal connection, welcoming and captivating.
+- Write the content in natural, conversational language, mixing casual tone (it's ok to use urban language} while keeping it welcoming, warm, empathic yet straightforward. 
+- Keep the content detailed, extensive, comprehensive, straightforward, no sugarcoathng.
+- The content should shows that you Master the topic presented, and highly knowledgeable based on the details you will provide. 
 - Provide guidance on love, career, finances, health, and timing for key decisions.
 - An integrated interpretation of the influences that shape the client's personal design, life purpose, energetic blueprint, and inherent patterns—presented fluidly without reference to the specific methodologies.
-- A comprehensive synthesis that provides actionable guidance on love, career, finances, health, and timing for key decisions and events.
-- A captivating, warm, welcoming tone and casual language and it's ok to use urban language that is both empathic, honest and empowering.
 - DO NOT USE ASTERIX (*) OR (**)
 - Address the user when you talk, address the user directly in the report
 - Use natural conversational human language 
@@ -854,75 +934,74 @@ Structure the report as follows:
   
 # Main Overview
 - Greet the user with their name and address them directly
-- Begin with a light hearted, captivating or even thought provoking hook that draws the reader in.
-- Offer an integrated interpretation of the I Ching reading (include the initial hexagram, transition lines, and final hexagram without naming the method IChing). (one elaborate paragraph)
-- Calculate and write the upcoming main theme and key energies based on current planetary positions and how upcoming transits will affect the client's natal chart ${JSON.stringify(combinedData, null, 2)} and life path. Include exact dates and degrees. (one paragraph)
+- Begin with a light hearted, captivating or even thought provoking hook that draws the reader right in.
+- Offer an integrated interpretation of the I Ching reading (include the initial hexagram, transition lines, and final hexagram without naming the method IChing) and Integrate the overall interpretation of the reading only seemlessly in one elaborate paragraph
+- Calculate and write the upcoming main theme and key energies based on current planetary positions and how upcoming transits will affect the client's natal chart ${JSON.stringify(combinedData, null, 2)} and life path. Include exact dates and degrees. (one extensive paragraph)
 - End this section introducing the upcoming section. 
 
 
 # Key Planetary Influences and Aspects
 
-# Major Aspects to Natal Planets
+## Major Aspects to Natal Planets
 
-Format each event as follows, organized chronologically by month. Include ALL events (transits, retrogrades, planets going direct, directs, eclipses, aspects) in chronological order: (MAKE SURE YOU INCLUDE AND WRITE FOR PLANETS GOING DIRECT, GOING RETROGRADE, AND ECLIPSE)
+Format each event as follows, organized chronologically by month. Include ALL events, verbatim copy and paste all of the Transit Data provided above, whitout missing or skipping one, in chronological order, with special emphasis on major planetary shifts (Do not summarize or modify it in any way):
+Make sure you write about the following events 
 
-## [Month Year]
+1. Planets Stationing Direct (when a planet ends retrograde motion).
+2. Planets Turning Retrograde.
+3. Eclipses (Solar and Lunar - Full and partial).
+4. Full Moon Phases.
+5. New Moon Phases.
+6. Major Transits.
+7. Major Aspects.
 
-[Month Day, Year]: [Event Name (Retrograde/going Direct/Eclipse/Aspect/Transit)] at [degrees°minutes] in [Sign] at [time] UTC
-[Write a natural, flowing paragraph describing how this transit affects the person's life. Include the house position and explain the significance of the aspect in clear, accessible language. Focus on practical impacts and opportunities while maintaining a warm, professional tone.]
-
-Example format:
-February 22, 2025: Neptune-Node Conjunction at 28°40' in Pisces at 03:47:00 UTC
-Neptune forms a powerful conjunction with the North Node in your 12th house, opening spiritual doorways and enhancing your intuitive abilities. This mystical alignment suggests a period of heightened sensitivity to subtle energies and increased connection to your spiritual path. You may experience vivid dreams or receive important spiritual insights. This is an excellent time for meditation, artistic pursuits, or spiritual studies.
-
-February 28, 2025: Mars Direct at 17°0' in Cancer at 02:00:00 UTC
-Mars stations direct in your 4th house of home and family, marking the end of a period of internal reflection about domestic matters. This shift brings renewed energy and momentum to home-related projects and family relationships. You'll feel more confident taking action in these areas, and any tensions within the family dynamic may begin to resolve. The emotional nature of Cancer adds depth and intuition to your actions.
-
-March 14, 2025: Total Lunar Eclipse at 23°58' in Virgo at 03:03:00 UTC
-The Lunar Eclipse in your 6th house marks a significant turning point in matters of health, work, and service. This eclipse may bring sudden revelations about your daily routines or work situation. Pay attention to your body's signals and be ready to make necessary changes to your lifestyle.
-
+For each event, follow this structure:
+### [Month Year]
+**[Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
+Create [aspect] in your [house] at [degrees°minutes] [Why this event is important] [Cast and Integrate a I Ching divinatory reading into the interpretation seamlessly.] [How it specifically affects the user's life area(s)]
+[What opportunities or challenges it may present] [Specific advice for working with this energy]
+Write for each event a very extensively detailed, comprehensive and knowledgeable paragraphe.
 
 # In Deph Analysis
-Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
+Introduce in a one welcoming, captivating, elaborating and comprehensive introduction paragraph that you are going to go into more details. 
 
-### Love and Relationships:
-Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
+## Love and Relationships:
 [List all events from significantEvents.loveHouse]
+For each event, Cast an I Ching divinatory reading and Integrate the overall interpretation of the reading only seemlessly in one elaborate paragraph.
 make this section very extensively detailed, comprehensive and knowledgeable
 
-### Financial Matters:
-Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
+## Financial Matters:
 [List all events from significantEvents.financeHouse]
+For each event, Cast an I Ching divinatory reading and Integrate the overall interpretation of the reading only seemlessly in one elaborate paragraph.
 make this section very extensively detailed, comprehensive and knowledgeable
 
-### Career and Business:
-Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
+## Career and Business:
 [List all events from significantEvents.careerHouse]
+For each event, Cast an I Ching divinatory reading and Integrate the overall interpretation of the reading only seemlessly in one elaborate paragraph.
 make this section very extensively detailed, comprehensive and knowledgeable
 
-### Health and Wellbeing:
-Start by Integrate a I Ching divinatory reading into the interpretation seamlessly.
+## Health and Wellbeing:
 [List all events from significantEvents.healthHouse]
+For each event, Cast an I Ching divinatory reading and Integrate the overall interpretation of the reading only seemlessly in one elaborate paragraph.
 make this section very extensively detailed, comprehensive and knowledgeable
 
-For each event listed above, provide a detailed paragraph explaining:
-- The astrological significance of the event
-- How it specifically affects the life area(s) involved
-- What opportunities or challenges it presents
-- Specific advice for working with this energy
+For each event listed above, provide a detailed, extensive paragraph, including the aspects they make with the user's natal chart, explaining:
+- The astrological significance of the event - Like why is it important.
+- Cast and integrate seemlessly an I Ching reading into the interpretation.
+- How it specifically affects the life area(s) involved.
+- What opportunities or challenges it presents.
+- Specific advice for working with this energy.
 
-
-Follow this format
+Follow this format strictly for each area of the user's life
 ###[Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC
-Create [aspect] in your [house] at [degrees°minutes] [Integrate a I Ching divinatory reading into the interpretation seamlessly.] [How it specifically affects the user's life area(s)]
-[What opportunities or challenges it may present] [Specific advice for working with this energy] [additional data mentioned above for each section]
+Create [aspect] in your [house] at [degrees°minutes] [How it specifically affects the user's life area(s)] [Integrate an interpretation of the I Ching reading into the content seamlessly.] 
+[What opportunities or challenges it may present] [Specific advice for working with this energy] 
 
 
 #Timing & Action Steps
+For each transit period, analyze the following conditions to determine optimal timing but do not write these conditions in the report:
 
-For each transit period, analyze the following conditions to determine optimal timing:
-
-##Favorable Periods (List specific dates for each that applies):
+Favorable Periods (List specific dates for each that applies):
 - Venus direct in harmonious aspect: Best for love, relationships, finances
 - Mercury direct + good aspects: Ideal for communication, contracts, business deals
 - Mars direct + strong aspects: Perfect for new initiatives, physical activities
@@ -930,45 +1009,46 @@ For each transit period, analyze the following conditions to determine optimal t
 - New Moon/Full Moon in favorable houses: Fresh starts or culminations
 - Harmonious aspects to natal planets: Personal power days
 
-##Challenging Periods (List specific dates for each that applies):
+Challenging Periods (List specific dates for each that applies):
 - Mercury retrograde: Communication issues, delay signing contracts
 - Mars retrograde: Low energy, avoid new projects
 - Eclipses in challenging houses: Major life changes needing careful handling
 - Hard aspects to natal planets: Extra patience and planning needed
 - Saturn transits: Periods requiring discipline and responsibility
 
-Based on these conditions, here are the specific recommendations:
+Based on these conditions, here are the specific recommendations (Write the following in the report): 
 
-## Best Days For (Only list dates that strongly align):
-- Meeting someone new (Venus/Jupiter favorable)
-- Rekindling Love (Venus/Mars harmony)
-- Important Communications (Mercury direct + good aspects)
-- Business Launches (Mars direct + good aspects)
-- Financial Decisions (Venus/Jupiter favorable to 2nd/8th houses)
-- Career Moves (Good aspects to MC/10th house)
-- Travel (Jupiter/9th house favorable)
-- Major Purchases (Venus/Jupiter favorable to 2nd house)
-- Legal Matters (Jupiter favorable to natal planets)
-- Partnership Agreements (Venus/7th house harmony)
+##Best Days For (Only list dates that strongly align):
+Meeting someone new (Venus/Jupiter favorable)
+Rekindling Love (Venus/Mars harmony)
+Important Communications (Mercury direct + good aspects)
+Business Launches (Mars direct + good aspects)
+Financial Decisions (Venus/Jupiter favorable to 2nd/8th houses)
+Career Moves (Good aspects to MC/10th house)
+Travel (Jupiter/9th house favorable)
+Major Purchases (Venus/Jupiter favorable to 2nd house)
+Legal Matters (Jupiter favorable to natal planets)
+Partnership Agreements (Venus/7th house harmony)
 
 ##Watch Out Days (Only list dates with clear challenging aspects):
-- High Conflict Potential (Mars hard aspects)
-- Legal Complications (Jupiter/Saturn stress)
-- Financial Risks (Venus/Jupiter stress to 2nd/8th houses)
-- Relationship Tension (Venus/Mars/7th house stress)
-- Energy/Health Challenges (Mars/6th house stress)
-- Career/Business Caution (Hard aspects to MC/10th house)
+High Conflict Potential (Mars hard aspects)
+Legal Complications (Jupiter/Saturn stress)
+Financial Risks (Venus/Jupiter stress to 2nd/8th houses)
+Relationship Tension (Venus/Mars/7th house stress)
+Energy/Health Challenges (Mars/6th house stress)
+Career/Business Caution (Hard aspects to MC/10th house)
 
 Note: Only include dates that show clear astrological correlations based on the transit data. Skip any categories where no strong astrological indicators are present during this period.
 
 
 # Before I go...
-- Synthesize all insights into a final, empowering summary, make it as detailed as possible. 
+- Write a Detailed, comprehensive Synthesis of all insights into a final, motivating, empowering summary. 
 - Include important reminder 
 - Conclude with a bold thought‑provoking statement that leaves the reader in awe, inspired and wanting to know more.
 
 Guidelines:
 - Use clean markdown formatting without emojis and do not put the asterix * or **.
+- when integrating the I Ching reading avoid saying "the initial energy", "the transitions", "the final" which suggest the steps of the I Ching reading; Start by addressing the theme of the section and integrate the interpretation in a weaing manner, using natual conversation tone, to keep things natual. 
 - Ensure the final report is comprehensive, elaborate, detailed, and a minimum of 6000 words.
 - Maintain a warm, engaging, casual language with a touch of urban expression and familiar tone where user feel cozy and at home or hearing their best friend talking.
 - Use their name throughout the report, address them directly like they where your best friend. 
@@ -996,11 +1076,12 @@ Follow these structure guidelines:
 3. Include how the next 30 days of transits specifically affect ${firstName}'s chart.
 4. Provide a deep, comprehensive, detailed, and knowledgeable analysis for love, career, finances, health, and timing.
 5. Remember to not mention I ching, Human Design, Life Path, and Cardology.
-`
+6. Rember when integrating the I Ching reading avoid saying "the initial energy", "the transitions", "the final" which suggest the steps of the I Ching reading; Start by addressing the theme of the section and integrate the interpretation in a weaing manner, using natual conversation tone, to keep things natual. 
+7. Do not use words like "divination", "the reading", etc.`
               }
             ],
-            temperature: 0.8,
-            max_tokens: 80000
+            temperature: 0.7,
+            max_tokens: 90000
           })
         });
 
