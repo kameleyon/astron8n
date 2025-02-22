@@ -589,12 +589,10 @@ export async function POST(req: Request) {
       // Process retrograde events
       retrogradeEvents.forEach((event: any) => {
         const date = new Date(event.event_date);
-        const formattedDate = date.toLocaleDateString('en-US', { 
-          month: 'long', 
-          day: 'numeric', 
-          year: 'numeric' 
-        });
-        const formattedEvent = `- ${formattedDate}: ${event.planet} goes ${event.event_type} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
+        // Use UTC methods to prevent timezone conversion
+        const formattedDate = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const formattedEvent = `- ${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}: ${event.planet} goes ${event.event_type} at ${event.degrees}°${event.minutes}' in ${event.sign} at ${event.time_utc} UTC`;
         
         if (event.event_type === 'retrograde') {
           significantEvents.retrogrades.push(formattedEvent);
