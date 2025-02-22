@@ -956,8 +956,8 @@ Make sure you write about the following events
 7. Major Aspects.
 
 For each event, follow this structure:
-### [Month Year]
-[Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
+###[Month Year]
+- [Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
 Create [aspect] in your [house] at [degrees°minutes] [Why this event is important] [Cast and Integrate a I Ching divinatory reading into the interpretation seamlessly.] [How it specifically affects the user's life area(s)]
 [What opportunities or challenges it may present] [Specific advice for working with this energy]
 Write for each event a very extensively detailed, comprehensive and knowledgeable paragraphe.
@@ -1080,7 +1080,7 @@ Follow these structure guidelines:
 7. Do not use words like "divination", "the reading", etc.`
               }
             ],
-            temperature: 0.7,
+            temperature: 0.2,
             max_tokens: 90000
           })
         });
