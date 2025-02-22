@@ -957,7 +957,7 @@ Make sure you write about the following events
 
 For each event, follow this structure:
 ### [Month Year]
-**[Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
+[Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
 Create [aspect] in your [house] at [degrees°minutes] [Why this event is important] [Cast and Integrate a I Ching divinatory reading into the interpretation seamlessly.] [How it specifically affects the user's life area(s)]
 [What opportunities or challenges it may present] [Specific advice for working with this energy]
 Write for each event a very extensively detailed, comprehensive and knowledgeable paragraphe.
