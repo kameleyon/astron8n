@@ -846,12 +846,14 @@ Your report should include:
 - A captivating, warm, welcoming tone and casual language and it's ok to use urban language that is both empathic, honest and empowering.
 - DO NOT USE ASTERIX (*) OR (**)
 - Address the user when you talk, address the user directly in the report
+- Use natural conversational human language 
 
-Use a warm, friendly, honest tone. Be empowering but direct. Merge all interpretations into one cohesive narrative. Avoid explicitly naming systems like I Ching, Human Design, or Cardology by name.
+Use a warmed, friendly, honest tone. Be empowering but direct. Merge all interpretations into one cohesive narrative. Avoid explicitly naming systems like I Ching, Human Design, or Cardology by name.
 
 Structure the report as follows:
   
 # Main Overview
+- Greet the user with their name and address them directly
 - Begin with a light hearted, captivating or even thought provoking hook that draws the reader in.
 - Offer an integrated interpretation of the I Ching reading (include the initial hexagram, transition lines, and final hexagram without naming the method IChing). (one elaborate paragraph)
 - Calculate and write the upcoming main theme and key energies based on current planetary positions and how upcoming transits will affect the client's natal chart ${JSON.stringify(combinedData, null, 2)} and life path. Include exact dates and degrees. (one paragraph)
@@ -860,32 +862,36 @@ Structure the report as follows:
 
 # Key Planetary Influences and Aspects
 
-The following significant events have been identified in your chart for the next 30 days:
-
-## Sign Changes and Major Transits:
-[List all events from significantEvents.signChanges]
-
-## Retrograde Activity:
-[List all events from significantEvents.retrogrades and significantEvents.directs]
-
-## Eclipse Events:
-[List all events from significantEvents.eclipses]
-
 ## Major Aspects to Natal Planets:
-[List all events from significantEvents.aspects]
+For each events, format exactly as follow (Organize by month - chronologically)
+-"[Month Year]"
+- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.signChanges],  [from significantEvents.eclipses] and, [from significantEvents.aspects]
+  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
+  Write a detailed pragraph for each event
+- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.retrogrades and significantEvents.directs],
+  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
+  Write a detailed pragraph for each event
+- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.eclipses],
+  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
+  Write a detailed pragraph for each event
+- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.aspects],
+  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
+  Write a detailed pragraph for each event
 
-## Events by Life Area:
 
-### Love and Relationships (5th, 7th, 8th houses):
+# In Deph Analysis
+Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
+
+### Love and Relationships:
 [List all events from significantEvents.loveHouse]
 
-### Financial Matters (2nd, 8th houses):
+### Financial Matters:
 [List all events from significantEvents.financeHouse]
 
-### Career and Professional Life (10th house):
+### Career and Business:
 [List all events from significantEvents.careerHouse]
 
-### Health and Wellbeing (6th, 12th houses):
+### Health and Wellbeing:
 [List all events from significantEvents.healthHouse]
 
 For each event listed above, provide a detailed paragraph explaining:
@@ -893,51 +899,14 @@ For each event listed above, provide a detailed paragraph explaining:
 - How it specifically affects the life area(s) involved
 - What opportunities or challenges it presents
 - Specific advice for working with this energy
-
-###[Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC
-Create [aspect] in your [house] at [degrees°minutes] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)]
-[What opportunities or challenges it may present]
-
-# In Deph Analysis
-Introduce in a one welcoming, captivating paragraph that you are going to go into more details. 
-
-##Love & Relationships:
-- Emphasize Venus transits (ingresses, retrogrades) or aspects to natal Venus/7th house
-- Note Mars influences on passion and conflict
-- Watch for eclipses in 5th house (romance) or 7th house (partnership)
-- Include the in relationship and signle aspect. Check the emotions the mood during that period of time. 
-- Include insights on potential romantic opportunities and periods of enhanced personal magnetism based on the user's natal chart and houses ${JSON.stringify(combinedData, null, 2)} influence by the upcoming transist. 
 - Integrate a I Ching divinatory reading into the interpretation seamlessly.
-- make this section very extensively detailed, comprehensive and knowledgeable
+- make each section very extensively detailed, comprehensive and knowledgeable
 
+Follow this format
+###[Month Day, Year]: [Type] Eclipse at [degrees°minutes] in [Sign] [time] UTC
+Create [aspect] in your [house] at [degrees°minutes] [Integrate a I Ching divinatory reading into the interpretation seamlessly.] [How it specifically affects the user's life area(s)]
+[What opportunities or challenges it may present] [Specific advice for working with this energy] [additional data mentioned above for each section]
 
-##Career & Business:
-- Focus on Midheaven (MC) or 10th house transits
-- Highlight Saturn/Jupiter aspects to natal MC or 10th house planets
-- Note Mercury's role in negotiations and business communications
-- Provide timing strategies for initiatives based on the interplay of energies.
-- Address if it's a good period to start a new job or business and why; and what field would be more likely successful and why. 
-- Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very extensively detailed, comprehensive and knowledgeable
-
-##Finances:
-- Analyze 2nd house (personal finances) and 8th house (shared resources) transits
-- Track Venus aspects for money matters
-- Watch Jupiter transits to 2nd house for income opportunities
-- Examine money flow patterns and investment timing influenced by planetary aspects.
-- Advise on resource management and strategic timing.
-- Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very extensively detailed, comprehensive and knowledgeable
-
-##Health & Mental Health:
-- Monitor 6th house (physical health) and 12th house (mental wellbeing) transits
-- Note Mars aspects for energy levels
-- Track Saturn for chronic conditions
-- Watch eclipses/lunations in 6th/12th houses
-- Explore physical energy cycles and emotional well‑being, with attention to stress management.
-- Clearly outline how specific aspects will influence health and mood.
-- Integrate a I Ching divinatory reading into the interpretation seamlessly. 
-- make this section very extensively detailed, comprehensive and knowledgeable
 
 #Timing & Action Steps
 
@@ -1017,7 +986,7 @@ Follow these structure guidelines:
 3. Include how the next 30 days of transits specifically affect ${firstName}'s chart.
 4. Provide a deep, comprehensive, detailed, and knowledgeable analysis for love, career, finances, health, and timing.
 5. Remember to not mention I ching, Human Design, Life Path, and Cardology.
-6. At the end of your report, include a section titled "Appendix: Raw Transit Data" and verbatim copy and paste all of the Transit Data provided above. Do not summarize or modify it in any way.`
+`
               }
             ],
             temperature: 0.8,
