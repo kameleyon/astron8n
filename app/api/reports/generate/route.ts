@@ -862,21 +862,19 @@ Structure the report as follows:
 
 # Key Planetary Influences and Aspects
 
-## Major Aspects to Natal Planets:
-For each events, format exactly as follow (Organize by month - chronologically)
--"[Month Year]"
-- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.signChanges],  [from significantEvents.eclipses] and, [from significantEvents.aspects]
-  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
-  Write a detailed pragraph for each event
-- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.retrogrades and significantEvents.directs],
-  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
-  Write a detailed pragraph for each event
-- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.eclipses],
-  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
-  Write a detailed pragraph for each event
-- [Month Day, Year]: [Event] at [degrees°minutes] in [Sign] at [time] UTC" [from significantEvents.aspects],
-  [aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
-  Write a detailed pragraph for each event
+# Major Aspects to Natal Planets
+
+Format each event as follows, organized Chronologically by month:
+
+## [Month Year]
+
+[Month Day, Year]: [Event Name] at [degrees°minutes] in [Sign] at [time] UTC
+[aspect] in your [number house] at [degrees°minutes'] [Why it's significant based on the above criteria] [How it specifically affects the user's life area(s)] [What opportunities or challenges it may present]
+[Write a natural, flowing paragraph describing how this transit affects the person's life. Include the house position and explain the significance of the aspect in clear, accessible language. Focus on practical impacts and opportunities while maintaining a warm, professional tone.]
+
+Example format:
+February 22, 2025: Neptune-Node Conjunction at 28°40' in Pisces at 03:47:00 UTC
+Neptune forms a powerful conjunction with the North Node in your 12th house, opening spiritual doorways and enhancing your intuitive abilities. This mystical alignment suggests a period of heightened sensitivity to subtle energies and increased connection to your spiritual path. You may experience vivid dreams or receive important spiritual insights. This is an excellent time for meditation, artistic pursuits, or spiritual studies.
 
 
 # In Deph Analysis
