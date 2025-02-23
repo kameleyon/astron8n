@@ -522,38 +522,13 @@ export async function POST(req: Request) {
         throw new Error('Failed to fetch transit events');
       }
 
-      // Define sign order once
-      const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
-
-      // Helper function to validate and get sign index
-      const getSignIndex = (sign: string): number => {
-        const cleanSign = sign.trim();
-        const index = signOrder.indexOf(cleanSign);
-        if (index === -1) {
-          console.error('Unknown sign name:', sign);
-          return 0; // Default to Aries if unknown
-        }
-        return index;
-      };
-
-      // Helper function to calculate the shortest angular distance between two points on a 360° circle
-      const getCircularDifference = (deg1: number, deg2: number) => {
-        let diff = Math.abs(deg1 - deg2) % 360;
-        if (diff > 180) {
-          diff = 360 - diff;
-        }
-        return diff;
-      };
-
       // Helper function to calculate house position
-      const calculateHousePosition = (degrees: number, minutes: number, sign: string, birthChart: any) => {
-        // Convert to decimal degrees
-        const decimalDegrees = degrees + (minutes / 60);
+      const calculateHousePosition = (degrees: number, sign: string, birthChart: any) => {
+        // Convert zodiacal position to absolute degrees
+        const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+        const absoluteDegrees = signOrder.indexOf(sign) * 30 + degrees;
         
-        // Calculate absolute position
-        const absoluteDegrees = getSignIndex(sign) * 30 + decimalDegrees;
-        
-        // Find house by comparing with house cusps (which are already in absolute degrees)
+        // Find house by comparing with house cusps
         for (let i = 0; i < birthChart.houses.length; i++) {
           const nextIndex = (i + 1) % birthChart.houses.length;
           const start = birthChart.houses[i].cusp;
@@ -566,36 +541,36 @@ export async function POST(req: Request) {
         return 1; // Default to 1st house if not found
       };
 
-      // Helper function to check for aspects with variable orbs
-      const checkAspects = (transitDegrees: number, transitMinutes: number, transitSign: string, birthChart: any) => {
+      // Helper function to calculate the shortest angular distance between two points on a 360° circle
+      const getCircularDifference = (deg1: number, deg2: number) => {
+        let diff = Math.abs(deg1 - deg2) % 360;
+        if (diff > 180) {
+          diff = 360 - diff;
+        }
+        return diff;
+      };
+
+      // Helper function to check for aspects
+      const checkAspects = (transitDegrees: number, transitSign: string, birthChart: any) => {
         const aspects: string[] = [];
-        
-        // Convert transit position to decimal degrees
-        const transitDecimalDegrees = transitDegrees + (transitMinutes / 60);
-        const transitAbsDegrees = getSignIndex(transitSign) * 30 + transitDecimalDegrees;
+        const orb = 3; // 3 degree orb
+        const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+        const transitAbsDegrees = signOrder.indexOf(transitSign) * 30 + transitDegrees;
 
         birthChart.planets.forEach((planet: any) => {
-          // Use planet.longitude directly as it's already in absolute degrees
-          const natalAbsDegrees = planet.longitude;
+          const natalAbsDegrees = signOrder.indexOf(planet.sign) * 30 + planet.longitude;
           const diff = getCircularDifference(transitAbsDegrees, natalAbsDegrees);
           
-          // Use different orbs for different aspects and bodies
-          const conjunctionOrb = 8;
-          const sextileOrb = 4;
-          const squareOrb = 6;
-          const trineOrb = 6;
-          const oppositionOrb = 8;
-          
           // Check for major aspects using the circular difference
-          if (diff <= conjunctionOrb) {
+          if (diff <= orb) {
             aspects.push(`conjunction ${planet.name}`);
-          } else if (Math.abs(diff - 60) <= sextileOrb) {
+          } else if (Math.abs(diff - 60) <= orb) {
             aspects.push(`sextile ${planet.name}`);
-          } else if (Math.abs(diff - 90) <= squareOrb) {
+          } else if (Math.abs(diff - 90) <= orb) {
             aspects.push(`square ${planet.name}`);
-          } else if (Math.abs(diff - 120) <= trineOrb) {
+          } else if (Math.abs(diff - 120) <= orb) {
             aspects.push(`trine ${planet.name}`);
-          } else if (Math.abs(diff - 180) <= oppositionOrb) {
+          } else if (Math.abs(diff - 180) <= orb) {
             aspects.push(`opposition ${planet.name}`);
           }
         });
@@ -628,15 +603,15 @@ export async function POST(req: Request) {
           significantEvents.directs.push(formattedEvent);
         }
 
-        // Check house position with minutes
-        const house = calculateHousePosition(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
+        // Check house position
+        const house = calculateHousePosition(event.degrees, event.sign, combinedData.birth_chart);
         if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
         if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
         if (house === 10) significantEvents.careerHouse.push(formattedEvent);
         if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
         // Process aspects for all retrograde events and especially for planets going direct
-        const aspects = checkAspects(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
+        const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
         if (aspects.length > 0) {
           if (event.event_type === 'direct') {
             // Add extra emphasis for direct stations
@@ -662,15 +637,15 @@ export async function POST(req: Request) {
         
         significantEvents.eclipses.push(formattedEvent);
 
-        // Check house position with minutes
-        const house = calculateHousePosition(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
+        // Check house position
+        const house = calculateHousePosition(event.degrees, event.sign, combinedData.birth_chart);
         if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
         if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
         if (house === 10) significantEvents.careerHouse.push(formattedEvent);
         if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
-        // Check aspects with minutes
-        const aspects = checkAspects(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
+        // Check aspects
+        const aspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
         if (aspects.length > 0) {
           significantEvents.aspects.push(`${formattedEvent} (${aspects.join(', ')})`);
         }
@@ -688,9 +663,9 @@ export async function POST(req: Request) {
           year: 'numeric' 
         });
 
-        // Format event with planet names and aspects (including minutes)
+        // Format event with planet names and aspects
         let formattedEvent = '';
-        const transitAspects = checkAspects(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
+        const transitAspects = checkAspects(event.degrees, event.sign, combinedData.birth_chart);
         const aspectText = transitAspects.length > 0 ? ` (${transitAspects.map(aspect => {
           const [aspectType, planetName] = aspect.split(' ');
           return `${aspectType} to natal ${planetName}`;
@@ -728,8 +703,8 @@ export async function POST(req: Request) {
           significantEvents.signChanges.push(formattedEvent);
         }
 
-        // Check house position with minutes
-        const house = calculateHousePosition(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
+        // Check house position
+        const house = calculateHousePosition(event.degrees, event.sign, combinedData.birth_chart);
         if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
         if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
         if (house === 10) significantEvents.careerHouse.push(formattedEvent);
