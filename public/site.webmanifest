@@ -1,16 +1,24 @@
 {
   "name": "AstroGenie",
   "short_name": "AstroGenie",
-  "description": "Your Personal Astrological AI Guide",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4F46E5",
+  "description": "Your Personal Astrological Guide",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "16x16",
-      "type": "image/x-icon"
+      "src": "/manifesto.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/manifesto.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "theme_color": "#FE8E0C",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
 }
