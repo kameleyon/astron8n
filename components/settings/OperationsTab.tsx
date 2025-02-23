@@ -29,6 +29,22 @@ export function OperationsTab() {
     }
     setLoading(true);
     try {
+      // First verify current password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: (await supabase.auth.getUser()).data.user?.email || '',
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        toast({
+          title: "Error",
+          description: "Current password is incorrect",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Then update to new password
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -61,6 +77,17 @@ export function OperationsTab() {
       });
       return;
     }
+
+    const currentEmail = (await supabase.auth.getUser()).data.user?.email;
+    if (newEmail === currentEmail) {
+      toast({
+        title: "Error",
+        description: "New email is the same as current email",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({
