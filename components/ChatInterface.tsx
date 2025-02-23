@@ -1,7 +1,54 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Mic, Send, AlertCircle, Loader2, Plus, Coins } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+
+// TypeScript declarations for Web Speech API
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  length: number;
+  isFinal: boolean;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: {
+      new(): SpeechRecognition;
+    };
+    webkitSpeechRecognition: {
+      new(): SpeechRecognition;
+    };
+  }
+}
+import { Mic, MicOff, Send, AlertCircle, Loader2, Plus, Coins } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { generateAIResponse } from "@/lib/openrouter";
 import { Message } from "@/types/chat";
@@ -24,6 +71,8 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -116,6 +165,79 @@ export default function ChatInterface() {
   const handleSuggestedQuestion = (question: string) => {
     setNewMessage(question);
   };
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+        const transcript = Array.from(event.results)
+          .map(result => (result[0] as SpeechRecognitionAlternative).transcript)
+          .join('');
+        setNewMessage(transcript);
+      };
+
+      recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        
+        if (event.error === 'not-allowed') {
+          setError('Microphone access was denied. Please check your browser permissions.');
+        } else if (event.error === 'no-speech') {
+          setError('No speech was detected. Please try again.');
+        } else {
+          setError(`Speech recognition error: ${event.error}`);
+        }
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    } else {
+      setError('Speech recognition is not supported in your browser. Please try using a modern browser like Chrome.');
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
+
+  const toggleSpeechRecognition = useCallback(() => {
+    if (!recognitionRef.current) {
+      setError("Speech recognition is not supported in your browser.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      // Clear any previous errors
+      setError(null);
+
+      try {
+        // Request microphone permission
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(() => {
+            recognitionRef.current?.start();
+            setIsListening(true);
+          })
+          .catch((err) => {
+            console.error('Microphone permission error:', err);
+            setError('Please allow microphone access to use voice input.');
+          });
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+        setError("Failed to start speech recognition. Please try again.");
+      }
+    }
+  }, [isListening]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -303,10 +425,16 @@ export default function ChatInterface() {
         <div className="flex items-center gap-3 bg-white p-2 rounded-full shadow-sm hover:shadow-md transition-shadow duration-300">
           <button 
             type="button" 
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            onClick={toggleSpeechRecognition}
+            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${isListening ? 'bg-primary/10' : ''}`}
             disabled={isLoading}
+            title={isListening ? "Stop listening" : "Start voice input"}
           >
-            <Mic className="text-primary" size={20} />
+            {isListening ? (
+              <MicOff className="text-primary animate-pulse" size={20} />
+            ) : (
+              <Mic className="text-primary" size={20} />
+            )}
           </button>
           <input
             type="text"
