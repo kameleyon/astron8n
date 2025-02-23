@@ -87,7 +87,7 @@ if (existingProfile) {
           .from('user_credits')
           .insert([{
             user_id: userId,
-            total_credits: 5000,
+            total_credits: 10000,
             used_credits: 0,
             rollover_credits: 0,
             is_subscriber: false,
@@ -131,7 +131,7 @@ if (existingProfile) {
         .from('user_credits')
         .upsert([{
           user_id: userId,
-          total_credits: 17000, // Monthly premium credits
+          total_credits: 40000, // Monthly premium credits
           used_credits: 0,
           rollover_credits: 0,
           is_subscriber: true,

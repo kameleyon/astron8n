@@ -8,79 +8,119 @@ AstroGenie is a modern, AI-powered astrological platform that combines tradition
 
 ## Features
 
-### Core Features
+Discover the power of AI-driven astrological insights with our comprehensive feature set:
 
-- **Interactive Birth Chart Analysis**
-  - Detailed planetary positions and aspects
-  - House interpretations with visual wheel
-  - Dynamic aspect analysis
-  - Personalized readings
-  - Interactive birth chart wheel
-  - Special features and patterns detection
+### Birth Chart Analysis
+- Get detailed insights into your natal chart with AI-powered interpretations
+- Interactive birth chart wheel visualization
+- Detailed planetary positions and aspects
+- House system interpretations
+- Dynamic aspect analysis
+- Pattern and configuration detection
+- Special features identification
+- Personalized birth chart readings
 
-- **AI-Powered Chat Interface**
-  - Real-time astrological consultations
-  - Natural language interactions
-  - Personalized responses based on birth data
-  - Credit-based conversation system
-  - Chat history tracking
-  - Multi-model AI integration (Gemini + Qwen)
+### AI Chat Assistant
+- Chat with our AI for personalized astrological guidance anytime
+- Natural language understanding
+- Context-aware responses
+- Birth chart integration
+- Multi-model AI system (Gemini + Qwen)
+- Chat history tracking
+- Conversation continuity
+- Real-time transit integration
 
-- **Comprehensive Reports**
-  - 30-day personalized forecasts
-  - Transit analysis with house positions
-  - Detailed aspect interpretations
-  - PDF report generation
-  - Automated report storage
-  - Custom report formatting
+### Custom Reports
+- Generate in-depth reports for specific life areas or time periods
+- 30-day personalized forecasts
+- Transit analysis with house positions
+- Aspect interpretations
+- PDF generation with custom formatting
+- Aspect interpretations
+- PDF generation with custom formatting
+- Secure report storage
+- Automated delivery
+- Report history tracking
 
-- **User Profile Management**
-  - Secure birth data storage
-  - Customizable preferences
-  - History tracking
-  - Credit management
-  - API key management
+### Transit Predictions
+- Understand how current planetary positions affect your chart
+- Real-time planetary tracking
+- Aspect calculations
+- House position monitoring
+- Retrograde periods
+- Eclipse predictions
+- Daily transit updates
+- Personal transit calendar
+
+### Compatibility Analysis
+- Compare charts and understand relationship dynamics
+- Synastry analysis
+- Composite chart creation
+- Relationship patterns
+- Compatibility scores
+- Aspect interpretations
+- Relationship forecasting
+- Dynamic compatibility updates
 
 ### Advanced Features
-
-- **Location Services**
+- Location Services
   - Precise birth location detection
-  - Timezone handling
-  - Coordinates validation
+  - Global timezone handling
+  - Coordinate validation
   - Interactive location search
+  - Automatic timezone conversion
+  - Location history
+  - Multiple location support
 
-- **Credit System**
-  - Trial credits for new users
-  - Token-based usage tracking
-  - Subscription management
-  - Pay-as-you-go options
-  - Usage analytics
+- Profile Management
+  - Secure data storage
+  - Multiple chart storage
+  - Preference customization
+  - History tracking
+  - Data export options
+  - Privacy controls
+  - Account management
 
-- **Transit Analysis**
-  - Real-time planetary positions
-  - Aspect calculations
-  - House position tracking
-  - Retrograde monitoring
-  - Eclipse predictions
+## Simple, Transparent Pricing
+
+Our Monthly Plan includes everything you need:
+
+- $7.99 per month
+- 2,500 credits monthly
+- Full birth chart analysis
+- Unlimited chat sessions
+- Custom reports
+- API access
+- Priority support
+- Never expires
+- Flexible usage
+- Combine with token packages
+
+Token Packages:
+- Basic: 5,000 tokens for $2.99
+- Pro: 9,000 tokens for $3.99 (Most Popular)
+- Premium: 17,000 tokens for $5.99
 
 ## Project Structure
 
 ```
 ├── app/                      # Next.js 13+ app directory
 │   ├── api/                 # API routes
-│   ├── birth-chart/         # Birth chart components
-│   ├── reports/            # Report generation
-│   └── chat-history/       # Chat interface
+│   │   ├── billing/        # Billing and payment endpoints
+│   │   ├── stripe/        # Stripe integration endpoints
+│   │   └── reports/       # Report generation endpoints
+│   ├── birth-chart/        # Birth chart components
+│   ├── reports/           # Report generation
+│   └── chat-history/      # Chat interface
 ├── birthchartpack/          # Astrological calculations package
-│   ├── lib/                # Core calculation logic
-│   └── ephe/              # Swiss Ephemeris data
-├── api-package/             # Shared API utilities
 ├── components/              # Reusable React components
+│   ├── settings/          # Settings components
+│   └── ui/               # UI components
 ├── lib/                     # Utility functions and services
-│   ├── astro/             # Astrological utilities
-│   ├── services/          # Backend services
-│   └── utils/             # Helper functions
-└── public/                  # Static assets
+│   ├── astro/            # Astrological utilities
+│   ├── services/         # Backend services
+│   └── utils/            # Helper functions
+└── types/                   # TypeScript type definitions
 ```
 
 ## Technologies
@@ -98,16 +138,17 @@ AstroGenie is a modern, AI-powered astrological platform that combines tradition
   - Swiss Ephemeris
   - PDF Generation (pdf-lib)
 
-- **AI Models**
-  - Google Gemini (Transit Analysis)
-  - Qwen (Chat Interface)
-  - Custom Prompt Engineering
+- **Payment Processing**
+  - Stripe Integration
+  - Secure Payment Portal
+  - Real-time Billing
+  - Transaction History
 
 - **Infrastructure**
   - Vercel Deployment
   - PostgreSQL Database
-  - Stripe Payment Integration
   - Supabase Storage
+  - Stripe Webhooks
 
 ## Getting Started
 
@@ -143,6 +184,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
 NEXT_PUBLIC_OPENROUTER_API_KEY=your_openrouter_key
 STRIPE_SECRET_KEY=your_stripe_secret_key
+NEXT_PUBLIC_URL=your_app_url
 ```
 
 4. Run the development server:
@@ -154,32 +196,45 @@ Visit `http://localhost:3000` to see the application.
 
 ## Credit System
 
-AstroGenie uses a token-based credit system:
+AstroGenie uses a flexible token-based credit system:
 
-- **New Users**:
-  - 1000 trial credits
-  - 3-day trial period
-  - No rollover for trial credits
+### Token Packages
+- **Basic Package**: 5,000 tokens for $2.99
+- **Pro Package**: 9,000 tokens for $3.99 (Most Popular)
+- **Premium Package**: 17,000 tokens for $5.99
 
-- **Credit Usage**:
-  - 1 token = 1 credit
-  - Credits deducted per AI interaction
-  - Real-time balance tracking
-  - Automatic trial expiration
-  - Report generation costs
+### Trial System
+- 3-day trial period
+- Access to all features
+- Automatic transition to pay-as-you-go
+- Real-time trial expiration tracking
 
-- **Subscription Options**:
-  - Monthly credit packages
-  - Premium features access
-  - Rollover credits for paid users
-  - Custom enterprise plans
+### Credit Management
+- Real-time balance tracking
+- Automatic usage monitoring
+- Detailed transaction history
+- Rollover credits for 30 days
+
+### Payment System
+- Secure Stripe integration
+- Multiple payment methods
+- Automatic billing
+- Transaction history
+- Real-time payment updates
+
+### Usage Tracking
+- Token consumption analytics
+- Usage patterns monitoring
+- Credit alerts
+- Activity logs
+- Detailed billing history
 
 ## Usage
 
 1. **Sign Up/Login**
    - Create an account or log in
    - Enter birth details for personalized readings
-   - Set up API keys if needed
+   - Set up payment method
 
 2. **Birth Chart Analysis**
    - Input birth date, time, and location
@@ -200,16 +255,16 @@ AstroGenie uses a token-based credit system:
    - Monitor credit usage
    - View chat history
 
-5. **Profile Management**
-   - Update personal information
-   - View consultation history
-   - Manage subscription
+5. **Billing Management**
+   - Purchase token packages
+   - View transaction history
+   - Manage payment methods
    - Track credit balance
-   - Manage API keys
+   - Monitor usage
 
 ## Security
 
-- Secure birth data storage
+- Secure payment processing
 - Encrypted user information
 - GDPR compliant
 - Regular security audits
@@ -220,17 +275,18 @@ AstroGenie uses a token-based credit system:
 
 ### Key Components
 
-- **birthchartpack**: Core astrological calculations package
-  - Swiss Ephemeris integration
-  - Planetary calculations
-  - House system implementations
-  - Aspect calculations
+- **Billing System**
+  - Stripe integration
+  - Token management
+  - Payment processing
+  - Usage tracking
+  - Transaction history
 
-- **api-package**: Shared API utilities
-  - Type definitions
-  - Validation logic
-  - Common calculations
-  - API interfaces
+- **Report Generation**
+  - PDF creation
+  - Dynamic content
+  - Payment processing
+  - Secure storage
 
 ### Code Style
 
@@ -253,6 +309,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - OpenRouter API for AI capabilities
 - Swiss Ephemeris for astrological calculations
 - Supabase team for backend infrastructure
+- Stripe team for payment infrastructure
 - Open source community for various tools and libraries
 
 ## Support

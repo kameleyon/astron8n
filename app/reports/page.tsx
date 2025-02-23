@@ -16,42 +16,48 @@ const reports = [
     title: 'Next 30-Days Focus & Action Plan Report',
     description: 'The 30-Day Focus & Action Plan is a personalized roadmap designed to help you navigate key areas of life—career, relationships, finances, personal growth, and well-being—over the next month. Using insights from astrology, I Ching, human design, numerology, life path, and cardology, this report provides a clear and actionable guide tailored to your unique energy. You\'ll receive key transits, focused action steps, power dates, and strategic insights to align with opportunities and overcome challenges. Whether you\'re seeking clarity, transformation, or success, this report equips you with the tools to make the most of the next 30 days.',
     price: 14.99,
-    icon: <FileText className="h-6 w-6" />
+    icon: <FileText className="h-6 w-6" />,
+    available: true
   },
   {
-    id: 'annual-forecast',
-    title: 'Annual Forecast Report',
-    description: 'A comprehensive report outlining major opportunities and challenges for the upcoming year, broken down by month.',
+    id: 'Birth-Chart-Analysis',
+    title: 'Birth Chart Analysis',
+    description: 'Unlock the secrets of your cosmic blueprint with our comprehensive Birth Chart Analysis. This in-depth report examines your unique astrological makeup at the moment of your birth, revealing your core personality traits, inherent talents, life challenges, and destined path. We analyze the positions of all planets, houses, and aspects to provide profound insights into your life purpose, relationships, career inclinations, and personal growth opportunities. Perfect for those seeking deep self-understanding and guidance for life\'s major decisions.',
     price: 29.99,
-    icon: <FileText className="h-6 w-6" />
+    icon: <FileText className="h-6 w-6" />,
+    available: false
   },
   {
     id: 'relationship',
     title: 'Relationship Compatibility Report',
-    description: 'A personalized report comparing two individuals to assess compatibility and potential dynamics.',
+    description: 'Discover the true potential of your relationships with our detailed Compatibility Analysis. This report goes beyond surface-level matching to examine the deep astrological synergy between two individuals. We analyze the interaction between both birth charts to reveal areas of harmony, growth opportunities, potential challenges, and karmic connections. Understand communication patterns, emotional bonds, shared values, and long-term compatibility. Essential for couples, business partners, or anyone seeking to improve significant relationships in their life.',
     price: 24.99,
-    icon: <FileText className="h-6 w-6" />
+    icon: <FileText className="h-6 w-6" />,
+    available: false
   },
   {
     id: 'career',
-    title: 'Career & Finance Insight Report',
-    description: 'Tailored career and financial advice, including the best periods for growth, new opportunities, and financial stability.',
+    title: 'The Career that fits you best',
+    description: 'Find your true professional calling with our Career Path Analysis. This comprehensive report examines your birth chart\'s career indicators to reveal your natural talents, ideal work environment, leadership style, and potential paths to success. We analyze your 10th house of career, 2nd house of income, and key planetary aspects to identify periods of professional growth and opportunity. Includes insights about work relationships, money management patterns, and timing for career moves. Perfect for career changes, business decisions, or long-term professional planning.',
     price: 19.99,
-    icon: <FileText className="h-6 w-6" />
+    icon: <FileText className="h-6 w-6" />,
+    available: false
   },
   {
-    id: 'decision',
-    title: 'Decision-Making Window Report',
-    description: 'Identifies the most favorable periods for important decisions.',
+    id: 'Partnership',
+    title: 'Who is my soulmate',
+    description: 'Uncover the qualities of your ideal life partner with our Soulmate Connection Report. This unique analysis examines your birth chart\'s relationship indicators to reveal the characteristics of your most compatible partner. We analyze your 7th house of partnerships, Venus and Mars positions, and significant aspects to describe your ideal match\'s personality, values, and life approach. Learn about timing for meaningful connections, relationship patterns to embrace or avoid, and how to recognize your true soulmate when they appear in your life.',
     price: 14.99,
-    icon: <FileText className="h-6 w-6" />
+    icon: <FileText className="h-6 w-6" />,
+    available: false
   },
   {
     id: 'health',
     title: 'Health & Well-Being Report',
-    description: 'Provides personalized insights into your energy patterns, stress points, and suggestions for maintaining well-being.',
+    description: 'Transform your approach to health with our Wellness Alignment Report. This holistic analysis examines your birth chart\'s health and vitality indicators to create a personalized wellness strategy. We analyze your 1st house of physical body, 6th house of health routines, and key planetary aspects to understand your energy patterns, stress responses, and natural healing abilities. Receive insights about diet preferences, exercise recommendations, stress management techniques, and optimal rest cycles. Includes timing for health initiatives and preventive measures. Essential for anyone seeking to enhance their physical and emotional well-being through cosmic wisdom.',
     price: 14.99,
-    icon: <FileText className="h-6 w-6" />
+    icon: <FileText className="h-6 w-6" />,
+    available: false
   }
 ];
 
@@ -196,6 +202,7 @@ interface Report {
   description: string;
   price: number;
   icon: JSX.Element;
+  available: boolean;
 }
 
 interface ReportCardProps {
@@ -230,10 +237,32 @@ function ReportCard({ report, isActive }: ReportCardProps) {
         return;
       }
 
-      router.push(`/reports/success?report_type=${report.id}`);
+      const response = await fetch('/api/reports/create-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          reportId: report.id,
+          priceId: PRICE_IDS[report.id]
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create payment session');
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (err) {
-      console.error('Error generating report:', err);
-      setError('Failed to generate report. Please try again later.');
+      console.error('Error processing payment:', err);
+      setError(err instanceof Error ? err.message : 'Failed to process payment');
     } finally {
       setLoading(false);
     }
@@ -266,19 +295,23 @@ function ReportCard({ report, isActive }: ReportCardProps) {
         </div>
 
         <button
-          onClick={handleGenerateReport}
-          disabled={loading}
-          className={`w-full mt-4 bg-primary text-white py-2 md:py-3 px-3 md:px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 transform ${
-            loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'
+          onClick={report.available ? handleGenerateReport : undefined}
+          disabled={loading || !report.available}
+          className={`w-full mt-4 py-2 md:py-3 px-3 md:px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 ${
+            report.available
+              ? `bg-primary text-white hover:scale-105 transform ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'}`
+              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
           }`}
         >
           {loading ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-          ) : (
+          ) : report.available ? (
             <FileText className="w-4 h-4 md:w-5 md:h-5" />
+          ) : (
+            <FileText className="w-4 h-4 md:w-5 md:h-5 opacity-50" />
           )}
           <span className="text-sm md:text-base">
-            {loading ? 'Processing...' : 'Generate Report'}
+            {loading ? 'Processing...' : report.available ? 'Generate Report' : 'Coming Soon'}
           </span>
         </button>
       </div>

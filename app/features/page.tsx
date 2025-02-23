@@ -9,7 +9,6 @@ import {
   Sparkles, 
   MessageSquare, 
   FileText, 
-  ChevronRight,
   Check,
   CreditCard
 } from "lucide-react";
@@ -37,41 +36,97 @@ export default function FeaturesPage() {
                 {
                   icon: Star,
                   title: "Birth Chart Analysis",
-                  description: "Get detailed insights into your natal chart with AI-powered interpretations"
+                  description: "Get detailed insights into your natal chart with AI-powered interpretations",
+                  features: [
+                    "Interactive birth chart wheel",
+                    "Detailed planetary positions",
+                    "House system interpretations",
+                    "Dynamic aspect analysis",
+                    "Pattern detection",
+                    "Special features identification"
+                  ]
                 },
                 {
                   icon: MessageSquare,
                   title: "AI Chat Assistant",
-                  description: "Chat with our AI to get personalized astrological guidance anytime"
+                  description: "Chat with our AI to get personalized astrological guidance anytime",
+                  features: [
+                    "Natural language understanding",
+                    "Context-aware responses",
+                    "Birth chart integration",
+                    "Multi-model AI system",
+                    "Chat history tracking",
+                    "Real-time transit integration"
+                  ]
                 },
                 {
                   icon: FileText,
                   title: "Custom Reports",
-                  description: "Generate in-depth reports for specific life areas or time periods"
+                  description: "Generate in-depth reports for specific life areas or time periods",
+                  features: [
+                    "30-day personalized forecasts",
+                    "Transit analysis",
+                    "Aspect interpretations",
+                    "PDF generation",
+                    "Secure storage",
+                    "Report history"
+                  ]
                 },
                 {
                   icon: Sparkles,
                   title: "Transit Predictions",
-                  description: "Understand how current planetary positions affect your chart"
-                },
-                {
-                  icon: CreditCard,
-                  title: "Flexible Credits",
-                  description: "Use credits for readings, reports, and extended chat sessions"
+                  description: "Understand how current planetary positions affect your chart",
+                  features: [
+                    "Real-time planetary tracking",
+                    "Aspect calculations",
+                    "House position monitoring",
+                    "Retrograde periods",
+                    "Eclipse predictions",
+                    "Daily transit updates"
+                  ]
                 },
                 {
                   icon: Star,
                   title: "Compatibility Analysis",
-                  description: "Compare charts and understand relationship dynamics"
+                  description: "Compare charts and understand relationship dynamics",
+                  features: [
+                    "Synastry analysis",
+                    "Composite chart creation",
+                    "Relationship patterns",
+                    "Compatibility scores",
+                    "Aspect interpretations",
+                    "Dynamic compatibility updates"
+                  ]
+                },
+                {
+                  icon: CreditCard,
+                  title: "Flexible Credits",
+                  description: "Use credits for readings, reports, and extended chat sessions",
+                  features: [
+                    "Multiple token packages",
+                    "Real-time balance tracking",
+                    "Usage monitoring",
+                    "Transaction history",
+                    "Credit alerts",
+                    "Activity logs"
+                  ]
                 }
               ].map((feature, index) => (
-                <Card key={index} className="p-6 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-shadow">
-                  <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
-                </Card>
+              <Card key={index} className="p-6 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-shadow">
+                <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
+                <p className="text-gray-600 mb-4">{feature.description}</p>
+                <ul className="space-y-2">
+                  {feature.features.map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
               ))}
             </div>
           </section>
@@ -88,7 +143,7 @@ export default function FeaturesPage() {
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {/* Monthly Subscription */}
               <Card className="p-8 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-300 border-2 border-primary">
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="text-2xl font-bold text-primary">Monthly Plan</h3>
                     <p className="text-gray-600">Perfect for regular insights</p>
@@ -115,46 +170,52 @@ export default function FeaturesPage() {
                   ))}
                 </ul>
 
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  Get Started
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
+                
               </Card>
 
-              {/* Credit Top-up */}
-              <Card className="p-8 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="text-2xl font-bold text-primary">Credit Top-up</h3>
-                    <p className="text-gray-600">Need extra credits?</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-primary">$4.99</div>
-                    <div className="text-sm text-gray-600">per 1,000 credits</div>
-                  </div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {[
-                    "1,000 additional credits",
-                    "Never expires",
-                    "Use anytime",
-                    "Combine with monthly plan",
-                    "Same features access",
-                    "Flexible usage"
-                  ].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button variant="outline" className="w-full">
-                  Top Up Credits
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Card>
+              {/* Token Packages */}
+              <div className="space-y-4">
+                {[
+                  {
+                    title: "Basic Package",
+                    price: "$2.99",
+                    tokens: "5,000",
+                    description: "Perfect for casual users"
+                  },
+                  {
+                    title: "Pro Package",
+                    price: "$3.99",
+                    tokens: "9,000",
+                    description: "Best value for regular users",
+                    popular: true
+                  },
+                  {
+                    title: "Premium Package",
+                    price: "$5.99",
+                    tokens: "17,000",
+                    description: "Ideal for power users"
+                  }
+                ].map((pkg, index) => (
+                  <Card key={index} className={`p-6 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-300 ${pkg.popular ? 'border-2 border-primary relative' : ''}`}>
+                    {pkg.popular && (
+                      <div className="absolute -top-3 right-4 bg-primary text-white text-xs px-2 py-1 rounded-full">
+                        Most Popular
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-primary">{pkg.title}</h3>
+                        <p className="text-gray-600">{pkg.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">{pkg.price}</div>
+                        <div className="text-sm text-gray-600">{pkg.tokens} tokens</div>
+                      </div>
+                    </div>
+                   
+                  </Card>
+                ))}
+              </div>
             </div>
           </section>
         </div>

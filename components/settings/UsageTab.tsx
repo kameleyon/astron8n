@@ -56,8 +56,8 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
                   </p>
                   <p className="text-sm text-gray-500">
                                 {creditInfo.is_subscriber 
-                      ? '3,500 credits per month' 
-                      : '1,500 credits for 3 days'}
+                      ? '40,000 credits per month' 
+                      : '10,000 credits for 3 days'}
                   </p>
                 </div>
                 <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
@@ -106,8 +106,10 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
             <ul className="text-sm text-[#0d0630] space-y-1">
               <li>• Credits are used for generating birth charts and reports</li>
               <li>• Unused credits roll over for up to 30 days</li>
-              <li>• Premium plan includes 3,500 credits monthly</li>
-              <li>• Trial plan includes 1,500 credits for 3 days</li>
+              <li>• Top-up packages available:</li>
+              <li>  - 5,000 tokens for $2.99</li>
+              <li>  - 9,000 tokens for $3.99</li>
+              <li>  - 17,000 tokens for $5.99</li>
             </ul>
           </div>
         </div>

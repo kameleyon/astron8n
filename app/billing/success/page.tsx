@@ -24,7 +24,7 @@ function BillingSuccessContent() {
         const { error: creditsError } = await supabase
           .from('user_credits')
           .update({
-            total_credits: 5000,
+            total_credits: 10000,
             is_subscriber: true,
             subscription_start_date: new Date().toISOString()
           })
