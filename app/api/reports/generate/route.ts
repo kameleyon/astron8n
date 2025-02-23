@@ -1080,8 +1080,8 @@ Follow these structure guidelines:
 7. Do not use words like "divination", "the reading", etc.`
               }
             ],
-            temperature: 0.7,
-            max_tokens: 90000
+            temperature: 0.5,
+            max_tokens: 100000
           })
         });
 

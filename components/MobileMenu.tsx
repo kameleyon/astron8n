@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { Menu, X, MessageCircle, Settings, History, BookOpenText, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
@@ -33,10 +33,60 @@ export default function MobileMenu() {
       {isOpen && (
         <div className="fixed top-[3.5rem] left-0 right-0 bg-primary shadow-lg border-t border-white/10">
           <div className="bg-[#0d0630] backdrop-blur-sm py-4 px-6 space-y-4 mobile-menu">
-            <a href="/about" className="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors">About</a>
-            <a href="/features" className="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors">Features</a>
-            <a href="/features#pricing" className="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors">Prices</a>
-            <a href="#api" className="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors">API</a>
+            <button 
+              onClick={() => {
+                router.push('/dashboard');
+                setIsOpen(false);
+              }}
+              className="flex items-center w-full py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <MessageCircle size={20} className="mr-3" />
+              Chat
+            </button>
+            <button 
+              onClick={() => {
+                router.push('/profile');
+                setIsOpen(false);
+              }}
+              className="flex items-center w-full py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <User size={20} className="mr-3" />
+              Profile
+            </button>
+            <button 
+              onClick={() => {
+                router.push('/chat-history');
+                setIsOpen(false);
+              }}
+              className="flex items-center w-full py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <History size={20} className="mr-3" />
+              History
+            </button>
+            <button 
+              onClick={() => {
+                router.push('/reports');
+                setIsOpen(false);
+              }}
+              className="flex items-center w-full py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <BookOpenText size={20} className="mr-3" />
+              Reports
+            </button>
+            <button 
+              onClick={() => {
+                router.push('/settings');
+                setIsOpen(false);
+              }}
+              className="flex items-center w-full py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <Settings size={20} className="mr-3" />
+              Settings
+            </button>
+            <div className="pt-2 border-t border-white/10">
+              <a href="/about" className="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors">About</a>
+              <a href="/features" className="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors">Features</a>
+            </div>
           </div>
         </div>
       )}

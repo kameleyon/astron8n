@@ -99,11 +99,11 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
             )}
           </div>
           {/* Usage Tips */}
-          <div className="bg-blue-50 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900 mb-2">
-              💡 Credit Usage Tips
+          <div className="bg-white rounded-lg p-4">
+            <h4 className="font-medium text-[#0d0630] mb-2">
+              Credit Usage Tips
             </h4>
-            <ul className="text-sm text-blue-800 space-y-1">
+            <ul className="text-sm text-[#0d0630] space-y-1">
               <li>• Credits are used for generating birth charts and reports</li>
               <li>• Unused credits roll over for up to 30 days</li>
               <li>• Premium plan includes 3,500 credits monthly</li>

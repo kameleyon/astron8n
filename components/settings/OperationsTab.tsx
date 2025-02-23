@@ -89,13 +89,13 @@ export function OperationsTab() {
         <h2 className="text-xl font-semibold text-primary mb-4">
           Settings
         </h2>
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Account Security */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4">Account Security</h3>
             
             {/* Password Change Form */}
-            <div className="bg-gray-50 rounded-lg p-6 mb-4">
+            <div className="bg-white rounded-lg p-6 mb-4 border border-gray-200">
               <h4 className="font-medium text-gray-900 mb-4">Change Password</h4>
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
@@ -134,14 +134,15 @@ export function OperationsTab() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="w-full py-2 px-4 bg-[#0d0630] text-white rounded-lg hover:bg-[#0d0630]/90 transition-colors disabled:opacity-50"
                 >
                   {loading ? "Updating..." : "Update Password"}
                 </button>
               </form>
             </div>
+            
             {/* Email Change Form */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
               <h4 className="font-medium text-gray-900 mb-4">Change Email</h4>
               <form onSubmit={handleEmailChange} className="space-y-4">
                 <div>
@@ -158,79 +159,67 @@ export function OperationsTab() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="w-full py-2 px-4 bg-[#0d0630] text-white rounded-lg hover:bg-[#0d0630]/90 transition-colors disabled:opacity-50"
                 >
                   {loading ? "Sending..." : "Update Email"}
                 </button>
               </form>
-            </div>
           </div>
-          {/* Notifications */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Notifications</h3>
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">Email Notifications</p>
-                    <p className="text-sm text-gray-500">Receive important updates about your account</p>
-                  </div>
-                  <Switch
-                    checked={emailNotifications}
-                    onCheckedChange={setEmailNotifications}
-                  />
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">Marketing Emails</p>
-                    <p className="text-sm text-gray-500">Receive news about features and updates</p>
-                  </div>
-                  <Switch
-                    checked={marketingEmails}
-                    onCheckedChange={setMarketingEmails}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Privacy */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Privacy</h3>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-900">Data Sharing</p>
-                  <p className="text-sm text-gray-500">Allow anonymous data collection to improve services</p>
-                </div>
-                <Switch
-                  checked={dataSharing}
-                  onCheckedChange={setDataSharing}
-                />
-              </div>
-            </div>
-          </div>
-          {/* Account Management */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Account Management</h3>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+
+          {/* Danger Zone */}
+          <div className="mt-12">
+            <div className="bg-red-50 rounded-lg p-6 border-2 border-red-200">
+              <h3 className="text-lg font-medium text-red-700 mb-4">Danger Zone</h3>
               <div>
-                <p className="font-medium text-gray-900 mb-2">Export Data</p>
-                <p className="text-sm text-gray-500 mb-2">Download all your data in a portable format</p>
-                <button className="text-primary hover:underline text-sm">
-                  Export all data
-                </button>
-              </div>
-              <div className="pt-4 border-t border-gray-200">
-                <p className="font-medium text-gray-900 mb-2">Delete Account</p>
-                <p className="text-sm text-gray-500 mb-2">Permanently delete your account and all data</p>
-                <button className="text-red-600 hover:underline text-sm">
-                  Delete account
+                <p className="font-medium text-red-900 mb-2">Delete Account</p>
+                <p className="text-sm text-red-700 mb-4">This action cannot be undone. This will permanently delete your account and remove your data from our servers.</p>
+                <button 
+                  onClick={async () => {
+                    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                      try {
+                        setLoading(true);
+                        // First delete user data from the database
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) throw new Error('User not found');
+
+                        const { error: dbError } = await supabase
+                          .from('user_profiles')
+                          .delete()
+                          .eq('id', user.id);
+                        if (dbError) throw dbError;
+
+                        // Then delete the auth user
+                        const { error } = await supabase.rpc('delete_user');
+                        if (error) throw error;
+                        
+                        toast({
+                          title: "Account Deleted",
+                          description: "Your account has been successfully deleted.",
+                        });
+                        
+                        // Sign out and redirect to home
+                        await supabase.auth.signOut();
+                        window.location.href = '/';
+                      } catch (error: any) {
+                        toast({
+                          title: "Error",
+                          description: error.message,
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setLoading(false);
+                      }
+                    }
+                  }}
+                  disabled={loading}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete Account
                 </button>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </CardContent>
     </Card>

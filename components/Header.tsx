@@ -85,49 +85,56 @@ export default function Header({ onAuth }: HeaderProps) {
             <a href="/about" className="hover:text-white/80 transition-colors">About</a>
             <span className="text-gray-500">|</span>
             <a href="/features" className="hover:text-white/80 transition-colors">Features</a>
-            
-            
+          </div>
+
+          <div className="flex-1 flex justify-center items-center">
+            <div className="flex items-center mobile-only">
+              <img src="/orangelogo.png" alt="AstroGenie Logo" className="h-6 w-auto" />
+              <span className="text-2xl font-semibold text-[#fe8e0c] logo-text pl-2 mt-2"> AstroGenie</span>
+            </div>
           </div>
 
           {isLoading ? (
             <div className="w-24 h-8 bg-gray-600/40 rounded-xl animate-pulse" />
           ) : isAuthenticated ? (
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => router.push('/dashboard')}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                title="Chat with Astrogenie"
-              >
-                <MessageCircle size={20} />
-              </button>
-              <button 
-                onClick={() => router.push('/profile')}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                title="Profile"
-              >
-                <User size={20} />
-              </button>
-              <button 
-                onClick={() => router.push('/chat-history')}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                title="Chat History"
-              >
-                <History size={20} />
-              </button>
-              <button 
-                onClick={() => router.push('/reports')}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                title="Reports"
-              >
-                <BookOpenText size={20} />
-              </button>
-              <button 
-                onClick={() => router.push('/settings')}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                title="Settings"
-              >
-                <Settings size={20} />
-              </button>
+            <div className="flex items-center">
+              <div className="hidden md:flex items-center space-x-4">
+                <button 
+                  onClick={() => router.push('/dashboard')}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  title="Chat with Astrogenie"
+                >
+                  <MessageCircle size={20} />
+                </button>
+                <button 
+                  onClick={() => router.push('/profile')}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  title="Profile"
+                >
+                  <User size={20} />
+                </button>
+                <button 
+                  onClick={() => router.push('/chat-history')}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  title="Chat History"
+                >
+                  <History size={20} />
+                </button>
+                <button 
+                  onClick={() => router.push('/reports')}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  title="Reports"
+                >
+                  <BookOpenText size={20} />
+                </button>
+                <button 
+                  onClick={() => router.push('/settings')}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  title="Settings"
+                >
+                  <Settings size={20} />
+                </button>
+              </div>
               <button 
                 onClick={handleLogout}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors text-[#ffa600] hover:text-[#ffa600]"

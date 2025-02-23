@@ -11,7 +11,7 @@ import SessionProvider from "@/components/SessionProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { User, FileText, Edit, AlertCircle } from "lucide-react";
-import BirthChartModal from "@/components/BirthChartModal";
+import BirthChartModal from "@/components/BirthChartModalprofile";
 import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
 import { calculateLifePath, getBirthCard } from "@/lib/utils/calculations";

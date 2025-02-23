@@ -108,3 +108,16 @@ body {
 .mobile-menu {
   animation: slideInFromTop 0.3s ease-out forwards;
 }
+
+/* Mobile-only display */
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: flex;
+  }
+}

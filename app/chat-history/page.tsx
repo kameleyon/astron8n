@@ -17,7 +17,7 @@ interface ChatSession {
   is_favorite?: boolean;
 }
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 7;
 
 export default function ChatHistoryPage() {
   const router = useRouter();
@@ -26,7 +26,6 @@ export default function ChatHistoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFavorites, setShowFavorites] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     loadChatSessions();
@@ -170,14 +169,6 @@ export default function ChatHistoryPage() {
                   />
                   <span>Show Favorites</span>
                 </label>
-
-                <button 
-                  onClick={() => setShowDatePicker(!showDatePicker)}
-                  className="text-sm flex items-center gap-1 hover:opacity-80 transition-opacity"
-                >
-                  <Calendar className="h-4 w-4" />
-                  <span>Pick a date</span>
-                </button>
               </div>
             </div>
 
@@ -198,11 +189,11 @@ export default function ChatHistoryPage() {
                         <div className="flex items-center gap-4 flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-sm text-gray-500">
                             <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                            <span>{session.message_count} messages</span>
+                            <span>{session.message_count}</span>
                           </div>
                           <p className="text-gray-900 truncate flex-1">{session.first_message}</p>
                           <span className="text-xs text-gray-500 flex-shrink-0">
-                            {format(new Date(session.created_at), 'MMM d, yyyy h:mm a')}
+                            {format(new Date(session.created_at), 'MMM d')}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
