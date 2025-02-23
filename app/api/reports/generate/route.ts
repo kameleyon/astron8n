@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PDFPage } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
+import { REPORT_CONFIG } from '../config';
+
 
 // Initialize Supabase client inside the route handler to avoid build-time errors
 function getSupabaseClient() {
@@ -38,6 +40,7 @@ async function createPDF(content: string, firstName: string) {
   const pageWidth = 612; // Letter size width
   const pageHeight = 792; // Letter size height
   const margin = 50;
+  const bottomMargin = 100; // Space for footer
   const contentWidth = pageWidth - margin * 2;
 
   // Create the first page
@@ -50,9 +53,6 @@ async function createPDF(content: string, firstName: string) {
     const logoBytes = fs.readFileSync(logoPath);
     const logoImage = await pdfDoc.embedPng(logoBytes);
     const logoDims = logoImage.scale(0.25);
-
-    // Get the width of the page
-    const pageWidth = firstPage.getWidth();
 
     // Calculate the x position to center the logo
     const centeredX = (pageWidth - logoDims.width) / 2;
@@ -118,14 +118,117 @@ async function createPDF(content: string, firstName: string) {
   });
   y = lineY - 50;
 
+  // Function to draw footer and page number
+  const drawFooterAndPageNumber = (page: PDFPage, pageNumber: number, totalPages: number) => {
+    const footerText = "Copyright 2025 - AstroGenie. All Rights Reserved to SensaCall.";
+    const footerWidth = helvetica.widthOfTextAtSize(footerText, 10);
+    const pageText = `Page ${pageNumber}`;
+    
+    // Draw footer text
+    page.drawText(footerText, {
+      x: (pageWidth - footerWidth) / 2,
+      y: margin / 2,
+      size: 10,
+      font: helvetica,
+      color: rgb(0.6, 0.6, 0.6),
+    });
+
+    // Draw page number
+    page.drawText(pageText, {
+      x: pageWidth - margin - helvetica.widthOfTextAtSize(pageText, 10),
+      y: margin / 2,
+      size: 10,
+      font: helvetica,
+      color: rgb(0.6, 0.6, 0.6),
+    });
+  };
+
+  // First pass: calculate total pages needed
+  let totalPages = 1;
+  let tempY = y;
+
+  for (const line of content.split('\n')) {
+    if (tempY < margin + bottomMargin) {
+      totalPages++;
+      tempY = pageHeight - margin;
+    }
+    
+    if (line.startsWith('# ')) tempY -= 70;
+    else if (line.startsWith('## ')) tempY -= 50;
+    else if (line.startsWith('- ')) {
+      const bulletText = line.substring(2);
+      const words = bulletText.split(' ');
+      let currentLine = '';
+      let xPos = margin + 40;
+
+      for (const word of words) {
+        const testLine = currentLine + word + ' ';
+        const textWidth = helvetica.widthOfTextAtSize(testLine, 12);
+        if (xPos + textWidth > pageWidth - margin) {
+          tempY -= 20;
+          xPos = margin + 30;
+          if (tempY < margin + bottomMargin) {
+            totalPages++;
+            tempY = pageHeight - margin;
+          }
+          currentLine = word + ' ';
+        } else {
+          currentLine = testLine;
+        }
+      }
+      tempY -= 30;
+    }
+    else if (line.trim() === '') tempY -= 20;
+    else {
+      const words = line.split(' ');
+      let currentLine = '';
+      let xPos = margin;
+
+      for (const word of words) {
+        const testLine = currentLine + word + ' ';
+        const textWidth = helvetica.widthOfTextAtSize(testLine, 12);
+        if (xPos + textWidth > pageWidth - margin) {
+          tempY -= 20;
+          xPos = margin;
+          if (tempY < margin + bottomMargin) {
+            totalPages++;
+            tempY = pageHeight - margin;
+          }
+          currentLine = word + ' ';
+        } else {
+          currentLine = testLine;
+        }
+      }
+      tempY -= 30;
+    }
+  }
+
   // Parse and place content
   let currentPage = firstPage;
+  const pages = [firstPage];
   const lines = content.split('\n');
 
+  // Function to create new page
+  const createNewPage = () => {
+    // Draw footer on current page before creating new one
+    if (currentPage) {
+      drawFooterAndPageNumber(currentPage, pages.length, totalPages);
+    }
+    
+    // Create and setup new page
+    currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+    pages.push(currentPage);
+    return pageHeight - margin;
+  };
+
+  // Function to check if new page is needed
+  const needsNewPage = (currentY: number) => {
+    return currentY < margin + bottomMargin;
+  };
+
   for (const line of lines) {
-    if (y < margin + 50) {
-      currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
-      y = pageHeight - margin;
+    if (needsNewPage(y)) {
+      y = createNewPage();
     }
 
     if (line.startsWith('# ')) {
@@ -244,12 +347,16 @@ async function createPDF(content: string, firstName: string) {
 
       y -= 30;
 
-      if (y < margin + 50) {
-        currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
-        y = pageHeight - margin;
+      if (needsNewPage(y)) {
+        y = createNewPage();
       }
     }
   }
+
+  // Add footer and page numbers to all pages
+  pages.forEach((page, index) => {
+    drawFooterAndPageNumber(page, index + 1, pages.length);
+  });
 
   return await pdfDoc.save();
 }
@@ -439,7 +546,7 @@ export async function POST(req: Request) {
 
     // Constants for retry logic
     const maxRetries = 3;
-    const timeout = 30000;
+    const timeout = 15000; // Reduced timeout since most responses come within 15 seconds
 
     // Function to fetch astrological events from database
     const fetchAstrologicalEvents = async (supabase: any, startDate: Date, endDate: Date) => {
@@ -454,81 +561,48 @@ export async function POST(req: Request) {
         endUTC: endDate.toUTCString()
       });
 
-      // Fetch retrograde events
-      const retrogradeQuery = supabase
-        .from('retrograde_events')
-        .select('*')
-        .gte('event_date', startDate.toISOString())
-        .lte('event_date', endDate.toISOString())
-        .order('event_date', { ascending: true });
+      // Fetch all events in parallel for better performance
+      const [
+        { data: retrogradeEvents, error: retrogradeError },
+        { data: eclipseEvents, error: eclipseError },
+        { data: transitEvents, error: transitError }
+      ] = await Promise.all([
+        supabase
+          .from('retrograde_events')
+          .select('*')
+          .gte('event_date', startDate.toISOString())
+          .lte('event_date', endDate.toISOString())
+          .order('event_date', { ascending: true }),
+        supabase
+          .from('eclipse_events')
+          .select('*')
+          .gte('event_date', startDate.toISOString())
+          .lte('event_date', endDate.toISOString())
+          .order('event_date', { ascending: true }),
+        supabase
+          .from('transit_events')
+          .select('*')
+          .gte('event_date', startDate.toISOString())
+          .lte('event_date', endDate.toISOString())
+          .order('event_date', { ascending: true })
+      ]);
 
-      console.log('Executing retrograde query with params:', {
-        table: 'retrograde_events',
-        start: startDate.toISOString(),
-        end: endDate.toISOString()
+      // Check for any errors from parallel queries
+      if (retrogradeError) throw new Error('Failed to fetch retrograde events: ' + retrogradeError.message);
+      if (eclipseError) throw new Error('Failed to fetch eclipse events: ' + eclipseError.message);
+      if (transitError) throw new Error('Failed to fetch transit events: ' + transitError.message);
+
+      // Log summary of events found
+      console.log('Events found:', {
+        retrograde: retrogradeEvents?.length || 0,
+        eclipse: eclipseEvents?.length || 0,
+        transit: transitEvents?.length || 0
       });
-      const { data: retrogradeEvents, error: retrogradeError } = await supabase
-        .from('retrograde_events')
-        .select('*')
-        .gte('event_date', startDate.toISOString())
-        .lte('event_date', endDate.toISOString())
-        .order('event_date', { ascending: true });
-
-      console.log('Retrograde events found:', retrogradeEvents?.length || 0);
-      console.log('Raw retrograde events:', JSON.stringify(retrogradeEvents, null, 2));
-      if (retrogradeError) {
-        console.error('Error fetching retrograde events:', retrogradeError);
-        throw new Error('Failed to fetch retrograde events');
-      }
-
-      // Fetch eclipse events
-      console.log('Executing eclipse query with params:', {
-        table: 'eclipse_events',
-        start: startDate.toISOString(),
-        end: endDate.toISOString()
-      });
-      const { data: eclipseEvents, error: eclipseError } = await supabase
-        .from('eclipse_events')
-        .select('*')
-        .gte('event_date', startDate.toISOString())
-        .lte('event_date', endDate.toISOString())
-        .order('event_date', { ascending: true });
-
-      console.log('Eclipse events found:', eclipseEvents?.length || 0);
-      console.log('Raw eclipse events:', JSON.stringify(eclipseEvents, null, 2));
-      if (eclipseError) {
-        console.error('Error fetching eclipse events:', eclipseError);
-        throw new Error('Failed to fetch eclipse events');
-      }
-
-      // Fetch transit events
-      console.log('Executing transit query with params:', {
-        table: 'transit_events',
-        start: startDate.toISOString(),
-        end: endDate.toISOString()
-      });
-      const { data: transitEvents, error: transitError } = await supabase
-        .from('transit_events')
-        .select('*')
-        .gte('event_date', startDate.toISOString())
-        .lte('event_date', endDate.toISOString())
-        .order('event_date', { ascending: true });
-
-      console.log('Transit events found:', transitEvents?.length || 0);
-      console.log('Raw transit events:', JSON.stringify(transitEvents, null, 2));
-
-      if (transitError) {
-        console.error('Error fetching transit events:', transitError);
-        throw new Error('Failed to fetch transit events');
-      }
-
-      // Define sign order once
-      const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
 
       // Helper function to validate and get sign index
       const getSignIndex = (sign: string): number => {
         const cleanSign = sign.trim();
-        const index = signOrder.indexOf(cleanSign);
+        const index = REPORT_CONFIG.signOrder.indexOf(cleanSign);
         if (index === -1) {
           console.error('Unknown sign name:', sign);
           return 0; // Default to Aries if unknown
@@ -579,23 +653,18 @@ export async function POST(req: Request) {
           const natalAbsDegrees = planet.longitude;
           const diff = getCircularDifference(transitAbsDegrees, natalAbsDegrees);
           
-          // Use different orbs for different aspects and bodies
-          const conjunctionOrb = 8;
-          const sextileOrb = 4;
-          const squareOrb = 6;
-          const trineOrb = 6;
-          const oppositionOrb = 8;
+          const { aspectOrbs } = REPORT_CONFIG;
           
           // Check for major aspects using the circular difference
-          if (diff <= conjunctionOrb) {
+          if (diff <= aspectOrbs.conjunction) {
             aspects.push(`conjunction ${planet.name}`);
-          } else if (Math.abs(diff - 60) <= sextileOrb) {
+          } else if (Math.abs(diff - 60) <= aspectOrbs.sextile) {
             aspects.push(`sextile ${planet.name}`);
-          } else if (Math.abs(diff - 90) <= squareOrb) {
+          } else if (Math.abs(diff - 90) <= aspectOrbs.square) {
             aspects.push(`square ${planet.name}`);
-          } else if (Math.abs(diff - 120) <= trineOrb) {
+          } else if (Math.abs(diff - 120) <= aspectOrbs.trine) {
             aspects.push(`trine ${planet.name}`);
-          } else if (Math.abs(diff - 180) <= oppositionOrb) {
+          } else if (Math.abs(diff - 180) <= aspectOrbs.opposition) {
             aspects.push(`opposition ${planet.name}`);
           }
         });
@@ -629,11 +698,12 @@ export async function POST(req: Request) {
         }
 
         // Check house position with minutes
+        const { houseAssignments } = REPORT_CONFIG;
         const house = calculateHousePosition(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
-        if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
-        if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
-        if (house === 10) significantEvents.careerHouse.push(formattedEvent);
-        if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
+        if (houseAssignments.love.includes(house)) significantEvents.loveHouse.push(formattedEvent);
+        if (houseAssignments.finance.includes(house)) significantEvents.financeHouse.push(formattedEvent);
+        if (houseAssignments.career.includes(house)) significantEvents.careerHouse.push(formattedEvent);
+        if (houseAssignments.health.includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
         // Process aspects for all retrograde events and especially for planets going direct
         const aspects = checkAspects(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
@@ -663,11 +733,12 @@ export async function POST(req: Request) {
         significantEvents.eclipses.push(formattedEvent);
 
         // Check house position with minutes
+        const { houseAssignments } = REPORT_CONFIG;
         const house = calculateHousePosition(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
-        if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
-        if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
-        if (house === 10) significantEvents.careerHouse.push(formattedEvent);
-        if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
+        if (houseAssignments.love.includes(house)) significantEvents.loveHouse.push(formattedEvent);
+        if (houseAssignments.finance.includes(house)) significantEvents.financeHouse.push(formattedEvent);
+        if (houseAssignments.career.includes(house)) significantEvents.careerHouse.push(formattedEvent);
+        if (houseAssignments.health.includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
         // Check aspects with minutes
         const aspects = checkAspects(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
@@ -697,7 +768,8 @@ export async function POST(req: Request) {
         }).join(', ')})` : '';
 
         // Only format events that have all required data
-        if (!event.event_type || !event.degrees || !event.minutes || !event.sign || !event.time_utc) {
+        // Note: degrees and minutes can be 0 for sign changes (0°0' of a sign)
+        if (!event.event_type || event.degrees === undefined || event.minutes === undefined || !event.sign || !event.time_utc) {
           console.log('Skipping event due to missing data:', event);
           return;
         }
@@ -729,11 +801,12 @@ export async function POST(req: Request) {
         }
 
         // Check house position with minutes
+        const { houseAssignments } = REPORT_CONFIG;
         const house = calculateHousePosition(event.degrees, event.minutes, event.sign, combinedData.birth_chart);
-        if ([5, 7, 8].includes(house)) significantEvents.loveHouse.push(formattedEvent);
-        if ([2, 8].includes(house)) significantEvents.financeHouse.push(formattedEvent);
-        if (house === 10) significantEvents.careerHouse.push(formattedEvent);
-        if ([6, 12].includes(house)) significantEvents.healthHouse.push(formattedEvent);
+        if (houseAssignments.love.includes(house)) significantEvents.loveHouse.push(formattedEvent);
+        if (houseAssignments.finance.includes(house)) significantEvents.financeHouse.push(formattedEvent);
+        if (houseAssignments.career.includes(house)) significantEvents.careerHouse.push(formattedEvent);
+        if (houseAssignments.health.includes(house)) significantEvents.healthHouse.push(formattedEvent);
 
         // Add to aspects list if there are any
         if (transitAspects.length > 0) {
@@ -820,13 +893,7 @@ export async function POST(req: Request) {
     }
 
     // Initialize variables
-    let transitData: string = `# Current Astrological Data
-## Planetary Positions
-- (Approximate or fallback data)
-## Expected Transits
-- (Approximate or fallback data)
-## General Influences
-- (Approximate or fallback data)`;
+    let transitData: string = '';
     let reportContent: string = '';
     let systemPrompt: string = '';
     let significantEvents = {
@@ -844,13 +911,6 @@ export async function POST(req: Request) {
 
     // Fetch transit data from database
     console.log('Starting transit data fetch...');
-    transitData = `# Current Astrological Data
-## Planetary Positions
-- (Approximate or fallback data)
-## Expected Transits
-- (Approximate or fallback data)
-## General Influences
-- (Approximate or fallback data)`;
 
     try {
       const startDate = new Date();
@@ -882,13 +942,7 @@ export async function POST(req: Request) {
       console.log('Transit data retrieved successfully');
     } catch (error) {
       console.error('Error fetching transit data:', error);
-      transitData = `# Current Astrological Data
-## Planetary Positions
-- (Approximate or fallback data)
-## Expected Transits
-- (Approximate or fallback data)
-## General Influences
-- (Approximate or fallback data)`;
+      throw new Error('Failed to fetch transit data. Please try generating the report again.');
     }
 
     // Generate report
@@ -984,6 +1038,7 @@ Make sure you write about the following events
 5. New Moon Phases.
 6. Major Transits.
 7. Major Aspects.
+(Include all of these events (if exist) whitout missing or skipping one)
 
 For each event, follow this structure:
 ###[Month Year]
@@ -1111,7 +1166,10 @@ Follow these structure guidelines:
               }
             ],
             temperature: 0.5,
-            max_tokens: 100000
+            top_p: 0.9,
+            frequency_penalty: 0.3,
+            presence_penalty: 0.2,
+            max_tokens: 80000,
           })
         });
 
