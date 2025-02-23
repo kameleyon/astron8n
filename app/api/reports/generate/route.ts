@@ -201,25 +201,15 @@ async function createPDF(content: string, firstName: string) {
       let isBold = false;
       let text = line;
 
-      if (text.includes('**')) {
-        const parts = text.split('**');
-        const lastPart = parts.length % 2 === 1 ? parts.pop() : '';
-        const processedParts = [];
-        for (let i = 0; i < parts.length; i += 2) {
-          if (i + 1 < parts.length) {
-            processedParts.push(parts[i] + parts[i + 1]);
-          } else {
-            processedParts.push(parts[i]);
-          }
-        }
-        text = processedParts.join('') + (lastPart || '');
-        isBold = parts.length > 1;
-      }
-
-      if (text.startsWith('###')) {
-        text = text.substring(3);
-        isBold = true;
-      }
+      // Enhanced markdown character handling
+      // First check for bold formatting
+      isBold = text.includes('**') || text.startsWith('#');
+      
+      // Then remove all markdown characters while preserving formatting intent
+      text = text.replace(/\*\*/g, ''); // Remove all ** markers
+      text = text.replace(/^#+\s*/, ''); // Remove any # markers at start
+      text = text.replace(/\[|\]|\*|_/g, ''); // Remove any other markdown characters
+      text = text.trim(); // Clean up any remaining whitespace
 
       const words = text.split(' ');
       for (const word of words) {
@@ -551,6 +541,15 @@ export async function POST(req: Request) {
         return 1; // Default to 1st house if not found
       };
 
+      // Helper function to calculate the shortest angular distance between two points on a 360° circle
+      const getCircularDifference = (deg1: number, deg2: number) => {
+        let diff = Math.abs(deg1 - deg2) % 360;
+        if (diff > 180) {
+          diff = 360 - diff;
+        }
+        return diff;
+      };
+
       // Helper function to check for aspects
       const checkAspects = (transitDegrees: number, transitSign: string, birthChart: any) => {
         const aspects: string[] = [];
@@ -560,14 +559,20 @@ export async function POST(req: Request) {
 
         birthChart.planets.forEach((planet: any) => {
           const natalAbsDegrees = signOrder.indexOf(planet.sign) * 30 + planet.longitude;
-          const diff = Math.abs(transitAbsDegrees - natalAbsDegrees);
+          const diff = getCircularDifference(transitAbsDegrees, natalAbsDegrees);
           
-          // Check for major aspects
-          if (Math.abs(diff - 0) <= orb || Math.abs(diff - 360) <= orb) aspects.push(`conjunction ${planet.name}`);
-          if (Math.abs(diff - 60) <= orb) aspects.push(`sextile ${planet.name}`);
-          if (Math.abs(diff - 90) <= orb) aspects.push(`square ${planet.name}`);
-          if (Math.abs(diff - 120) <= orb) aspects.push(`trine ${planet.name}`);
-          if (Math.abs(diff - 180) <= orb) aspects.push(`opposition ${planet.name}`);
+          // Check for major aspects using the circular difference
+          if (diff <= orb) {
+            aspects.push(`conjunction ${planet.name}`);
+          } else if (Math.abs(diff - 60) <= orb) {
+            aspects.push(`sextile ${planet.name}`);
+          } else if (Math.abs(diff - 90) <= orb) {
+            aspects.push(`square ${planet.name}`);
+          } else if (Math.abs(diff - 120) <= orb) {
+            aspects.push(`trine ${planet.name}`);
+          } else if (Math.abs(diff - 180) <= orb) {
+            aspects.push(`opposition ${planet.name}`);
+          }
         });
 
         return aspects;
@@ -1128,9 +1133,14 @@ Follow these structure guidelines:
       }
     }
 
-    // Create PDF from the final report
+    // Clean up markdown formatting before creating PDF
+    console.log('Cleaning markdown formatting...');
+    const { cleanReportContent } = await import('../../../../lib/utils/markdown-cleaner');
+    const cleanedContent = cleanReportContent(reportContent);
+    
+    // Create PDF from the cleaned report content
     console.log('Creating PDF...');
-    const pdfBytes = await createPDF(reportContent, firstName);
+    const pdfBytes = await createPDF(cleanedContent, firstName);
 
     // Save report to Supabase Storage
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
