@@ -22,8 +22,10 @@ export default function SettingsPage() {
     subscription_start_date: null
   });
   const [billingInfo, setBillingInfo] = useState<BillingInfo>({ 
-    next_payment_date: "", 
-    activities: [] 
+    next_payment_date: null,
+    trial_end_date: null,
+    is_trial: false,
+    activities: []
   });
   useEffect(() => {
     const initializeUserData = async () => {
@@ -164,7 +166,9 @@ export default function SettingsPage() {
                 <UsageTab loading={loading} creditInfo={creditInfo} />
               </TabsContent>
               <TabsContent value="billing">
-                <BillingTab billingInfo={billingInfo} />
+                <div>
+                  <BillingTab billingInfo={billingInfo} />
+                </div>
               </TabsContent>
               <TabsContent value="settings">
                 <OperationsTab />

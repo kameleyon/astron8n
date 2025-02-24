@@ -16,8 +16,15 @@ interface ExtendedBillingInfo extends BillingInfo {
   payment_method: PaymentMethod | null;
 }
 
-export function BillingTab() {
-  const [billingInfo, setBillingInfo] = useState<ExtendedBillingInfo | null>(null);
+interface BillingTabProps {
+  billingInfo: BillingInfo;
+}
+
+export function BillingTab(props: BillingTabProps) {
+  const [billingInfo, setBillingInfo] = useState<ExtendedBillingInfo>({
+    ...props.billingInfo,
+    payment_method: null
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
