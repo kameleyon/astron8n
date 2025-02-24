@@ -90,11 +90,11 @@ export function BillingTab(props: BillingTabProps) {
           Billing
         </h2>
         <div className="space-y-8">
-          {/* Credit Top-up Options */}
+          {/* Credit Top-up Options 
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4">Purchase Additional Credits</h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Basic Package */}
+            <div className="grid md:grid-cols-3 gap-4">*/}
+              {/* Basic Package 
               <div className="bg-gray-50 rounded-lg p-6 border-2 border-gray-200 hover:border-primary transition-colors">
                 <div className="text-center mb-4">
                   <h4 className="text-xl font-semibold text-gray-900">Basic</h4>
@@ -109,8 +109,8 @@ export function BillingTab(props: BillingTabProps) {
                 <button className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                   Purchase
                 </button>
-              </div>
-              {/* Pro Package */}
+              </div>*/}
+              {/* Pro Package
               <div className="bg-gray-50 rounded-lg p-6 border-2 border-primary relative">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-primary text-white text-xs px-3 py-1 rounded-full">Most Popular</span>
@@ -128,8 +128,8 @@ export function BillingTab(props: BillingTabProps) {
                 <button className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                   Purchase
                 </button>
-              </div>
-              {/* Premium Package */}
+              </div>*/}
+              {/* Premium Package 
               <div className="bg-gray-50 rounded-lg p-6 border-2 border-gray-200 hover:border-primary transition-colors">
                 <div className="text-center mb-4">
                   <h4 className="text-xl font-semibold text-gray-900">Premium</h4>
@@ -146,7 +146,7 @@ export function BillingTab(props: BillingTabProps) {
                 </button>
               </div>
             </div>
-          </div>
+          </div>*/}
           {/* Payment Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-3">Payment Information</h3>

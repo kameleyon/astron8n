@@ -52,6 +52,7 @@ import { Mic, MicOff, Send, AlertCircle, Loader2, Plus, Coins } from "lucide-rea
 import { supabase } from "@/lib/supabase";
 import { generateAIResponse } from "@/lib/openrouter";
 import { Message } from "@/types/chat";
+import { TypingAnimation } from "@/components/ui/TypingAnimation";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { checkUserCredits } from "@/lib/utils/credits";
@@ -68,7 +69,7 @@ const suggestedQuestions = [
 export default function ChatInterface() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<(Message & { isTyping?: boolean })[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -295,7 +296,8 @@ export default function ChatInterface() {
         createdAt: new Date(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const typingMessage = { ...assistantMessage, isTyping: true };
+      setMessages(prev => [...prev, typingMessage]);
       setRemainingCredits(response.remainingCredits ?? null);
 
       // Store AI response
@@ -357,7 +359,19 @@ export default function ChatInterface() {
                     : 'bg-[#FFF3E0] text-gray-800'
                 }`}
               >
-                {message.role === 'assistant' ? (
+              {message.role === 'assistant' ? (
+                message.isTyping ? (
+                  <TypingAnimation
+                    content={message.content}
+                    onComplete={() => {
+                      setMessages(prev =>
+                        prev.map(msg =>
+                          msg.id === message.id ? { ...msg, isTyping: false } : msg
+                        )
+                      );
+                    }}
+                  />
+                ) : (
                   <ReactMarkdown
                     className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2"
                     components={{
@@ -374,9 +388,10 @@ export default function ChatInterface() {
                   >
                     {message.content}
                   </ReactMarkdown>
-                ) : (
-                  message.content
-                )}
+                )
+              ) : (
+                message.content
+              )}
               </div>
             </div>
           ))}
