@@ -122,6 +122,19 @@ body {
   }
 }
 
+/* Typing cursor animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typing-cursor {
+  display: inline-block;
+  animation: blink 1s step-end infinite;
+  color: #FE8E0C;
+  font-weight: bold;
+}
+
 /* Custom scrollbar for legal sections */
 .custom-scrollbar {
   scrollbar-width: thin;

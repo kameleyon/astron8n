@@ -217,7 +217,7 @@ function ReportCard({ report, isActive }: ReportCardProps) {
 
   // Map report IDs to Stripe price IDs
   const PRICE_IDS: { [key: string]: string } = {
-    '30-days': 'price_1QsxLAGTXKQOsgznyJHgk0W9',
+    '30-days': 'price_1QtJfsGTXKQOsgzngGNk8ibg',
     'annual-forecast': 'price_1QsxLBGTXKQOsgznKpL8j4Xt',
     'relationship': 'price_1QsxLCGTXKQOsgznM9qR5kWn',
     'career': 'price_1QsxLDGTXKQOsgznPwX2mJYt',
