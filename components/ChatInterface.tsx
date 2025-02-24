@@ -325,10 +325,10 @@ export default function ChatInterface() {
     <div className="chat-container bg-white/50 border border-white/80 shadow-md shadow-black mt-8 mb-8 h-[600px] w-full flex flex-col transition-all duration-300">
       {/* Header */}
       <div className="p-4 border-b border-white/20 flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-800">Chat with AstroGenie</h2>
+        <h2 className="text-lg font-semibold text-gray-800"></h2>
         <div className="flex items-center gap-4">
           {remainingCredits !== null && (
-            <div className="flex items-center gap-1 text-sm text-gray-600">
+            <div className="flex items-center gap-1 text-sm text-[#0d0630]">
               <Coins className="h-4 w-4" />
               <span>{remainingCredits} credits</span>
             </div>

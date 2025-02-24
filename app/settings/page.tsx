@@ -137,24 +137,24 @@ export default function SettingsPage() {
               Settings
             </h1>
             <Tabs defaultValue="usage" className="w-full">
-              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm rounded-xl p-1 mb-8">
+              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm shadow-sm shadow-black/40  rounded-xl p-1 mb-8">
                 <TabsTrigger
                   value="usage"
-                  className="text-white data-[state=active]:bg-white/50 data-[state=active]:text-primary"
+                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
                 >
                   <Activity className="h-4 w-4 mr-2" />
                   Usage
                 </TabsTrigger>
                 <TabsTrigger
                   value="billing"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
+                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
                 >
                   <CreditCard className="h-4 w-4 mr-2" />
                   Billing
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
+                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Settings

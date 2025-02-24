@@ -55,7 +55,7 @@ export function BillingTab() {
 
   if (loading) {
     return (
-      <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
+      <Card className="bg-white/70 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -67,7 +67,7 @@ export function BillingTab() {
 
   if (error || !billingInfo) {
     return (
-      <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
+      <Card className="bg-white/70 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
         <CardContent className="p-6">
           <div className="text-center text-red-600 p-4">
             {error || 'Unable to load billing information'}
@@ -77,7 +77,7 @@ export function BillingTab() {
     );
   }
   return (
-    <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
+    <Card className="bg-white/70 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
       <CardContent className="p-6">
         <h2 className="text-xl font-semibold text-primary mb-4">
           Billing
@@ -282,22 +282,22 @@ export function BillingTab() {
             )}
           </div>
           {/* Danger Zone - Subscription Management */}
-          <div>
-            <h3 className="text-lg font-medium text-red-600 mb-3 flex items-center">
+          <div className="bg-red-700 border border-white  backdrop-blur-sm p-4 rounded-3xl">
+            <h3 className="text-lg font-medium pl-4 text-white  mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               Danger Zone
             </h3>
-            <div className="bg-red-50 rounded-lg p-4 border-2 border-red-200">
+            <div className="p-4">
               <div className="mb-4">
-                <h4 className="text-base font-medium text-red-800">Subscription Management</h4>
-                <p className="text-sm text-red-600 mt-1">
+                <h4 className="text-base font-medium text-white/80">Subscription Management</h4>
+                <p className="text-sm text-white/80 mt-1">
                   Warning: Changes to your subscription may affect your access to premium features and monthly credit allowance.
                 </p>
               </div>
               <div className="space-y-3">
-                <button className="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                <button className="w-full py-2 px-4 bg-white/80 text-red-700 rounded-lg hover:bg-white transition-colors text-sm font-medium">
                   Cancel Subscription
                 </button>
               </div>

@@ -26,9 +26,13 @@ export const metadata: Metadata = {
   ],
   manifest: '/site.webmanifest',
   icons: {
-    icon: '/manifesto.png',
-    shortcut: '/manifesto.png',
-    apple: '/manifesto.png'
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/manifesto.png',
+    other: {
+      rel: 'manifest-icon',
+      url: '/manifesto.png'
+    }
   },
   robots: {
     index: true,

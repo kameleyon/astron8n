@@ -19,7 +19,7 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
     );
   }
   return (
-    <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
+    <Card className="bg-white/70 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
       <CardContent className="p-6">
         <div className="space-y-8">
           {/* Credit Status Section */}

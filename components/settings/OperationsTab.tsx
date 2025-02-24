@@ -111,7 +111,7 @@ export function OperationsTab() {
     }
   };
   return (
-    <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
+    <Card className="bg-white/70 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
       <CardContent className="p-6">
         <h2 className="text-xl font-semibold text-primary mb-4">
           Settings
@@ -195,11 +195,11 @@ export function OperationsTab() {
 
           {/* Danger Zone */}
           <div className="mt-12">
-            <div className="bg-red-50 rounded-lg p-6 border-2 border-red-200">
-              <h3 className="text-lg font-medium text-red-700 mb-4">Danger Zone</h3>
+            <div className="bg-red-700 border border-white  backdrop-blur-sm p-4 rounded-3xl">
+              <h3 className="text-lg font-medium text-white mb-4">Danger Zone</h3>
               <div>
-                <p className="font-medium text-red-900 mb-2">Delete Account</p>
-                <p className="text-sm text-red-700 mb-4">This action cannot be undone. This will permanently delete your account and remove your data from our servers.</p>
+                <p className="font-medium text-white mb-2">Delete Account</p>
+                <p className="text-sm text-white mb-4">This action cannot be undone. This will permanently delete your account and remove your data from our servers.</p>
                 <button 
                   onClick={async () => {
                     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
@@ -239,7 +239,7 @@ export function OperationsTab() {
                     }
                   }}
                   disabled={loading}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="px-4 py-2 bg-white/80 text-red-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Delete Account
                 </button>

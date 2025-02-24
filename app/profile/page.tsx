@@ -398,24 +398,24 @@ export default function ProfilePage() {
             </h1>
 
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm rounded-xl p-1 mb-8">
+              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm shadow-sm shadow-black/40 rounded-xl p-1 mb-8">
                 <TabsTrigger
                   value="personal"
-                  className="text-white data-[state=active]:bg-white/50 data-[state=active]:text-primary"
+                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
                 >
                   <User className="h-4 w-4 mr-2" />
                   Personal
                 </TabsTrigger>
                 <TabsTrigger
                   value="birthchart"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
+                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Birth Chart
                 </TabsTrigger>
                 <TabsTrigger
                   value="reports"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-primary"
+                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Reports
@@ -423,7 +423,7 @@ export default function ProfilePage() {
               </TabsList>
 
               <TabsContent value="personal">
-                <Card className="bg-white/95 backdrop-blur-sm rounded-3xl mb-6 overflow-hidden">
+                <Card className="bg-white/80 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6 overflow-hidden">
                   <CardContent className="p-0">
                     {/* Personal Information Section */}
                     <div className="p-8 border-b border-gray-100">
@@ -504,10 +504,10 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Spiritual Profile Section */}
-                    <div className="p-8 bg-gray-50/50">
+                    <div className="p-8 ">
                       <h3 className="text-lg font-medium text-gray-900 mb-6">Spiritual Profile</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-xl p-4 shadow-sm">
+                        <div className="bg-white rounded-2xl p-4 shadow-sm shadow-black/30">
                           <p className="text-sm text-gray-500 mb-1">Human Design</p>
                           <div className="text-gray-900">
                             {humanDesignData ? (
@@ -523,13 +523,13 @@ export default function ProfilePage() {
                             )}
                           </div>
                         </div>
-                        <div className="bg-white rounded-xl p-4 shadow-sm">
+                        <div className="bg-white rounded-xl p-4 shadow-sm shadow-black/30">
                           <p className="text-sm text-gray-500 mb-1">Life Path Number</p>
                           <p className="text-gray-900 font-medium">
                             {profile.birth_date ? calculateLifePath(profile.birth_date) : "Not available"}
                           </p>
                         </div>
-                        <div className="bg-white rounded-xl p-4 shadow-sm">
+                        <div className="bg-white rounded-xl p-4 shadow-sm shadow-black/30">
                           <p className="text-sm text-gray-500 mb-1">Birth Card</p>
                           <p className="text-gray-900 font-medium">
                             {profile.birth_date ? getBirthCard(profile.birth_date) : "Not available"}
@@ -542,7 +542,7 @@ export default function ProfilePage() {
               </TabsContent>
 
               <TabsContent value="birthchart">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-2">
+                <Card className="bg-white/80 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-2">
                   <CardContent className="p-2">
                     
                     {isBirthDataIncomplete ? (
@@ -564,7 +564,7 @@ export default function ProfilePage() {
               </TabsContent>
 
               <TabsContent value="reports" id="reports">
-                <Card className="bg-white/90 backdrop-blur-sm rounded-3xl mb-6">
+                <Card className="bg-white/80 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
                   <CardContent className="p-6">
                     <h2 className="text-xl font-semibold text-primary mb-4">
                       Reports
