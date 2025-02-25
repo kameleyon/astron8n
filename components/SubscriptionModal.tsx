@@ -40,7 +40,7 @@ export default function SubscriptionModal({
       if (error) throw new Error(error.message);
 
       // Load Stripe
-      const stripe = await loadStripe('pk_test_51QJcWMGTXKQOsgznvEcIRLI3gVc0wuICwLJhnIpWRNxNrarG4ayb9Of4yfUcOl0NGEpvSKgkLGFPHdNmZs7XAb5700UOpPtsAn');
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
       if (!stripe) throw new Error('Failed to load Stripe');
 
       // Redirect to checkout

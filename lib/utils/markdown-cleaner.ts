@@ -7,6 +7,9 @@ interface FormattingInfo {
   text: string;
 }
 
+// Special marker to indicate a page break in the PDF
+export const PAGE_BREAK_MARKER = '<!--PAGE_BREAK-->';
+
 export function cleanMarkdown(content: string): string {
   // Split content into lines for processing
   const lines = content.split('\n');
@@ -59,13 +62,72 @@ export function parseFormattingInfo(text: string): FormattingInfo {
   };
 }
 
+/**
+ * Spell check common misspellings in the report content
+ */
+function correctSpellings(text: string): string {
+  const corrections: Record<string, string> = {
+    'astrolgical': 'astrological',
+    'astrolgy': 'astrology',
+    'retrograd': 'retrograde',
+    'conjuction': 'conjunction',
+    'oppositon': 'opposition',
+    'jupter': 'Jupiter',
+    'mercry': 'Mercury',
+    'vnus': 'Venus',
+    'marrs': 'Mars',
+    'satrun': 'Saturn',
+    'uranis': 'Uranus',
+    'neptne': 'Neptune',
+    'plto': 'Pluto',
+    'chrion': 'Chiron',
+    'piscs': 'Pisces',
+    'aquaris': 'Aquarius',
+    'capricorn': 'Capricorn',
+    'sagitarius': 'Sagittarius',
+    'scorpio': 'Scorpio',
+    'libra': 'Libra',
+    'virgo': 'Virgo',
+    'leo': 'Leo',
+    'cancer': 'Cancer',
+    'gemini': 'Gemini',
+    'taurus': 'Taurus',
+    'aries': 'Aries',
+    'fullmoon': 'full moon',
+    'full_moon': 'full moon',
+    'newmoon': 'new moon',
+    'lunareclipse': 'lunar eclipse',
+    'solareclipse' : 'solar eclipse',
+    // Add more common astrological misspellings as needed
+  };
+
+  let correctedText = text;
+  
+  // Apply corrections for whole words only (using word boundaries)
+  Object.entries(corrections).forEach(([misspelled, correct]) => {
+    const regex = new RegExp(`\\b${misspelled}\\b`, 'gi');
+    correctedText = correctedText.replace(regex, correct);
+  });
+
+  return correctedText;
+}
+
 export function cleanReportContent(content: string): string {
   // Special handling for report-specific formatting
   let cleanedContent = content;
 
   // Remove all double asterisks (bold markers)
-  cleanedContent = cleanedContent.replace(/\*\*([^*]+)\*\*/g, '$1');
   cleanedContent = cleanedContent.replace(/\*\*/g, '');
+  cleanedContent = cleanedContent.replace(/\*\*/g, '');
+
+  // Add page break markers before each main heading
+  cleanedContent = cleanedContent.replace(/^# /gm, `${PAGE_BREAK_MARKER}\n# `);
+  
+  // Ensure the first heading doesn't have a page break before it
+  cleanedContent = cleanedContent.replace(`${PAGE_BREAK_MARKER}\n# `, '# ');
+  
+  // Add page break markers before each secondary heading to prevent content overflow
+  //cleanedContent = cleanedContent.replace(/^## /gm, `${PAGE_BREAK_MARKER}\n## `);
 
   // Clean up section titles while preserving hierarchy and removing any markdown
   cleanedContent = cleanedContent.replace(/^(#+)\s*([^#\n]+)/gm, (_, hashes, title) => {
@@ -90,7 +152,7 @@ export function cleanReportContent(content: string): string {
   // Clean up any remaining markdown in regular text
   cleanedContent = cleanedContent.split('\n').map(line => {
     // Skip lines that are already handled (headings and list items)
-    if (line.match(/^#+\s/) || line.match(/^\s*-\s/)) {
+    if (line.match(/^#+\s/) || line.match(/^\s*-\s/) || line === PAGE_BREAK_MARKER) {
       return line;
     }
     
@@ -104,6 +166,9 @@ export function cleanReportContent(content: string): string {
 
   // Remove any empty lines that might have been created
   cleanedContent = cleanedContent.replace(/\n{3,}/g, '\n\n');
+  
+  // Apply spelling corrections
+  cleanedContent = correctSpellings(cleanedContent);
 
   return cleanedContent;
 }

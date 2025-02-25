@@ -40,7 +40,7 @@ async function createPDF(content: string, firstName: string) {
   const pageWidth = 612; // Letter size width
   const pageHeight = 792; // Letter size height
   const margin = 50;
-  const bottomMargin = 100; // Space for footer
+  const bottomMargin = 70; // Increased from 50 to provide more space for footer
   const contentWidth = pageWidth - margin * 2;
 
   // Create the first page
@@ -223,16 +223,27 @@ async function createPDF(content: string, firstName: string) {
 
   // Function to check if new page is needed
   const needsNewPage = (currentY: number) => {
-    return currentY < margin + bottomMargin;
+    // Add extra buffer (80px) to ensure text doesn't get too close to the footer
+    return currentY < margin + bottomMargin + 80;
   };
 
+  // Import the page break marker from markdown-cleaner
+  const { PAGE_BREAK_MARKER } = await import('../../../../lib/utils/markdown-cleaner');
+
   for (const line of lines) {
+    // Check if this line is a page break marker
+    if (line === PAGE_BREAK_MARKER) {
+      // Create a new page regardless of current position
+      y = createNewPage();
+      continue; // Skip to the next line
+    }
+    
     if (needsNewPage(y)) {
       y = createNewPage();
     }
 
     if (line.startsWith('# ')) {
-      y -= 30;
+      y -= 20; // Reduced from 30 to make better use of page space
       currentPage.drawText(line.substring(2), {
         x: margin,
         y,
@@ -240,7 +251,7 @@ async function createPDF(content: string, firstName: string) {
         font: helveticaBold,
         color: rgb(254/255, 142/255, 12/255),
       });
-      y -= 40;
+      y -= 30; // Reduced from 40 to make better use of page space
     } else if (line.startsWith('## ')) {
       y -= 20;
       currentPage.drawText(line.substring(3), {
@@ -250,7 +261,7 @@ async function createPDF(content: string, firstName: string) {
         font: helveticaBold,
         color: rgb(254/255, 142/255, 12/255),
       });
-      y -= 30;
+      y -= 25; // Reduced from 30 to make better use of page space
     } else if (line.startsWith('- ')) {
       currentPage.drawText('•', {
         x: margin + 15,
@@ -345,7 +356,7 @@ async function createPDF(content: string, firstName: string) {
         });
       }
 
-      y -= 30;
+      y -= 25; // Reduced from 30 to make better use of page space
 
       if (needsNewPage(y)) {
         y = createNewPage();
@@ -963,7 +974,7 @@ export async function POST(req: Request) {
             'X-Title': 'AstroGenie Report Generator'
           },
           body: JSON.stringify({
-            model: 'qwen/qwen-plus',
+            model: 'anthropic/claude-3.7-sonnet',
             messages: [
               {
                 role: 'system',

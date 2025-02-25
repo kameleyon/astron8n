@@ -3,10 +3,14 @@ export const STRIPE_CONFIG = {
     monthly: {
       // Price ID for API calls (not used directly anymore)
       priceId: process.env.NODE_ENV === 'production' 
+        //? 'price_1QtJ3TGTXKQOsgzn1U1g0kje'  // Production price ID
+        //: 'price_1QtJ3TGTXKQOsgzn1U1g0kje',  // Test price ID
         ? 'price_1QtJfoGTXKQOsgznJ56CUks0'  // Production price ID
         : 'price_1QtJfoGTXKQOsgznJ56CUks0',  // Test price ID
       // Permalink for direct user access (shows trial period)
       checkoutUrl: process.env.NODE_ENV === 'production'
+        //? 'https://buy.stripe.com/test_4gw03xf4H4uUcEw5kp'
+        //: 'https://buy.stripe.com/test_4gw03xf4H4uUcEw5kp',
         ? 'https://buy.stripe.com/cN26r455td8N5iw3ce'
         : 'https://buy.stripe.com/cN26r455td8N5iw3ce',
       credits: 40000,
