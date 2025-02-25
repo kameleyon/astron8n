@@ -11,7 +11,7 @@ import SessionProvider from "@/components/SessionProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { User, FileText, Edit, AlertCircle } from "lucide-react";
-import BirthChartModal from "@/components/BirthChartModalprofile";
+import BirthChartModalProfile from "@/components/BirthChartModalprofile";
 import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
 import { calculateLifePath, getBirthCard } from "@/lib/utils/calculations";
@@ -209,7 +209,7 @@ export default function ProfilePage() {
 
             console.log("Sending birth chart request:", requestData);
 
-            const response = await fetch("/api/calculate", {
+            const calculateResponse = await fetch("/api/calculate", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -217,13 +217,13 @@ export default function ProfilePage() {
               body: JSON.stringify(requestData),
             });
 
-            if (!response.ok) {
-              const errorData = await response.json();
+            if (!calculateResponse.ok) {
+              const errorData = await calculateResponse.json();
               console.error("Birth chart API error:", errorData);
               throw new Error(errorData.error || "Failed to fetch birth chart data");
             }
 
-            const chartData = await response.json();
+            const chartData = await calculateResponse.json();
             console.log("Birth chart data received:", chartData);
             setBirthChartData(chartData);
 
@@ -287,21 +287,28 @@ export default function ProfilePage() {
       // If user left time blank or unknown, set to 12:00 by default
       const timeValue = has_unknown_birth_time && !data.time ? "12:00" : data.time;
 
-      // Update user in supabase
-      const { error: updateError } = await supabase
-        .from("user_profiles")
-        .update({
+      // Use the new API endpoint instead of direct Supabase interaction
+      const updateResponse = await fetch('/api/update-birth-chart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: profile.id,
           full_name: data.name,
           birth_date: data.date,
           birth_time: timeValue,
           birth_location: data.location,
           latitude: data.latitude,
           longitude: data.longitude,
-          has_unknown_birth_time,
-        })
-        .eq("id", profile.id);
+          hasUnknownBirthTime: has_unknown_birth_time,
+        }),
+      });
 
-      if (updateError) throw updateError;
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
+        throw new Error(errorData.error || 'Failed to update birth chart profile');
+      }
 
       // Refresh local state
       setProfile((prev) => {
@@ -319,17 +326,20 @@ export default function ProfilePage() {
       });
 
       // Refresh the chart data
+      // Ensure time is in 24-hour format (HH:MM)
+      const formattedTime = standardizeTime(timeValue || "12:00");
+      
       const requestData = {
         name: data.name,
         date: data.date,
-        time: timeValue || "12:00",
+        time: formattedTime,
         location: data.location,
         latitude: data.latitude,
         longitude: data.longitude,
       };
       console.log("Sending birth chart update request:", requestData);
 
-      const response = await fetch("/api/calculate", {
+      const chartResponse = await fetch("/api/calculate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -337,17 +347,20 @@ export default function ProfilePage() {
         body: JSON.stringify(requestData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!chartResponse.ok) {
+        const errorData = await chartResponse.json();
         console.error("Birth chart API error:", errorData);
         throw new Error(errorData.error || "Failed to fetch birth chart data");
       }
 
-      const chartData = await response.json();
+      const chartData = await chartResponse.json();
       console.log("Updated birth chart data received:", chartData);
       setBirthChartData(chartData);
 
       // Update Human Design data
+      // Ensure time is in 24-hour format (HH:MM) for Human Design API
+      const formattedTimeHD = standardizeTime(timeValue || "12:00");
+      
       const hdResponse = await fetch("/api/human-design", {
         method: "POST",
         headers: {
@@ -355,7 +368,7 @@ export default function ProfilePage() {
         },
         body: JSON.stringify({
           birthDate: data.date,
-          birthTime: timeValue,
+          birthTime: formattedTimeHD,
           latitude: data.latitude,
           longitude: data.longitude,
         }),
@@ -655,7 +668,7 @@ export default function ProfilePage() {
       </div>
 
       {/* The BirthChartModal replaces the old embedded form */}
-      <BirthChartModal
+      <BirthChartModalProfile
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         // We cast the function to match the signature (data: BirthChartFormData) => void

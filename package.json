@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "start:prod": "concurrently \"npm start\" \"npm run api\"",
-    "lint": "next lint"
+    "lint": "next lint",
+    "apply-migrations": "node scripts/apply-migrations.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.22.0",
