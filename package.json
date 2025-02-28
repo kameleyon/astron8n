@@ -44,6 +44,7 @@
     "@stripe/stripe-js": "^5.6.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "2.39.8",
+    "@tanstack/react-query": "^5.66.11",
     "@todo-esta-bien/numerodon": "^0.33.0",
     "astrogenie-birthchart": "file:api-package",
     "autoprefixer": "^10.4.16",
@@ -61,6 +62,7 @@
     "framer-motion": "10.16.4",
     "human-design-core": "^0.1.0",
     "input-otp": "1.0.1",
+    "ioredis": "^5.5.0",
     "lucide-react": "0.292.0",
     "moment": "^2.29.4",
     "moment-timezone": "0.5.43",
@@ -89,6 +91,7 @@
     "tz-lookup": "^6.1.25",
     "uuid": "9.0.1",
     "vaul": "0.7.9",
+    "workerize-loader": "^2.0.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {

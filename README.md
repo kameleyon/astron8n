@@ -79,7 +79,7 @@ Discover the power of AI-driven astrological insights with our comprehensive fea
   - Canonical URL handling
   - Mobile responsiveness
   - Web app manifest
-  - Performance optimization
+  - [Performance optimization](PERFORMANCE_OPTIMIZATIONS.md)
   - Search engine verification
   - Rich snippets support
 
@@ -157,12 +157,16 @@ Token Packages:
   - TypeScript
   - Tailwind CSS
   - Shadcn UI Components
+  - React Query for API caching
+  - Web Workers for heavy calculations
 
 - **Backend**
   - Supabase (Authentication & Database)
   - OpenRouter API Integration
   - Swiss Ephemeris
   - PDF Generation (pdf-lib)
+  - Redis for response caching
+  - Edge Functions for real-time AI
 
 - **Payment Processing**
   - Stripe Integration
@@ -175,6 +179,21 @@ Token Packages:
   - PostgreSQL Database
   - Supabase Storage
   - Stripe Webhooks
+  - Redis Cache
+
+## Performance Optimizations
+
+AstroGenie is optimized for performance at every level. See our [detailed performance documentation](PERFORMANCE_OPTIMIZATIONS.md) for more information.
+
+### Frontend Performance
+- **Incremental Static Regeneration (ISR)** for faster birth chart pages
+- **React Query** for efficient API response caching
+- **Web Workers** for offloading heavy astrological calculations
+
+### Backend Performance
+- **Redis Caching** for AI responses to reduce API calls
+- **Edge Functions** for low-latency real-time AI chat
+- **PostgreSQL Indexing** for faster database queries
 
 ## Getting Started
 
@@ -206,11 +225,22 @@ cp .env.example .env.local
 
 Fill in your environment variables:
 ```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+
+# OpenRouter
 NEXT_PUBLIC_OPENROUTER_API_KEY=your_openrouter_key
+
+# Stripe
 STRIPE_SECRET_KEY=your_stripe_secret_key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 NEXT_PUBLIC_URL=your_app_url
+
+# Redis Cache (for performance optimization)
+REDIS_URL=redis://localhost:6379
+ENABLE_AI_CACHE=true
+AI_CACHE_TTL=3600
 ```
 
 4. Run the development server:

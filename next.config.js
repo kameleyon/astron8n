@@ -29,6 +29,18 @@ const nextConfig = {
       'supports-color': false
     };
 
+    // Add support for Web Workers
+    config.module.rules.push({
+      test: /\.worker\.js$/,
+      use: { loader: 'worker-loader' }
+    });
+
+    // Add support for workerize-loader
+    config.module.rules.push({
+      test: /\.workerize\.js$/,
+      use: { loader: 'workerize-loader' }
+    });
+
     // Handle native modules
     if (isServer) {
       config.externals = [...(config.externals || []), 'swisseph', 'swisseph-v2', 'tz-lookup'];
