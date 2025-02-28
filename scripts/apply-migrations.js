@@ -26,6 +26,7 @@ const migrationFiles = [
   '20250225_add_update_birth_chart_profile_function.sql',
   '20250225_add_execute_sql_function.sql',
   '20250228_add_performance_indexes.sql'
+  // Note: user_credits table already exists, so we don't need to create it
 ];
 
 async function applyMigrations() {

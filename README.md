@@ -252,7 +252,7 @@ Visit `http://localhost:3000` to see the application.
 
 ## Credit System
 
-AstroGenie uses a flexible token-based credit system:
+AstroGenie uses a flexible token-based credit system. For detailed information about our subscription system, including trial periods, automatic payments, and credit management, see our [Subscription System Documentation](docs/subscription-system.md).
 
 ### Token Packages
 - **Basic Package**: 5,000 tokens for $2.99
@@ -262,7 +262,7 @@ AstroGenie uses a flexible token-based credit system:
 ### Trial System
 - 3-day trial period
 - Access to all features
-- Automatic transition to pay-as-you-go
+- Automatic transition to paid subscription
 - Real-time trial expiration tracking
 
 ### Credit Management
