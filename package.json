@@ -58,7 +58,9 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.4.7",
     "embla-carousel-react": "8.0.0-rc17",
+    "expo": "^52.0.37",
     "express": "^4.21.2",
+    "@astrogenie/shared": "file:shared",
     "framer-motion": "10.16.4",
     "human-design-core": "^0.1.0",
     "input-otp": "1.0.1",
@@ -92,7 +94,10 @@
     "uuid": "9.0.1",
     "vaul": "0.7.9",
     "workerize-loader": "^2.0.2",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "expo-dev-client": "~5.0.12",
+    "react-native-web": "~0.19.13",
+    "@expo/metro-runtime": "~4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",

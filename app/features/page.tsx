@@ -11,9 +11,18 @@ import {
   FileText, 
   Check,
   CreditCard,
-  ChevronLeft
+  ChevronLeft,
+  Key
 } from "lucide-react";
 import Link from "next/link";
+
+interface Feature {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  features: string[];
+  link?: string;
+}
 
 export default function FeaturesPage() {
   return (
@@ -120,6 +129,20 @@ export default function FeaturesPage() {
                     "Credit alerts",
                     "Activity logs"
                   ]
+                },
+                {
+                  icon: Key,
+                  title: "Developer API",
+                  description: "Integrate AstroGenie's powerful birth chart calculations into your own applications",
+                  features: [
+                    "RESTful API access",
+                    "Comprehensive documentation",
+                    "Multiple subscription tiers",
+                    "Usage analytics",
+                    "Secure authentication",
+                    "Developer support"
+                  ],
+                  link: "/api-generator"
                 }
               ].map((feature, index) => (
               <Card key={index} className="p-6 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-shadow">
@@ -128,7 +151,7 @@ export default function FeaturesPage() {
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
                 <p className="text-gray-600 mb-4">{feature.description}</p>
-                <ul className="space-y-2">
+                <ul className="space-y-2 mb-4">
                   {feature.features.map((item, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                       <Check className="w-4 h-4 text-primary flex-shrink-0" />
@@ -136,6 +159,17 @@ export default function FeaturesPage() {
                     </li>
                   ))}
                 </ul>
+                {feature.link && (
+                  <Link 
+                    href={feature.link}
+                    className="inline-flex items-center text-primary hover:text-primary/80 text-sm font-medium"
+                  >
+                    Learn more
+                    <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                )}
               </Card>
               ))}
             </div>

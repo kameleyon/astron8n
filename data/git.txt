@@ -1,0 +1,63 @@
+git add . ; git commit -m "update factcheck" ; git push
+
+npx prisma migrate deploy
+npx prisma migrate resolve --applied "20250227233500_add_performance_indexes"
+
+
+npm run mobile
+npm run mobile:web
+-----------------------------------------
+Rules to always follow
+remember we need to keep consitency in the template throughout the app.
+Keep or make all Title H1 h2 h3 are font-normal font league Spartan
+Build each section into components to meet standard practice. 
+do not truncate. 
+keep the colors neutral  so no blue
+DO NOT TRUNCATE. read first. 
+DO NOT CHANGE THE GLOBAL.CSS ADD NEW ONE
+Do not use mockup and hardcoded data
+when updating a file make all the updates that needs to be applied to at file at once not one at the time... 
+always update the roadmap.md checkbox when you are done.
+
+npm install --global eas-cli && eas init --id 0443bd20-a342-4b88-a94e-216866e64d75
+taskkill /F /IM node.exe
+
+ok let's go to articles/new
+
+I would like to add an option for user to upload the article then when they click on the button create article it goes to the review page, I want to give them an option to enhance their articles with AI
+
+make the fact check much simpler like a check mark saying pass fact check
+or x saying fail fact check
+or article is not focus or not compliant with the vision of the website when they are trying to post thing now related to black people.....when save make it go to markdowncleaner before posting....
+
+In the form ad a section for references....
+
+before posting also make sure you gather all the keyword and metadata that can help with seo and search engine and place them somewhere not visible in the artble but the web browser can read them and use to help findin search engine.
+
+
+
+Is there anything else you can think of that we can add to enhance the quality of the user experience?
+
+remember we need to keep consitency in the template throughout the app.
+do not truncate.
+keep the colors neutral so no blue
+do not truncate. read first.
+when updating a file make all the updates that needs to be applied to at file at once not one at the time...
+
+
+The Haitian Revolution (1791–1804) was the first successful revolution led by enslaved people and resulted in the establishment of Haiti, the first Black republic in the world. It marked a turning point in global history, dismantling French colonial rule, ending slavery, and inspiring anti-colonial movements across the globe. The revolution was fueled by the resilience, strategic brilliance, and determination of figures like Toussaint Louverture, Jean-Jacques Dessalines, and Henri Christophe, who defied European empires and changed the course of history.
+
+
+
+James, C.L.R. The Black Jacobins: Toussaint L'Ouverture and the San Domingo Revolution. Vintage Books, 1989 (1938).
+Dubois, Laurent. Avengers of the New World: The Story of the Haitian Revolution. Harvard University Press, 2004.
+Fick, Carolyn E. The Making of Haiti: The Saint Domingue Revolution from Below. University of Tennessee Press, 1990.
+Trouillot, Michel-Rolph. Silencing the Past: Power and the Production of History. Beacon Press, 1995.
+Geggus, David Patrick. Haitian Revolutionary Studies. Indiana University Press, 2002.
+Popkin, Jeremy D. You Are All Free: The Haitian Revolution and the Abolition of Slavery. Cambridge University Press, 2010.
+Girard, Philippe. The Slaves Who Defeated Napoleon: Toussaint Louverture and the Haitian War of Independence, 1801-1804. University of Alabama Press, 2011.
+Gaffield, Julia. Haitian Connections in the Atlantic World: Recognition after Revolution. University of North Carolina Press, 2015.
+Daut, Marlene L. Tropics of Haiti: Race and the Literary History of the Haitian Revolution in the Atlantic World, 1789-1865. Liverpool University Press, 2015.
+Reinhardt, Catherine A. Claims to Memory: Beyond Slavery and Emancipation in the French Caribbean. Berghahn Books, 2006.
+Ferrer, Ada. Freedom's Mirror: Cuba and Haiti in the Age of Revolution. Cambridge University Press, 2014.
+Cauna, Jacques de. Toussaint Louverture: Le Grand Précurseur. Éditions Sud Ouest, 2012.

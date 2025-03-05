@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "AstroGenie",
+    "slug": "astrogenie",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.astrogenie.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.astrogenie.mobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "41b4c850-32de-4fe5-8d48-1df8eb7b050e"
+      },
+      "NEXT_PUBLIC_SUPABASE_URL": "${process.env.NEXT_PUBLIC_SUPABASE_URL}",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}",
+      "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN": "${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}",
+      "NEXT_PUBLIC_OPENROUTER_API_KEY": "${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}",
+      "NEXT_ASTROGENIE_API_KEY": "${process.env.NEXT_ASTROGENIE_API_KEY}",
+      "NEXT_PUBLIC_API_SERVER_URL": "${process.env.NEXT_PUBLIC_API_SERVER_URL}",
+      "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}",
+      "STRIPE_WEBHOOK_SECRET": "${process.env.STRIPE_WEBHOOK_SECRET}",
+      "NEXT_PUBLIC_URL": "${process.env.NEXT_PUBLIC_URL}"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ]
+  }
+}
