@@ -414,18 +414,20 @@ export default function ChatInterface() {
       
       
       
-      {/* Suggested Questions */}
-      <div className="px-6 py-2 flex flex-wrap gap-2 justify-center bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
-        {suggestedQuestions.map((question, index) => (
-          <button
-            key={index}
-            onClick={() => handleSuggestedQuestion(question)}
-            className="px-4 py-2 bg-white/5 hover:bg-white/30 text-[#cd6301]/90  rounded-full text-sm backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-md"
-          >
-            {question}
-          </button>
-        ))}
-      </div>
+      {/* Suggested Questions - only show when no messages */}
+      {messages.length === 0 && (
+        <div className="px-6 py-4 flex flex-wrap gap-2 justify-center bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
+          {suggestedQuestions.map((question, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestedQuestion(question)}
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 text-secondary rounded-full text-sm backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-md"
+            >
+              {question}
+            </button>
+          ))}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="p-5 bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
         <div className="flex items-center gap-3 bg-white/20 p-3 rounded-full shadow-md backdrop-blur-md border border-white/30">
