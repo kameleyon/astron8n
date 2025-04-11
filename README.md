@@ -83,6 +83,17 @@ Discover the power of AI-driven astrological insights with our comprehensive fea
   - Search engine verification
   - Rich snippets support
 
+### Visual Experience
+- **Immersive Animations**
+  - Subtle sparkle background effects
+  - Dynamic astrology-themed particles
+  - Responsive animation performance
+  - Customizable visual elements
+  - Atmospheric lighting effects
+  - Interactive visual elements
+  - Seamless transitions
+  - Theme-consistent design
+
 ### Advanced Features
 - Location Services
   - Precise birth location detection
@@ -137,6 +148,10 @@ Token Packages:
 │   └── chat-history/      # Chat interface
 ├── birthchartpack/          # Astrological calculations package
 ├── components/              # Reusable React components
+│   ├── AstrologyBackground.tsx  # Astrology-themed background
+│   ├── AstrologyParticles.tsx   # Particle animation system
+│   ├── SparkleBackground.tsx    # Subtle sparkle animation
+│   ├── SubtleAstrologyBackground.tsx # Subtle astrology background
 │   ├── settings/          # Settings components
 │   └── ui/               # UI components
 ├── lib/                     # Utility functions and services
@@ -159,6 +174,7 @@ Token Packages:
   - Shadcn UI Components
   - React Query for API caching
   - Web Workers for heavy calculations
+  - Custom animation components
 
 - **Backend**
   - Supabase (Authentication & Database)
@@ -189,6 +205,7 @@ AstroGenie is optimized for performance at every level. See our [detailed perfor
 - **Incremental Static Regeneration (ISR)** for faster birth chart pages
 - **React Query** for efficient API response caching
 - **Web Workers** for offloading heavy astrological calculations
+- **Optimized animations** for smooth visual effects without performance impact
 
 ### Backend Performance
 - **Redis Caching** for AI responses to reduce API calls
