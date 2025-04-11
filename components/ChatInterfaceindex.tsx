@@ -67,37 +67,65 @@ export default function ChatInterfaceindex() {
   }, [currentIndex]);
 
   return (
-    <div className="chat-container bg-white/50 border border-white/80 shadow-md shadow-black mt-16 mb-8 h-[600px] w-full flex flex-col transition-all duration-300">
-      <div className="p-4 border-b border-white/20">
-        <h2 className="text-lg font-semibold text-gray-800">Chat with AstroGenie</h2>
+    <div className="chat-container backdrop-blur-md bg-white/20 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mt-16 mb-8 h-[600px] w-full flex flex-col transition-all duration-300 rounded-3xl overflow-hidden">
+      {/* Header with gradient */}
+      <div className="p-5 border-b border-white/20 bg-gradient-to-r from-primary/80 to-secondary/80 backdrop-blur-md">
+        <h2 className="text-xl font-comfortaa font-bold text-white">
+          Chat with AstroGenie
+        </h2>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 relative message-container">
-        <div className="space-y-4">
+      {/* Message container with subtle pattern */}
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 relative message-container bg-gradient-to-b from-white/10 to-white/5">
+        <div className="space-y-6">
           {messages.map((message, index) => (
             <div key={index} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
               <div 
-                className={`p-3 rounded-2xl max-w-[80%] animate-fade-in ${
+                className={`p-4 rounded-2xl max-w-[80%] animate-fade-in shadow-lg ${
                   message.isUser 
-                    ? 'bg-[#E3F2FD] text-gray-800 hover:bg-[#BBDEFB] transition-colors' 
-                    : 'bg-[#FFF3E0] text-gray-800 hover:bg-[#FFE0B2] transition-colors'
+                    ? 'bg-gradient-to-br from-lightgray to-palegray/70 text-gray-800 backdrop-blur-sm border border-white/40' 
+                    : 'bg-gradient-to-br from-lightorange/90 to-cream/90 text-gray-800 backdrop-blur-sm border border-white/40'
                 }`}
               >
-                {message.text}
+                <p className="font-jost">{message.text}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="p-4 md:p-6 pt-2 bg-white/1 rounded-lg border-t border-white/20">
-        <div className="flex items-center gap-3 bg-white p-2 rounded-full shadow-sm">
+      {/* Suggested questions */}
+      <div className="px-6 py-4 flex flex-wrap gap-2 justify-center bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
+        <button className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm backdrop-blur-md border border-white/30 transition-all duration-300 shadow-sm hover:shadow-md">
+          Will I get the job at the dealership?
+        </button>
+        <button className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm backdrop-blur-md border border-white/30 transition-all duration-300 shadow-sm hover:shadow-md">
+          Should I invest in crypto?
+        </button>
+        <button className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm backdrop-blur-md border border-white/30 transition-all duration-300 shadow-sm hover:shadow-md">
+          What period would be best to start a business?
+        </button>
+      </div>
+
+      {/* Input area with modern styling */}
+      <div className="p-5 bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
+        <div className="flex items-center gap-3 bg-white/20 p-3 rounded-full shadow-md backdrop-blur-md border border-white/30">
+          <div className="w-6 h-6 flex items-center justify-center text-white/70">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          </div>
           <input
             type="text"
             placeholder="Sign in to start chatting..."
-            className="flex-1 bg-transparent border-none focus:outline-none text-gray-800 text-sm md:text-base"
+            className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-white/60 text-sm md:text-base font-jost"
             disabled
           />
+          <button className="w-8 h-8 flex items-center justify-center bg-primary/80 hover:bg-primary text-white rounded-full transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -115,6 +143,13 @@ export default function ChatInterfaceindex() {
         .animate-fade-in {
           animation: message-in 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
           will-change: transform, opacity;
+        }
+        
+        .message-container {
+          background-image: 
+            radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+            radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+          background-size: 40px 40px;
         }
       `}</style>
     </div>

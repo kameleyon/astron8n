@@ -49,13 +49,13 @@ declare global {
   }
 }
 import { Mic, MicOff, Send, AlertCircle, Loader2, Plus, Coins } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { generateAIResponse } from "@/lib/openrouter";
-import { Message } from "@/types/chat";
-import { TypingAnimation } from "@/components/ui/TypingAnimation";
+import { supabase } from "../lib/supabase";
+import { generateAIResponse } from "../lib/openrouter";
+import { Message } from "../types/chat";
+import { TypingAnimation } from "./ui/TypingAnimation";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { checkUserCredits } from "@/lib/utils/credits";
+import { checkUserCredits } from "../lib/utils/credits";
 import ReactMarkdown from 'react-markdown';
 
 const suggestedQuestions = [
@@ -63,7 +63,7 @@ const suggestedQuestions = [
   "Should I invest in crypto",
   "Is it a good time to call Jessica?",
   "What are Jack's intentions about me?",
-  "what period would be best to start a business?"
+  //"what period would be best to start a business?"
 ];
 
 export default function ChatInterface() {
@@ -324,28 +324,20 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="chat-container bg-white/50 border border-white/80 shadow-md shadow-black mt-8 mb-8 h-[600px] w-full flex flex-col transition-all duration-300">
-      {/* Header */}
-      <div className="p-4 border-b border-white/20 flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-800"></h2>
-        <div className="flex items-center gap-4">
-          {remainingCredits !== null && (
-            <div className="flex items-center gap-1 text-sm text-[#0d0630]">
-              <Coins className="h-4 w-4" />
-              <span>{remainingCredits} credits</span>
-            </div>
-          )}
-          <button
-            onClick={startNewChat}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
-            title="New Chat"
-          >
-            <Plus className="h-5 w-5 text-gray-600" />
-          </button>
-        </div>
+    <div className=" bg-white rounded-3xl border border-white/80 shadow-md mt-8 mb-8 h-[600px] w-full flex flex-col transition-all duration-300 font-questrial">
+      {/* Header with gradient */}
+      <div className="p-4 border-b border-white/20 bg-gradient-to-r from-primary/90 to-secondary/90 rounded-t-3xl flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-white">Chat with AstroGenie</h2>
+        <button
+          onClick={startNewChat}
+          className="p-2 hover:bg-white/20 rounded-full transition-colors"
+          title="New Chat"
+        >
+          <Plus className="h-5 w-5 text-white" />
+        </button>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 relative">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 relative bg-white/95 dot-pattern">
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -353,10 +345,10 @@ export default function ChatInterface() {
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`p-3 rounded-2xl max-w-[80%] ${
+                className={`p-3 rounded-2xl max-w-[80%] shadow-md ${
                   message.role === 'user'
-                    ? 'bg-primary text-white'
-                    : 'bg-[#FFF3E0] text-gray-800'
+                    ? 'bg-gradient-to-r from-primary to-primary/90 text-white'
+                    : 'bg-gradient-to-r from-[#FFF3E0] to-cream text-gray-800'
                 }`}
               >
               {message.role === 'assistant' ? (
@@ -397,8 +389,8 @@ export default function ChatInterface() {
           ))}
 
           {isLoading && (
-            <div className="flex items-center space-x-2 text-white">
-              <Loader2 className="h-4 w-4 text-white font-bold animate-spin" />
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Loader2 className="h-4 w-4 text-secondary animate-spin" />
               <span>Thinking...</span>
             </div>
           )}
@@ -420,13 +412,13 @@ export default function ChatInterface() {
 
         {/* Suggested Questions */}
         {messages.length === 0 && (
-          <div className="absolute inset-x-0 bottom-0 p-4">
+          <div className="absolute inset-x-0 bottom-0 px-4 py-0">
             <div className="flex flex-wrap gap-2 justify-center">
               {suggestedQuestions.map((question, index) => (
                 <button
                   key={index}
                   onClick={() => handleSuggestedQuestion(question)}
-                  className="bg-white/80 hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm transition-colors shadow-sm"
+                  className="bg-[#bcb7af]/20 hover:bg-primary/80 text-primary/90 hover:text-white px-4 py-2 rounded-full text-sm transition-colors shadow-sm border border-white/10 hover:shadow-md"
                 >
                   {question}
                 </button>
@@ -436,8 +428,10 @@ export default function ChatInterface() {
         )}
       </div>
       
-      <form onSubmit={handleSubmit} className="p-4 md:p-6 pt-2 bg-white/1 rounded-lg border-t border-white/20">
-        <div className="flex items-center gap-3 bg-white p-2 rounded-full shadow-sm hover:shadow-md transition-shadow duration-300">
+      
+      
+      <form onSubmit={handleSubmit} className="p-4 md:p-6 pt-2 bg-white/90 rounded-b-3xl border-t border-white/20">
+        <div className="flex items-center gap-3 p-2 rounded-full  border-primary/40 shadow-sm bg-transparent hover:shadow-lg transition-shadow duration-300 border border-gray-100">
           <button 
             type="button" 
             onClick={toggleSpeechRecognition}
@@ -456,7 +450,7 @@ export default function ChatInterface() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Ask me anything"
-            className="flex-1 bg-transparent border-none focus:outline-none text-gray-800 text-sm md:text-base"
+            className="flex-1 bg-transparent border-none focus:outline-none text-gray-800 text-sm md:text-base  placeholder-primary/50"
             disabled={isLoading}
           />
           <button 
@@ -468,6 +462,22 @@ export default function ChatInterface() {
           </button>
         </div>
       </form>
+      {/* Credits display at the bottom 
+      {remainingCredits !== null && (
+        <div className="px-4 py-3 border-t-2 border-[#bcb7af]/50  bg-primary/40 mt-4 text-primary/50">
+          <div className="flex justify-center items-center gap-8">
+            <div className="flex flex-col items-center">
+              <span className="text-lg font-bold">{remainingCredits}</span>
+              <span className="text-xs text-white/70">Credits left</span>
+            </div>
+            <div className="w-px h-10 bg-white/20"></div>
+            <div className="flex flex-col items-center">
+              <a href="/billing" className="text-lg font-bold hover:text-secondary transition-colors">5000</a>
+              <span className="text-xs text-white/70">Topup Credits</span>
+            </div>
+          </div>
+        </div>*/}
+      )}
     </div>
   );
 }

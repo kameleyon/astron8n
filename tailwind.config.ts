@@ -12,6 +12,9 @@ const config: Config = {
       fontFamily: {
         spartan: ['League Spartan', 'sans-serif'],
         lato: ['Lato', 'sans-serif'],
+        comfortaa: ['Comfortaa', 'cursive'],
+        jost: ['Jost', 'sans-serif'],
+        questrial: ['Questrial', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -19,16 +22,44 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: '#f1f3f5',
+        foreground: '#c43c1e',
         primary: {
-          DEFAULT: '#0d0630',
+          DEFAULT: '#c43c1e', // Red from the palette
         },
         secondary: {
-          DEFAULT: '#D15200',
+          DEFAULT: '#ef8535', // Main orange from palette (for landing page)
         },
         accent: {
-          DEFAULT: '#FFA600',
+          DEFAULT: '#ffcb65', // Soft yellow accent
+        },
+        brown: {
+          DEFAULT: '#763c00',
+        },
+        orange: {
+          DEFAULT: '#CD6301',
+        },
+        cream: {
+          DEFAULT: '#f9f7dc',
+        },
+        lightorange: {
+          DEFAULT: '#F8DCBF',
+        },
+        gray: {
+          DEFAULT: '#BCB7AF',
+        },
+        white: {
+          DEFAULT: '#ffffff',
+        },
+        // Adding new colors from the palette
+        lightgray: {
+          DEFAULT: '#f1f3f5', // Light gray background
+        },
+        palegray: {
+          DEFAULT: '#BCB7AF', // Pale gray from palette
+        },
+        paleyellow: {
+          DEFAULT: '#f9f7dc', // Pale yellow from palette
         },
       },
     },

@@ -77,76 +77,72 @@ export default function Header({ onAuth }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-[#0d0630] text-white py-3 relative z-50">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <header className="bg-gradient-to-r from-primary to-primary/90 text-white py-4 relative z-50 font-jost shadow-lg backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[url('/subtle-pattern.png')] opacity-5"></div>
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative">
           <MobileMenu />
           
-          <div className="hidden md:flex space-x-8 items-center text-sm">
-            <a href="/about" className="hover:text-white/80 transition-colors">About</a>
-            <span className="text-gray-500">|</span>
-            <a href="/features" className="hover:text-white/80 transition-colors">Features</a>
+          <div className="hidden md:flex space-x-8 items-center text-xl">
+            <a href="/about" className="hover:text-white/80 transition-colors font-medium tracking-wide">About</a>
+            <span className="text-white">|</span>
+            <a href="/features" className="hover:text-white/80 transition-colors font-medium tracking-wide">Features</a>
           </div>
 
-          <div className="flex-1 flex justify-center items-center">
-            <div className="flex items-center mobile-only">
-              <img src="/orangelogo.png" alt="AstroGenie Logo" className="h-6 w-auto" />
-              <span className="text-2xl font-semibold text-[#fe8e0c] logo-text pl-2 mt-2"> AstroGenie</span>
-            </div>
-          </div>
+          
 
           {isLoading ? (
-            <div className="w-24 h-8 bg-gray-600/40 rounded-xl animate-pulse" />
+            <div className="w-24 h-10 bg-white/10 rounded-xl animate-pulse backdrop-blur-sm" />
           ) : isAuthenticated ? (
             <div className="flex items-center">
-              <div className="hidden md:flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-2">
                 <button 
                   onClick={() => router.push('/dashboard')}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:shadow-md"
                   title="Chat with Astrogenie"
                 >
-                  <MessageCircle size={20} />
+                  <MessageCircle size={20} className="drop-shadow-sm" />
                 </button>
                 <button 
                   onClick={() => router.push('/profile')}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:shadow-md"
                   title="Profile"
                 >
-                  <User size={20} />
+                  <User size={20} className="drop-shadow-sm" />
                 </button>
                 <button 
                   onClick={() => router.push('/chat-history')}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:shadow-md"
                   title="Chat History"
                 >
-                  <History size={20} />
+                  <History size={20} className="drop-shadow-sm" />
                 </button>
                 <button 
                   onClick={() => router.push('/reports')}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:shadow-md"
                   title="Reports"
                 >
-                  <BookOpenText size={20} />
+                  <BookOpenText size={20} className="drop-shadow-sm" />
                 </button>
                 <button 
                   onClick={() => router.push('/settings')}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:shadow-md"
                   title="Settings"
                 >
-                  <Settings size={20} />
+                  <Settings size={20} className="drop-shadow-sm" />
                 </button>
               </div>
               <button 
                 onClick={handleLogout}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors text-[#ffa600] hover:text-[#ffa600]"
+                className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:shadow-md ml-2"
                 title="Logout"
               >
-                <LogOut size={20} />
+                <LogOut size={20} className="text-accent drop-shadow-sm" />
               </button>
             </div>
           ) : (
             <button 
               onClick={() => setShowAuthModal(true)}
-              className="bg-gray-600/40 text-white px-4 md:px-6 py-1.5 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-600/50 transition-all duration-300 hover:scale-105"
+              className="bg-white/10 backdrop-blur-sm text-white px-5 py-2 rounded-xl shadow-md hover:shadow-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20"
             >
               Sign in
             </button>

@@ -66,6 +66,14 @@ const nextConfig = {
       ]
     });
 
+    // Handle pdf-lib module
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'pdf-lib': 'pdf-lib/dist/pdf-lib.min.js'
+      };
+    }
+
     return config;
   },
   async rewrites() {
@@ -90,7 +98,7 @@ const nextConfig = {
     styledComponents: true,
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  transpilePackages: ['moment-timezone', 'birthchartpack'],
+  transpilePackages: ['moment-timezone', 'birthchartpack', 'pdf-lib'],
 };
 
 module.exports = nextConfig;

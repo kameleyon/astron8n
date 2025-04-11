@@ -1,10 +1,26 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Jost, Comfortaa, Questrial } from 'next/font/google';
 import { Providers } from './providers';
 import { getStructuredData } from './structured-data';
 
-const inter = Inter({ subsets: ['latin'] });
+const jost = Jost({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-jost',
+});
+
+const comfortaa = Comfortaa({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-comfortaa',
+});
+
+const questrial = Questrial({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-questrial',
+});
 const structuredData = getStructuredData();
 
 export const metadata: Metadata = {
@@ -74,7 +90,7 @@ export const metadata: Metadata = {
   }
 };
 export const viewport = {
-  themeColor: '#FE8E0C',
+  themeColor: '#ef8535', // Updated to match our orange color
   width: 'device-width',
   initialScale: 1.0
 };
@@ -85,14 +101,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${questrial.variable} ${comfortaa.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={questrial.className}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -12,6 +12,8 @@
     "apply-migrations": "node scripts/apply-migrations.js"
   },
   "dependencies": {
+    "@astrogenie/shared": "file:shared",
+    "@expo/metro-runtime": "~4.0.1",
     "@google/generative-ai": "^0.22.0",
     "@hookform/resolvers": "3.3.2",
     "@radix-ui/react-accordion": "1.1.2",
@@ -59,8 +61,8 @@
     "dotenv": "^16.4.7",
     "embla-carousel-react": "8.0.0-rc17",
     "expo": "^52.0.37",
+    "expo-dev-client": "~5.0.12",
     "express": "^4.21.2",
-    "@astrogenie/shared": "file:shared",
     "framer-motion": "10.16.4",
     "human-design-core": "^0.1.0",
     "input-otp": "1.0.1",
@@ -68,7 +70,7 @@
     "lucide-react": "0.292.0",
     "moment": "^2.29.4",
     "moment-timezone": "0.5.43",
-    "next": "^14.0.0",
+    "next": "^14.2.28",
     "next-themes": "0.2.1",
     "node-fetch": "^3.3.2",
     "numeroljs": "^1.1.4",
@@ -79,6 +81,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "7.47.0",
     "react-markdown": "^9.0.3",
+    "react-native-web": "~0.19.13",
     "react-resizable-panels": "1.0.9",
     "recharts": "2.9.0",
     "sonner": "1.2.0",
@@ -94,10 +97,7 @@
     "uuid": "9.0.1",
     "vaul": "0.7.9",
     "workerize-loader": "^2.0.2",
-    "zod": "^3.22.4",
-    "expo-dev-client": "~5.0.12",
-    "react-native-web": "~0.19.13",
-    "@expo/metro-runtime": "~4.0.1"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",

@@ -1,0 +1,16 @@
+{
+  "name": "AstroGenie",
+  "short_name": "AstroGenie",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f3f5",
+  "theme_color": "#ef8535",
+  "description": "Your Personal AI Astrology Guide",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

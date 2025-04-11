@@ -1,13 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Jost:wght@400;500;700&family=Questrial&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --palette-white: #ffffff;
+  --palette-bg: #f1f3f5;
+  --palette-cream: #f9f7dc;
+  --palette-yellow: #ffcb65;
+  --palette-orange: #ef8535;
+  --palette-orange-dark: #CD6301;
+  --palette-red: #c43c1e;
+  --palette-brown: #763c00;
+  --palette-lightorange: #F8DCBF;
+  --palette-gray: #BCB7AF;
+  
+  /* Glass morphism variables */
+  --glass-background: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-blur: blur(12px);
 }
 
 /* Disable zoom on input focus for mobile */
@@ -22,15 +35,59 @@ html, body {
   overflow-x: hidden;
   width: 100%;
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: var(--font-questrial), var(--font-jost), 'Questrial', 'Jost', sans-serif;
+  background: var(--palette-bg);
+  color: #222;
   position: relative;
 }
 
 .logo-text {
-  font-family: 'League Spartan', sans-serif;
+  font-family: var(--font-comfortaa), 'Comfortaa', cursive;
+  font-weight: 700;
+}
+
+.title, .heading, h1, h2, h3 {
+  font-family: var(--font-comfortaa), 'Comfortaa', cursive;
+  font-weight: 700;
+}
+
+/* Glass morphism utility classes */
+.glass {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Modern button styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-primary to-primary/90 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 font-medium border border-white/10;
+}
+
+.btn-secondary {
+  @apply bg-white/10 backdrop-blur-md text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:bg-white/20 transition-all duration-300 border border-white/20;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 overflow-hidden;
+}
+
+.card-dark {
+  @apply bg-black/20 backdrop-blur-md rounded-2xl shadow-lg border border-white/10 overflow-hidden;
 }
 
 .chat-container {
