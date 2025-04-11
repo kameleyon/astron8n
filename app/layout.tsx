@@ -1,14 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Jost, Comfortaa, Questrial } from 'next/font/google';
+import { Comfortaa, Questrial } from 'next/font/google';
 import { Providers } from './providers';
 import { getStructuredData } from './structured-data';
 
-const jost = Jost({ 
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-jost',
-});
 
 const comfortaa = Comfortaa({
   subsets: ['latin'],

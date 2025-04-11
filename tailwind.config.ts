@@ -10,10 +10,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        spartan: ['League Spartan', 'sans-serif'],
-        lato: ['Lato', 'sans-serif'],
+        //spartan: ['League Spartan', 'sans-serif'],
+        //lato: ['Lato', 'sans-serif'],
         comfortaa: ['Comfortaa', 'cursive'],
-        jost: ['Jost', 'sans-serif'],
+        //jost: ['Jost', 'sans-serif'],
         questrial: ['Questrial', 'sans-serif'],
       },
       backgroundImage: {

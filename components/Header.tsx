@@ -77,7 +77,7 @@ export default function Header({ onAuth }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-primary to-primary/90 text-white py-4 relative z-50 font-jost shadow-lg backdrop-blur-sm">
+      <header className="bg-gradient-to-r from-primary to-primary/90 text-white py-4 relative z-50 font-questrial shadow-lg backdrop-blur-sm">
         <div className="absolute inset-0 bg-[url('/subtle-pattern.png')] opacity-5"></div>
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative">
           <MobileMenu />
@@ -142,7 +142,7 @@ export default function Header({ onAuth }: HeaderProps) {
           ) : (
             <button 
               onClick={() => setShowAuthModal(true)}
-              className="bg-white/10 backdrop-blur-sm text-white px-5 py-2 rounded-xl shadow-md hover:shadow-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20"
+              className="bg-accent/50 backdrop-blur-sm text-white px-5 py-2 rounded-xl shadow-md hover:shadow-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20"
             >
               Sign in
             </button>

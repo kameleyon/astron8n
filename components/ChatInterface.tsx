@@ -324,31 +324,31 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className=" bg-white rounded-3xl border border-white/80 shadow-md mt-8 mb-8 h-[600px] w-full flex flex-col transition-all duration-300 font-questrial">
+    <div className="chat-container backdrop-blur-md bg-white/20 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mt-8 mb-8 h-[600px] w-full flex flex-col transition-all duration-300 rounded-3xl overflow-hidden font-questrial">
       {/* Header with gradient */}
-      <div className="p-4 border-b border-white/20 bg-gradient-to-r from-primary/90 to-secondary/90 rounded-t-3xl flex justify-between items-center">
+      <div className="p-5 border-b border-white/20 bg-gradient-to-r from-primary/80 to-secondary/80 backdrop-blur-md flex justify-between items-center">
         <h2 className="text-lg font-semibold text-white">Chat with AstroGenie</h2>
         <button
           onClick={startNewChat}
-          className="p-2 hover:bg-white/20 rounded-full transition-colors"
+          className="p-2 hover:bg-white/30 bg-white/20 rounded-full transition-colors"
           title="New Chat"
         >
           <Plus className="h-5 w-5 text-white" />
         </button>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 relative bg-white/95 dot-pattern">
-        <div className="space-y-4">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 relative message-container bg-gradient-to-b from-white/10 to-white/5">
+        <div className="space-y-6">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`p-3 rounded-2xl max-w-[80%] shadow-md ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-r from-primary to-primary/90 text-white'
-                    : 'bg-gradient-to-r from-[#FFF3E0] to-cream text-gray-800'
+                className={`p-4 rounded-2xl max-w-[80%] animate-fade-in shadow-lg ${
+                  message.role === 'user' 
+                    ? 'bg-gradient-to-br from-lightgray to-palegray/70 text-gray-800 backdrop-blur-sm border border-white/40' 
+                    : 'bg-gradient-to-br from-lightorange/90 to-cream/90 text-gray-800 backdrop-blur-sm border border-white/40'
                 }`}
               >
               {message.role === 'assistant' ? (
@@ -365,7 +365,7 @@ export default function ChatInterface() {
                   />
                 ) : (
                   <ReactMarkdown
-                    className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2"
+                    className="prose prose-md max-w-none prose-p:my-1 prose-headings:my-2"
                     components={{
                       p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                       ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
@@ -389,8 +389,8 @@ export default function ChatInterface() {
           ))}
 
           {isLoading && (
-            <div className="flex items-center space-x-2 text-gray-600">
-              <Loader2 className="h-4 w-4 text-secondary animate-spin" />
+            <div className="flex items-center space-x-2 text-white">
+              <Loader2 className="h-4 w-4 text-white animate-spin" />
               <span>Thinking...</span>
             </div>
           )}
@@ -410,39 +410,36 @@ export default function ChatInterface() {
 
         <div ref={messagesEndRef} />
 
-        {/* Suggested Questions */}
-        {messages.length === 0 && (
-          <div className="absolute inset-x-0 bottom-0 px-4 py-0">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {suggestedQuestions.map((question, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestedQuestion(question)}
-                  className="bg-[#bcb7af]/20 hover:bg-primary/80 text-primary/90 hover:text-white px-4 py-2 rounded-full text-sm transition-colors shadow-sm border border-white/10 hover:shadow-md"
-                >
-                  {question}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
       
       
       
-      <form onSubmit={handleSubmit} className="p-4 md:p-6 pt-2 bg-white/90 rounded-b-3xl border-t border-white/20">
-        <div className="flex items-center gap-3 p-2 rounded-full  border-primary/40 shadow-sm bg-transparent hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+      {/* Suggested Questions */}
+      <div className="px-6 py-2 flex flex-wrap gap-2 justify-center bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
+        {suggestedQuestions.map((question, index) => (
+          <button
+            key={index}
+            onClick={() => handleSuggestedQuestion(question)}
+            className="px-4 py-2 bg-white/5 hover:bg-white/30 text-[#cd6301]/90  rounded-full text-sm backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            {question}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} className="p-5 bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
+        <div className="flex items-center gap-3 bg-white/20 p-3 rounded-full shadow-md backdrop-blur-md border border-white/30">
           <button 
             type="button" 
             onClick={toggleSpeechRecognition}
-            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${isListening ? 'bg-primary/10' : ''}`}
+            className={`w-6 h-6 flex items-center justify-center text-primary/50 hover:text-primary/90 ${isListening ? 'text-primary animate-pulse' : ''}`}
             disabled={isLoading}
             title={isListening ? "Stop listening" : "Start voice input"}
           >
             {isListening ? (
-              <MicOff className="text-primary animate-pulse" size={20} />
+              <MicOff className="w-5 h-5" />
             ) : (
-              <Mic className="text-primary" size={20} />
+              <Mic className="w-5 h-5" />
             )}
           </button>
           <input
@@ -450,34 +447,42 @@ export default function ChatInterface() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Ask me anything"
-            className="flex-1 bg-transparent border-none focus:outline-none text-gray-800 text-sm md:text-base  placeholder-primary/50"
+            className="flex-1 bg-transparent border-none focus:outline-none text-[#cd6301]  placeholder-primary/50 text-sm md:text-base"
             disabled={isLoading}
           />
           <button 
             type="submit" 
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-8 h-8 flex items-center justify-center bg-primary/80 hover:bg-primary text-white rounded-full transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading || !newMessage.trim() || remainingCredits === 0}
           >
-            <Send className="text-primary" size={20} />
+            <Send className="w-5 h-5" />
           </button>
         </div>
       </form>
-      {/* Credits display at the bottom 
-      {remainingCredits !== null && (
-        <div className="px-4 py-3 border-t-2 border-[#bcb7af]/50  bg-primary/40 mt-4 text-primary/50">
-          <div className="flex justify-center items-center gap-8">
-            <div className="flex flex-col items-center">
-              <span className="text-lg font-bold">{remainingCredits}</span>
-              <span className="text-xs text-white/70">Credits left</span>
-            </div>
-            <div className="w-px h-10 bg-white/20"></div>
-            <div className="flex flex-col items-center">
-              <a href="/billing" className="text-lg font-bold hover:text-secondary transition-colors">5000</a>
-              <span className="text-xs text-white/70">Topup Credits</span>
-            </div>
-          </div>
-        </div>*/}
-      )}
+      
+      <style jsx>{`
+        @keyframes message-in {
+          0% {
+            opacity: 0;
+            transform: translateY(15px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: message-in 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+          will-change: transform, opacity;
+        }
+        
+        .message-container {
+          background-image: 
+            radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+            radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+      `}</style>
     </div>
   );
 }

@@ -26,13 +26,13 @@ export default function Hero({ onAuth }: HeroProps) {
           </div>
         </div>
         
-        <h1 className="logo-text text-6xl md:text-8xl font-bold text-center mb-3 slide-in drop-shadow-lg">
+        <h1 className="logo-text text-6xl md:text-8xl font-bold font-comfortaa text-center mb-3 slide-in drop-shadow-lg">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/90">
-            Astro<span className="text-accent">Genie</span>
+            Astro<span className="text-[#cd5301]">Genie</span>
           </span>
         </h1>
         
-        <p className="text-lg md:text-xl text-center mb-10 slide-in slide-in-delay-1 text-white/90 max-w-2xl mx-auto font-jost tracking-wide">
+        <p className="text-lg md:text-xl text-center mb-10 slide-in slide-in-delay-1 text-white/90 max-w-2xl mx-auto font-questrial tracking-wide">
           Your personalized AI-powered cosmic guide and companion for navigating life's journey through the stars
         </p>
         

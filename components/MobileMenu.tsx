@@ -32,7 +32,7 @@ export default function MobileMenu() {
 
       {isOpen && (
         <div className="fixed top-[4rem] left-0 right-0 bg-gradient-to-b from-primary to-primary/95 shadow-xl border-t border-white/10">
-          <div className="backdrop-blur-md py-6 px-6 space-y-4 mobile-menu font-jost">
+          <div className="backdrop-blur-md py-6 px-6 space-y-4 mobile-menu font-questrial">
             <button 
               onClick={() => {
                 router.push('/dashboard');

@@ -87,7 +87,7 @@ export default function ChatInterfaceindex() {
                     : 'bg-gradient-to-br from-lightorange/90 to-cream/90 text-gray-800 backdrop-blur-sm border border-white/40'
                 }`}
               >
-                <p className="font-jost">{message.text}</p>
+                <p className="font-questrial">{message.text}</p>
               </div>
             </div>
           ))}
@@ -96,13 +96,13 @@ export default function ChatInterfaceindex() {
 
       {/* Suggested questions */}
       <div className="px-6 py-4 flex flex-wrap gap-2 justify-center bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
-        <button className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm backdrop-blur-md border border-white/30 transition-all duration-300 shadow-sm hover:shadow-md">
+        <button className="px-4 py-2 bg-white/5 hover:bg-white/30 text-[#cd6301]/90 rounded-full text-sm backdrop-blur-md  transition-all duration-300 shadow-sm hover:shadow-md">
           Will I get the job at the dealership?
         </button>
-        <button className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm backdrop-blur-md border border-white/30 transition-all duration-300 shadow-sm hover:shadow-md">
+        <button className="px-4 py-2 bg-white/5 hover:bg-white/30 text-[#cd6301]/90  rounded-full text-sm backdrop-blur-md  transition-all duration-300 shadow-sm hover:shadow-md">
           Should I invest in crypto?
         </button>
-        <button className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm backdrop-blur-md border border-white/30 transition-all duration-300 shadow-sm hover:shadow-md">
+        <button className="px-4 py-2 bg-white/5 hover:bg-white/30 text-[#cd6301]/90  rounded-full text-sm backdrop-blur-md  transition-all duration-300 shadow-sm hover:shadow-md">
           What period would be best to start a business?
         </button>
       </div>
@@ -110,7 +110,7 @@ export default function ChatInterfaceindex() {
       {/* Input area with modern styling */}
       <div className="p-5 bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
         <div className="flex items-center gap-3 bg-white/20 p-3 rounded-full shadow-md backdrop-blur-md border border-white/30">
-          <div className="w-6 h-6 flex items-center justify-center text-white/70">
+          <div className="w-6 h-6 flex items-center justify-center text-primary/40">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
@@ -118,7 +118,7 @@ export default function ChatInterfaceindex() {
           <input
             type="text"
             placeholder="Sign in to start chatting..."
-            className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-white/60 text-sm md:text-base font-jost"
+            className="flex-1 bg-transparent border-none focus:outline-none text-primary placeholder-primary/50 text-sm md:text-base font-questrial"
             disabled
           />
           <button className="w-8 h-8 flex items-center justify-center bg-primary/80 hover:bg-primary text-white rounded-full transition-colors duration-300">
