@@ -150,7 +150,7 @@ export function LocationSearch({ onSelect, value, className }: LocationSearchPro
             {results.map((result, index) => (
               <li
                 key={`${result.name}-${index}`}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-[#645b4b]"
                 onClick={() => handleSelect(result)}
               >
                 {result.name}

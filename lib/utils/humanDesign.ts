@@ -1,3 +1,4 @@
+
 import { calculatePlanetPositions, calculateJulianDay } from '../../birthchartpack/lib/services/astro/calculations';
 import { PlanetPosition } from '../../birthchartpack/lib/services/astro/types';
 
@@ -176,9 +177,19 @@ export async function calculateHumanDesign(
   ];
   
   console.log('Converting planet positions to gates...');
-  allPlanets.forEach(planet => {
-    // Simple conversion of zodiacal degrees to gates (1-64)
-    const gate = Math.floor((planet.longitude / 5.625) + 1);
+  
+  // Detailed logging of planet positions
+  console.log('Planet positions:');
+  allPlanets.forEach((planet, index) => {
+    // More accurate conversion of zodiacal degrees to gates (1-64)
+    // Each gate spans 5.625 degrees (360 / 64)
+    // Make sure gate is between 1 and 64
+    let gate = Math.floor((planet.longitude / 5.625) + 1);
+    if (gate > 64) gate = gate % 64;
+    if (gate === 0) gate = 64;
+    
+    console.log(`Planet ${index}: longitude ${planet.longitude.toFixed(2)}° -> Gate ${gate}`);
+    
     if (!activatedGates.includes(gate)) {
       activatedGates.push(gate);
     }
@@ -186,10 +197,20 @@ export async function calculateHumanDesign(
 
   console.log('Activated gates:', activatedGates);
 
+  // Check which sacral gates are activated (for debugging)
+  const sacralGates = centerGates.sacral;
+  const activatedSacralGates = sacralGates.filter(gate => activatedGates.includes(gate));
+  console.log('Sacral gates:', sacralGates);
+  console.log('Activated sacral gates:', activatedSacralGates);
+  
   // Determine which centers are defined based on activated gates
   Object.entries(centerGates).forEach(([center, gates]) => {
-    const isActivated = gates.some(gate => activatedGates.includes(gate));
+    const activatedCenterGates = gates.filter(gate => activatedGates.includes(gate));
+    const isActivated = activatedCenterGates.length > 0;
     centers[center as keyof typeof centers] = isActivated;
+    
+    // Log which gates are activating each center
+    console.log(`${center} center: ${isActivated ? 'ACTIVATED' : 'not activated'} by gates: ${activatedCenterGates.join(', ')}`);
   });
 
   console.log('Activated centers:', centers);

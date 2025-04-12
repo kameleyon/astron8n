@@ -191,7 +191,7 @@ export default function BirthChartModal({
           <h2 className="text-2xl font-bold text-gray-900">Update Birth Details</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-500 hover:text-[#645b4b] transition-colors"
           >
             ✕
           </button>
@@ -206,7 +206,7 @@ export default function BirthChartModal({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Full Name
             </label>
             <input
@@ -222,7 +222,7 @@ export default function BirthChartModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Birth Date
             </label>
             <input
@@ -238,7 +238,7 @@ export default function BirthChartModal({
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-[#645b4b]">
                 Birth Time
               </label>
               <div className="flex items-center">
@@ -272,7 +272,7 @@ export default function BirthChartModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[#645b4b] mb-1">
               Place of Birth
             </label>
             <LocationSearch
@@ -286,7 +286,7 @@ export default function BirthChartModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300"
+              className="flex-1 py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-[#645b4b] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300"
             >
               Cancel
             </button>

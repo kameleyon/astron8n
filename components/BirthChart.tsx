@@ -94,7 +94,7 @@ export default function BirthChart() {
           <h3 className="text-lg font-semibold mb-4">Planetary Positions</h3>
           <div className="space-y-4">
             {chartData.planets.map((planet) => (
-              <div key={planet.name} className="flex items-center justify-between border-b border-gray-700 pb-2">
+              <div key={planet.name} className="flex items-center justify-between border-b border-[#645b4b] pb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-[#FF5D01]">{planet.name}</span>
                   <span className="text-gray-400">in</span>
@@ -113,7 +113,7 @@ export default function BirthChart() {
           <h3 className="text-lg font-semibold mb-4">Houses</h3>
           <div className="grid grid-cols-2 gap-4">
             {Object.entries(chartData.houses).map(([house, data]) => (
-              <div key={house} className="border-b border-gray-700 pb-2">
+              <div key={house} className="border-b border-[#645b4b] pb-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[#FF5D01]">{house}</span>
                   <span className="text-gray-400">{data.sign}</span>
@@ -133,7 +133,7 @@ export default function BirthChart() {
           <h3 className="text-lg font-semibold mb-4">Major Aspects</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {chartData.aspects.map((aspect, index) => (
-              <div key={index} className="border-b border-gray-700 pb-2">
+              <div key={index} className="border-b border-[#645b4b] pb-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-[#FF5D01]">{aspect.planet1}</span>

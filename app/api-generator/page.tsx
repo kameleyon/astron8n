@@ -217,7 +217,7 @@ export default function ApiGeneratorPage() {
                     
                     <div className="space-y-4">
                       <div>
-                        <label htmlFor="keyName" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="keyName" className="block text-sm font-medium text-[#645b4b] mb-1">
                           Key Name
                         </label>
                         <input
@@ -318,7 +318,7 @@ export default function ApiGeneratorPage() {
                   ) : (
                     <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
                       <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <h3 className="text-lg font-medium text-gray-700 mb-1">No API Keys Found</h3>
+                      <h3 className="text-lg font-medium text-[#645b4b] mb-1">No API Keys Found</h3>
                       <p className="text-gray-600 mb-4">You haven't generated any API keys yet.</p>
                       <Button
                         onClick={() => document.getElementById('keyName')?.focus()}

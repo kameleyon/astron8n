@@ -31,7 +31,7 @@ export default function VerificationCard() {
           </p>
         </div>
 
-        <div className="bg-white/70 p-4 rounded-lg mb-6 text-sm text-gray-700">
+        <div className="bg-white/70 p-4 rounded-lg mb-6 text-sm text-[#645b4b]">
           <p className="mb-4">By using AstroGenie, you acknowledge and agree that:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>The information provided is for entertainment purposes only</li>
@@ -49,7 +49,7 @@ export default function VerificationCard() {
               onChange={(e) => setAgreed(e.target.checked)}
               className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
             />
-            <span className="ml-2 text-sm text-gray-700">
+            <span className="ml-2 text-sm text-[#645b4b]">
               I agree to the terms and conditions
             </span>
           </label>

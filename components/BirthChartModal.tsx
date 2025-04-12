@@ -191,7 +191,7 @@ export default function BirthChartModal({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Full Name
             </label>
             <input
@@ -207,7 +207,7 @@ export default function BirthChartModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Birth Date
             </label>
             <input
@@ -223,7 +223,7 @@ export default function BirthChartModal({
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-[#645b4b]">
                 Birth Time
               </label>
               <div className="flex items-center">
@@ -257,7 +257,7 @@ export default function BirthChartModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[#645b4b] mb-1">
               Place of Birth
             </label>
             <LocationSearch

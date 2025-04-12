@@ -56,7 +56,7 @@ function VerifyPageInner() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
       <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
       {message && (
-        <p className="text-gray-700 text-center max-w-md mb-6">
+        <p className="text-[#645b4b] text-center max-w-md mb-6">
           {message}
         </p>
       )}
@@ -81,7 +81,7 @@ export default function VerifyPage() {
       fallback={
         <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
           <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
-          <p className="text-gray-700 text-center max-w-md mb-6">
+          <p className="text-[#645b4b] text-center max-w-md mb-6">
             Loading verification...
           </p>
         </div>

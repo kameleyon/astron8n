@@ -61,7 +61,7 @@ export function PersonalitySnapshot({
         <div className="grid grid-cols-2 gap-4">
           {Object.entries(dominantElements).map(([element, value]) => (
             <div key={element} className="flex items-center gap-2">
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+              <div className="w-full bg-gray-200 dark:bg-[#645b4b] rounded-full h-2.5">
                 <div
                   className={`h-2.5 rounded-full ${getElementColor(element)}`}
                   style={{ width: value }}
@@ -78,7 +78,7 @@ export function PersonalitySnapshot({
         <div className="grid grid-cols-2 gap-4">
           {Object.entries(dominantQualities).map(([quality, value]) => (
             <div key={quality} className="flex items-center gap-2">
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+              <div className="w-full bg-gray-200 dark:bg-[#645b4b] rounded-full h-2.5">
                 <div
                   className={`h-2.5 rounded-full ${getQualityColor(quality)}`}
                   style={{ width: value }}

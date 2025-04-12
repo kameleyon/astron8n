@@ -69,7 +69,7 @@ function AuthPageInner() {
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
         <button 
           onClick={() => router.push("/")}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b]"
         >
           ×
         </button>
@@ -88,7 +88,7 @@ function AuthPageInner() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Email
             </label>
             <input
@@ -102,7 +102,7 @@ function AuthPageInner() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Password
             </label>
             <input

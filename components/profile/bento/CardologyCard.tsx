@@ -61,7 +61,7 @@ export function CardologyCard({ birthCard, isLoading = false, className }: Cardo
             <h3 className="text-7xl font-bold text-primary mr-2">{birthCard}</h3>
             {/*{suitIcon}*/}
           </div>
-          <p className="text-sm text-gray-700">{description}</p>
+          <p className="text-sm text-[#645b4b]">{description}</p>
         </div>
       ) : isLoading ? (
         <div className="animate-pulse space-y-2">

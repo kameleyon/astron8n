@@ -41,7 +41,7 @@ export function LifePathCard({ lifePathNumber, isLoading = false, className }: L
       {lifePathNumber ? (
         <div className="space-y-2">
           <h3 className="text-8xl font-bold text-primary">{lifePathNumber}</h3>
-          <p className="text-sm text-gray-700">{description}</p>
+          <p className="text-sm text-[#645b4b]">{description}</p>
         </div>
       ) : isLoading ? (
         <div className="animate-pulse space-y-2">

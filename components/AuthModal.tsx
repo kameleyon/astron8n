@@ -174,7 +174,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative animate-in slide-in-from-bottom duration-300">
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+            className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b] transition-colors"
           >
             <X size={24} />
           </button>
@@ -220,7 +220,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
             </button>
             <button
               onClick={() => setShowVerificationMessage(false)}
-              className="w-full py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300"
+              className="w-full py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-[#645b4b] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300"
             >
               Back to {isLogin ? "Sign In" : "Sign Up"}
             </button>
@@ -235,7 +235,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative animate-in slide-in-from-bottom duration-300">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+          className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b] transition-colors"
         >
           <X size={24} />
         </button>
@@ -256,7 +256,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Email
             </label>
             <input
@@ -270,7 +270,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
               Password
             </label>
             <input

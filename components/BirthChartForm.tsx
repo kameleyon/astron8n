@@ -177,7 +177,7 @@ export default function BirthChartForm() {
 
           <div>
 
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
 
               Full Name
 
@@ -209,7 +209,7 @@ export default function BirthChartForm() {
 
           <div>
 
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
 
               Date of Birth
 
@@ -245,7 +245,7 @@ export default function BirthChartForm() {
 
           <div>
 
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-[#645b4b]">
 
               Time of Birth
 
@@ -311,7 +311,7 @@ export default function BirthChartForm() {
 
           <div>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[#645b4b] mb-1">
 
               Place of Birth
 

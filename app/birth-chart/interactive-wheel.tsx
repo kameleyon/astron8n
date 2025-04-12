@@ -340,7 +340,7 @@ export function InteractiveWheel({ houses, planets }: InteractiveWheelProps) {
                   <div>{planet.degree} {planet.sign}</div>
                   <div className="text-gray-500">House {planet.house}</div>
                   {planetAspects.length > 0 && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                    <div className="border-t border-gray-200 dark:border-[#645b4b] pt-2 mt-2">
                       <div className="text-xs font-medium mb-1">Aspects:</div>
                       {planetAspects.map((aspect, i) => (
                         <div key={i} className="text-xs text-gray-500">

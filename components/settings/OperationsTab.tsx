@@ -126,7 +126,7 @@ export function OperationsTab() {
               <h4 className="font-medium text-gray-900 mb-4">Change Password</h4>
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#645b4b] mb-1">
                     Current Password
                   </label>
                   <Input
@@ -137,7 +137,7 @@ export function OperationsTab() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#645b4b] mb-1">
                     New Password
                   </label>
                   <Input
@@ -148,7 +148,7 @@ export function OperationsTab() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#645b4b] mb-1">
                     Confirm New Password
                   </label>
                   <Input
@@ -173,7 +173,7 @@ export function OperationsTab() {
               <h4 className="font-medium text-gray-900 mb-4">Change Email</h4>
               <form onSubmit={handleEmailChange} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#645b4b] mb-1">
                     New Email Address
                   </label>
                   <Input
