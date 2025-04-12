@@ -78,7 +78,7 @@ export default function Header({ onAuth }: HeaderProps) {
   return (
     <>
       <header className="bg-gradient-to-r from-primary to-primary/90 text-white py-4 relative z-50 font-questrial shadow-lg backdrop-blur-sm">
-        <div className="absolute inset-0 bg-[url('/subtle-pattern.png')] opacity-5"></div>
+        
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative">
           <MobileMenu />
           

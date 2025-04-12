@@ -12,6 +12,7 @@
     "apply-migrations": "node scripts/apply-migrations.js"
   },
   "dependencies": {
+    "@astrodraw/astrochart": "^3.0.2",
     "@astrogenie/shared": "file:shared",
     "@expo/metro-runtime": "~4.0.1",
     "@google/generative-ai": "^0.22.0",

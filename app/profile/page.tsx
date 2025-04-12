@@ -8,9 +8,8 @@ import ErrorState from "@/components/dashboard/ErrorState";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
 import { User, FileText, Edit, AlertCircle } from "lucide-react";
+import { ProfileBento } from "@/components/profile/bento/ProfileBento";
 import BirthChartModalProfile from "@/components/BirthChartModalprofile";
 import type { BirthChartData } from "@/lib/types/birth-chart";
 import { BirthChartResult } from "../../birthchartpack/components/birth-chart/birth-chart-result";
@@ -404,263 +403,29 @@ export default function ProfilePage() {
 
         <Header onAuth={() => {}} />
 
-        <main className="flex-grow relative z-10 py-12 mb-8">
-          <div className="w-full max-w-5xl mx-auto px-4">
-            <h1 className="text-3xl font-bold text-white text-left mb-4 pl-8">
-              My profile
-            </h1>
+        <main className="flex-grow relative z-10 py-6 sm:py-8 md:py-12 mb-4 sm:mb-6 md:mb-8">
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4">
+            {isBirthDataIncomplete && (
+              <div className="bg-yellow-50/80 border border-yellow-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 max-w-5xl mx-auto">
+                <p className="text-yellow-800 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                  Please complete your birth information to get accurate readings
+                </p>
+              </div>
+            )}
 
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm shadow-sm shadow-black/40 rounded-xl p-1 mb-8">
-                <TabsTrigger
-                  value="personal"
-                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Personal
-                </TabsTrigger>
-                <TabsTrigger
-                  value="birthchart"
-                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Birth Chart
-                </TabsTrigger>
-                <TabsTrigger
-                  value="reports"
-                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Reports
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="personal">
-                <Card className="bg-white/80 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6 overflow-hidden">
-                  <CardContent className="p-0">
-                    {/* Personal Information Section */}
-                    <div className="p-8 border-b border-gray-100">
-                      <div className="flex justify-between items-start mb-6">
-                        <div>
-                          <h2 className="text-2xl font-semibold text-gray-900">
-                            {profile.full_name}
-                          </h2>
-                          <p className="text-gray-500 mt-1">{email}</p>
-                        </div>
-                        <button
-                          onClick={() => setShowEditModal(true)}
-                          className="text-primary hover:text-primary/80 flex items-center gap-1.5 transition-colors text-sm"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Edit Profile
-                        </button>
-                      </div>
-
-                      {isBirthDataIncomplete && (
-                        <div className="bg-yellow-50/50 border border-yellow-200 rounded-xl p-4 mb-6">
-                          <p className="text-yellow-800 flex items-center gap-2 text-sm">
-                            <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                            Please complete your birth information to get accurate readings
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-900 mb-4">Birth Details</h3>
-                          <div className="space-y-4">
-                            <div>
-                              <p className="text-sm text-gray-500">Birth Date</p>
-                              <p className="text-gray-900 mt-0.5">
-                                {profile.birth_date ? formatDate(profile.birth_date) : "Not provided"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Birth Time</p>
-                              <p className="text-gray-900 mt-0.5">
-                                {profile.has_unknown_birth_time ? "Not provided" : profile.birth_time}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Birth Location</p>
-                              <p className="text-gray-900 mt-0.5">
-                                {profile.birth_location || "Not provided"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-900 mb-4">Astrological Profile</h3>
-                          <div className="space-y-4">
-                            <div>
-                              <p className="text-sm text-gray-500">Sun Sign</p>
-                              <p className="text-gray-900 mt-0.5">
-                                {birthChartData?.planets.find(p => p.name === "Sun")?.sign || "Not available"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Moon Sign</p>
-                              <p className="text-gray-900 mt-0.5">
-                                {birthChartData?.planets.find(p => p.name === "Moon")?.sign || "Not available"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Ascendant</p>
-                              <p className="text-gray-900 mt-0.5">
-                                {birthChartData?.ascendant?.sign || "Not available"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Spiritual Profile Section */}
-                    <div className="p-8 ">
-                      <h3 className="text-lg font-medium text-gray-900 mb-6">Spiritual Profile</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-2xl p-4 shadow-sm shadow-black/30">
-                          <p className="text-sm text-gray-500 mb-1">Human Design</p>
-                          <div className="text-gray-900">
-                            {humanDesignData ? (
-                              <div className="space-y-1">
-                                <p className="font-medium">{humanDesignData.type}</p>
-                                <p className="text-sm">Authority: {humanDesignData.authority}</p>
-                                <p className="text-sm">Profile: {humanDesignData.profile}</p>
-                              </div>
-                            ) : profile.birth_date && profile.birth_time ? (
-                              <p className="font-medium">Loading...</p>
-                            ) : (
-                              <p className="font-medium">Not available</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 shadow-sm shadow-black/30">
-                          <p className="text-sm text-gray-500 mb-1">Life Path Number</p>
-                          <p className="text-gray-900 font-medium">
-                            {profile.birth_date ? calculateLifePath(profile.birth_date) : "Not available"}
-                          </p>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 shadow-sm shadow-black/30">
-                          <p className="text-sm text-gray-500 mb-1">Birth Card</p>
-                          <p className="text-gray-900 font-medium">
-                            {profile.birth_date ? getBirthCard(profile.birth_date) : "Not available"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="birthchart">
-                <Card className="bg-white/80 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-2">
-                  <CardContent className="p-2">
-                    
-                    {isBirthDataIncomplete ? (
-                      <div className="text-gray-600">
-                        Please complete your birth information to view your birth chart.
-                      </div>
-                    ) : birthChartData ? (
-                      <BirthChartResult
-                        data={birthChartData}
-                        onBack={() => {}}
-                      />
-                    ) : (
-                      <div className="text-gray-600">
-                        Loading birth chart data...
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="reports" id="reports">
-                <Card className="bg-white/80 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl mb-6">
-                  <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold text-primary mb-4">
-                      Reports
-                    </h2>
-                    <div className="space-y-4">
-                      {/* Reports list */}
-                      <div className="space-y-2">
-                        {reports?.length > 0 ? (
-                          <>
-                            {currentReports.map((report) => (
-                              <div
-                                key={report.id}
-                                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-100"
-                              >
-                                <div className="flex items-center space-x-3">
-                                  <FileText className="h-5 w-5 text-primary" />
-                                  <div>
-                                    <p className="font-medium text-gray-900">
-                                      {report.report_type === '30-day' ? '30-Day Forecast' : report.report_type}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                      {new Date(report.created_at).toLocaleDateString()} at {new Date(report.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handleDownloadReport(report.file_name)}
-                                  className="text-primary hover:text-primary/80 font-medium text-sm"
-                                >
-                                  Download
-                                </button>
-                              </div>
-                            ))}
-                            
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                              <div className="flex justify-center items-center space-x-2 mt-6">
-                                <button
-                                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                  disabled={currentPage === 1}
-                                  className="p-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  Previous
-                                </button>
-                                
-                                <div className="flex items-center space-x-1">
-                                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                    <button
-                                      key={page}
-                                      onClick={() => setCurrentPage(page)}
-                                      className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                                        currentPage === page
-                                          ? 'bg-primary text-white'
-                                          : 'bg-white text-gray-700 hover:bg-gray-50'
-                                      }`}
-                                    >
-                                      {page}
-                                    </button>
-                                  ))}
-                                </div>
-                                
-                                <button
-                                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                  disabled={currentPage === totalPages}
-                                  className="p-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  Next
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <p className="text-gray-600 text-center py-4">
-                            No reports available yet.
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-            </Tabs>
+            <ProfileBento
+              profile={profile}
+              email={email}
+              birthChartData={birthChartData}
+              humanDesignData={humanDesignData}
+              lifePathNumber={profile.birth_date ? calculateLifePath(profile.birth_date) : null}
+              birthCard={profile.birth_date ? getBirthCard(profile.birth_date) : null}
+              reports={reports}
+              isLoading={loading}
+              onEdit={() => setShowEditModal(true)}
+              onDownloadReport={handleDownloadReport}
+            />
           </div>
         </main>
 

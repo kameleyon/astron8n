@@ -35,14 +35,14 @@ export const metadata: Metadata = {
     'retrograde planets', 'astrological houses', 'zodiac signs', 'natal astrology',
     'transit predictions', 'astrological consultations', 'online astrology'
   ],
-  manifest: '/site.webmanifest',
+  manifest: '/manifest.webmanifest',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
-    apple: '/manifesto.png',
+    apple: '/webmanifest.png',
     other: {
       rel: 'manifest-icon',
-      url: '/manifesto.png'
+      url: '/webmanifest.png'
     }
   },
   robots: {
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     description: 'Experience the future of astrology with AI-powered birth chart readings, accurate daily predictions, and personalized transit forecasts. Unlock deep insights about your life path, relationships, and destiny with AstroGenie\'s advanced astrological guidance.',
     siteName: 'AstroGenie',
     images: [{
-      url: '/manifesto.png',
+      url: '/webmanifest.png',
       width: 512,
       height: 512,
       alt: 'AstroGenie Logo'
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'AstroGenie - AI Astrology Guide',
     description: 'AI-powered birth charts, horoscopes, and astrological insights personalized for you.',
-    images: ['/manifesto.png'],
+    images: ['/webmanifest.png'],
     creator: '@astrogenie'
   },
   alternates: {
