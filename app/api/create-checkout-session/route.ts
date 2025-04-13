@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings?purchase_success=true&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings/success?package_id=${packageId}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
       metadata: {
         user_id: user.id,
