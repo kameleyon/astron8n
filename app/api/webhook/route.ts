@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         const session = event.data.object as Stripe.Checkout.Session;
         
         // Make sure this is a payment for credits
-        if (session.mode === 'payment' && session.metadata?.credits && session.metadata?.user_id) {
+        if (session.mode === 'payment' && session.metadata?.package_id && session.metadata?.user_id) {
           await handleSuccessfulPayment(session);
         }
         break;
@@ -85,12 +85,32 @@ export async function POST(request: Request) {
 
 async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.user_id;
-  const creditsToAdd = parseInt(session.metadata?.credits || '0', 10);
   const packageId = session.metadata?.package_id || 'unknown';
   
-  if (!userId || !creditsToAdd) {
-    console.error('Missing user_id or credits in session metadata');
+  if (!userId) {
+    console.error('Missing user_id in session metadata');
     return;
+  }
+  
+  // Determine credits to add based on package ID
+  let creditsToAdd: number;
+  switch (packageId) {
+    case 'basic':
+      creditsToAdd = 5000; // Basic: $2.99 for 5000 credits
+      break;
+    case 'pro':
+      creditsToAdd = 9000; // Pro: $3.99 for 9000 credits
+      break;
+    case 'premium':
+      creditsToAdd = 17000; // Premium: $5.99 for 17000 credits
+      break;
+    default:
+      // Fallback to metadata if package ID is not recognized
+      creditsToAdd = parseInt(session.metadata?.credits || '0', 10);
+      if (!creditsToAdd) {
+        console.error('Invalid package ID and no credits specified in metadata');
+        return;
+      }
   }
 
   try {

@@ -88,15 +88,20 @@ export async function POST(request: Request) {
 
     // Get the price ID based on the package selected
     let priceId: string;
+    let creditsAmount: number;
+    
     switch (packageId) {
       case 'basic':
         priceId = 'price_1RDTkoGTXKQOsgznwXSKf1uP'; // Basic: $2.99 for 5000 credits
+        creditsAmount = 5000;
         break;
       case 'pro':
         priceId = 'price_1RDTmYGTXKQOsgzntFpo66Cs'; // Pro: $3.99 for 9000 credits
+        creditsAmount = 9000;
         break;
       case 'premium':
         priceId = 'price_1RDToRGTXKQOsgzntueN0ejg'; // Premium: $5.99 for 17000 credits
+        creditsAmount = 17000;
         break;
       default:
         return NextResponse.json(
@@ -119,7 +124,7 @@ export async function POST(request: Request) {
       metadata: {
         user_id: user.id,
         package_id: packageId,
-        credits: credits.toString(),
+        credits: creditsAmount.toString(),
       },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?purchase_success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
