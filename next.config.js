@@ -89,6 +89,20 @@ const nextConfig = {
       }
     ];
   },
+  async headers() {
+    return [
+      {
+        // For Stripe webhook - needs raw body for signature verification
+        source: '/api/webhook',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+        ],
+      },
+    ];
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },

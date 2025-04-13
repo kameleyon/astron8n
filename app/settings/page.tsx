@@ -119,66 +119,137 @@ export default function SettingsPage() {
             .eq('user_id', user.id);
         }
         
-        // Fetch billing information
+        // Fetch billing information with proper error handling
         try {
-          // Get subscription information
-          const { data: subscriptionData, error: subscriptionError } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-          
-          if (subscriptionError && subscriptionError.code !== 'PGRST116') {
-            throw subscriptionError;
+          // Get subscription information from subscription_history table
+          try {
+            const { data: subscriptionData, error: subscriptionError } = await supabase
+              .from('subscription_history')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+            
+            if (subscriptionError) {
+              console.log('Error fetching subscription data:', subscriptionError.message);
+            } else if (subscriptionData && subscriptionData.length > 0) {
+              // Use the first (most recent) subscription record
+              const latestSubscription = subscriptionData[0];
+              
+              // Update billing info with subscription data
+              setBillingInfo(prevInfo => ({
+                ...prevInfo,
+                next_payment_date: latestSubscription.next_payment_date || null,
+                trial_end_date: latestSubscription.trial_end_date || null,
+                is_trial: latestSubscription.is_trial || false
+              }));
+            }
+          } catch (subscriptionError) {
+            console.error('Error accessing subscription_history table:', subscriptionError);
           }
           
           // Get payment methods
-          const { data: paymentMethodData, error: paymentMethodError } = await supabase
-            .from('payment_methods')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('is_default', true)
-            .single();
-          
-          if (paymentMethodError && paymentMethodError.code !== 'PGRST116') {
-            throw paymentMethodError;
+          try {
+            const { data: paymentMethodData, error: paymentMethodError } = await supabase
+              .from('payment_methods')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('is_default', true)
+              .maybeSingle();
+            
+            if (paymentMethodError) {
+              console.log('Error fetching payment method data:', paymentMethodError.message);
+            } else if (paymentMethodData) {
+              // Update billing info with payment method data
+              setBillingInfo(prevInfo => ({
+                ...prevInfo,
+                payment_method: {
+                  brand: paymentMethodData.brand || '',
+                  last4: paymentMethodData.last4 || '',
+                  exp_month: paymentMethodData.exp_month || 0,
+                  exp_year: paymentMethodData.exp_year || 0
+                }
+              }));
+            }
+          } catch (paymentMethodError) {
+            console.error('Error accessing payment_methods table:', paymentMethodError);
           }
           
-          // Get billing activities
-          const { data: activitiesData, error: activitiesError } = await supabase
-            .from('billing_activities')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('date', { ascending: false })
-            .limit(10);
-          
-          if (activitiesError) {
-            throw activitiesError;
+          // Try to get billing activities from both billing_activities and api_usage tables
+          try {
+            // First try billing_activities table
+            const { data: billingActivitiesData, error: billingActivitiesError } = await supabase
+              .from('billing_activities')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('date', { ascending: false })
+              .limit(10);
+            
+            // Then try api_usage table
+            const { data: apiUsageData, error: apiUsageError } = await supabase
+              .from('api_usage')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(10);
+            
+            // Define the activity type
+            type BillingActivity = {
+              type: 'subscription_payment' | 'token_purchase';
+              amount: number;
+              date: string;
+              status: 'completed' | 'pending' | 'failed';
+              tokens: number;
+            };
+            
+            // Combine the results
+            let combinedActivities: BillingActivity[] = [];
+            
+            if (!billingActivitiesError && billingActivitiesData && billingActivitiesData.length > 0) {
+              // Map billing activities data
+              const formattedBillingActivities: BillingActivity[] = billingActivitiesData.map(activity => ({
+                type: activity.type as 'subscription_payment' | 'token_purchase',
+                amount: activity.amount,
+                date: activity.date,
+                status: activity.status as 'completed' | 'pending' | 'failed',
+                tokens: activity.tokens
+              }));
+              
+              combinedActivities = [...combinedActivities, ...formattedBillingActivities];
+            }
+            
+            if (!apiUsageError && apiUsageData && apiUsageData.length > 0) {
+              // Map api_usage data to billing activities format
+              const formattedApiUsage: BillingActivity[] = apiUsageData.map(usage => ({
+                type: 'token_purchase' as 'subscription_payment' | 'token_purchase',
+                amount: usage.cost || 0,
+                date: usage.created_at,
+                status: 'completed' as 'completed' | 'pending' | 'failed',
+                tokens: usage.tokens_used || 0
+              }));
+              
+              combinedActivities = [...combinedActivities, ...formattedApiUsage];
+            }
+            
+            // Sort by date (newest first)
+            combinedActivities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            
+            // Limit to 10 activities
+            combinedActivities = combinedActivities.slice(0, 10);
+            
+            // Update billing info with activities data
+            if (combinedActivities.length > 0) {
+              setBillingInfo(prevInfo => ({
+                ...prevInfo,
+                activities: combinedActivities
+              }));
+            }
+          } catch (activitiesError) {
+            console.error('Error accessing activities tables:', activitiesError);
           }
-          
-          // Format billing information
-          const formattedBillingInfo: BillingInfo = {
-            next_payment_date: subscriptionData?.next_payment_date || null,
-            trial_end_date: subscriptionData?.trial_end_date || null,
-            is_trial: subscriptionData?.is_trial || false,
-            activities: activitiesData?.map(activity => ({
-              type: activity.type as 'subscription_payment' | 'token_purchase',
-              amount: activity.amount,
-              date: activity.date,
-              status: activity.status as 'completed' | 'pending' | 'failed',
-              tokens: activity.tokens
-            })) || [],
-            payment_method: paymentMethodData ? {
-              brand: paymentMethodData.brand,
-              last4: paymentMethodData.last4,
-              exp_month: paymentMethodData.exp_month,
-              exp_year: paymentMethodData.exp_year
-            } : null
-          };
-          
-          setBillingInfo(formattedBillingInfo);
         } catch (err) {
           console.error('Error fetching billing information:', err);
+          // Keep using the default billing info set in useState
         }
       } catch (err) {
         console.error('Error initializing user data:', err);

@@ -1,163 +1,136 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { headers } from 'next/headers';
+import Stripe from 'stripe';
 
-export async function POST(req: Request) {
-  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-  const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL;
+// Initialize Stripe with your secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2025-01-27.acacia', // Use the latest API version
+});
 
-  if (!STRIPE_SECRET_KEY) {
-    return NextResponse.json(
-      { error: 'STRIPE_SECRET_KEY environment variable is not set' },
-      { status: 500 }
-    );
-  }
-
-  if (!NEXT_PUBLIC_URL) {
-    return NextResponse.json(
-      { error: 'NEXT_PUBLIC_URL environment variable is not set' },
-      { status: 500 }
-    );
-  }
-
-  const stripe = new Stripe(STRIPE_SECRET_KEY, {
-    apiVersion: '2025-01-27.acacia'
-  });
-
+export async function POST(request: Request) {
   try {
-    // Check auth header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    // Verify authentication
+    const authHeader = headers().get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Missing or invalid authorization header' },
+        { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Verify the access token
-    const accessToken = authHeader.split(' ')[1];
-    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
-    
+    const token = authHeader.split(' ')[1];
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
-      console.error('Auth error:', authError);
       return NextResponse.json(
-        { error: 'Invalid authentication token' },
+        { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
     // Parse request body
-    if (!req.body) {
+    const body = await request.json();
+    const { packageId, credits, amount } = body;
+
+    if (!packageId || !credits || !amount) {
       return NextResponse.json(
-        { error: 'Request body is required' },
+        { error: 'Missing required parameters' },
         { status: 400 }
       );
     }
 
-    let priceId, reportType;
-    try {
-      const body = await req.json();
-      priceId = body.priceId;
-      reportType = body.reportType;
-    } catch (error) {
-      console.error('Error parsing request body:', error);
+    // Check if user already has a Stripe customer ID
+    const { data: userData, error: userDataError } = await supabase
+      .from('user_profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
+
+    if (userDataError && userDataError.code !== 'PGRST116') {
+      console.error('Error fetching user data:', userDataError);
       return NextResponse.json(
-        { error: 'Invalid request body format' },
-        { status: 400 }
-      );
-    }
-
-    if (!priceId || !reportType) {
-      return NextResponse.json(
-        { error: 'priceId and reportType are required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate price ID and report type
-    if (!priceId.startsWith('price_')) {
-      return NextResponse.json(
-        { error: 'Invalid price ID format' },
-        { status: 400 }
-      );
-    }
-
-    // Create Stripe checkout session with error handling
-    let checkoutSession;
-    try {
-      if (!user.email) {
-        throw new Error('User email is required');
-      }
-
-      const sessionParams: Stripe.Checkout.SessionCreateParams = {
-        customer_email: user.email,
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        mode: reportType === 'subscription' ? 'subscription' : 'payment',
-        success_url: reportType === 'subscription' 
-          ? `${process.env.NEXT_PUBLIC_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`
-          : `${process.env.NEXT_PUBLIC_URL}/reports/success?session_id={CHECKOUT_SESSION_ID}&report_type=${reportType}`,
-        cancel_url: `${process.env.NEXT_PUBLIC_URL}${reportType === 'subscription' ? '/billing' : '/reports'}`,
-        metadata: {
-          userId: user.id,
-          reportType: reportType,
-          userEmail: user.email
-        },
-        subscription_data: reportType === 'subscription' ? {
-          metadata: {
-            userId: user.id,
-            reportType: reportType
-          }
-        } : undefined,
-        payment_intent_data: reportType !== 'subscription' ? {
-          metadata: {
-            userId: user.id,
-            reportType: reportType
-          }
-        } : undefined
-      };
-
-      checkoutSession = await stripe.checkout.sessions.create(sessionParams);
-
-      return NextResponse.json({
-        id: checkoutSession.id,
-        url: checkoutSession.url
-      });
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      
-      // Handle Stripe errors specifically
-      if (error instanceof Stripe.errors.StripeError) {
-        return NextResponse.json(
-          { 
-            error: 'Payment service error',
-            details: error.message
-          },
-          { status: error.statusCode || 500 }
-        );
-      }
-
-      return NextResponse.json(
-        { 
-          error: 'Failed to create checkout session',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        },
+        { error: 'Failed to fetch user data' },
         { status: 500 }
       );
     }
-  } catch (error) {
-    console.error('Unexpected error:', error);
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
+
+    let customerId = userData?.stripe_customer_id;
+
+    // If user doesn't have a Stripe customer ID, create one
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          user_id: user.id
+        }
+      });
+
+      customerId = customer.id;
+
+      // Save the customer ID to the user's profile
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: user.id,
+          stripe_customer_id: customerId,
+          updated_at: new Date().toISOString()
+        });
+
+      if (updateError) {
+        console.error('Error updating user profile:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to update user profile' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Get the price ID based on the package selected
+    let priceId: string;
+    switch (packageId) {
+      case 'basic':
+        priceId = 'price_1RDTkoGTXKQOsgznwXSKf1uP'; // Basic: $2.99 for 5000 credits
+        break;
+      case 'pro':
+        priceId = 'price_1RDTmYGTXKQOsgzntFpo66Cs'; // Pro: $3.99 for 9000 credits
+        break;
+      case 'premium':
+        priceId = 'price_1RDToRGTXKQOsgzntueN0ejg'; // Premium: $5.99 for 17000 credits
+        break;
+      default:
+        return NextResponse.json(
+          { error: 'Invalid package ID' },
+          { status: 400 }
+        );
+    }
+
+    // Create a Stripe Checkout session for purchasing credits
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      customer: customerId,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        user_id: user.id,
+        package_id: packageId,
+        credits: credits.toString(),
       },
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?purchase_success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
+    });
+
+    // Return the checkout URL
+    return NextResponse.json({ url: session.url });
+  } catch (error) {
+    console.error('Error in create-checkout-session API:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

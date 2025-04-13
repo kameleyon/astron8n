@@ -1,6 +1,6 @@
 "use client";
 
-import { BentoGridItem } from "@/components/profile/bento/BentoGrid";
+import { SettingsBentoGridItem } from "@/components/settings/bento/SettingsBentoGridItem";
 import { CreditInfo, RolloverCredit } from "@/types/credits";
 import { Calendar } from "lucide-react";
 
@@ -17,11 +17,11 @@ export function RolloverCreditsCard({
 }: RolloverCreditsCardProps) {
   if (isLoading) {
     return (
-      <BentoGridItem className={className}>
+      <SettingsBentoGridItem className={className}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </BentoGridItem>
+      </SettingsBentoGridItem>
     );
   }
 
@@ -33,15 +33,18 @@ export function RolloverCreditsCard({
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
+  // Use actual rollover credits from creditInfo
+  const rolloverCredits = creditInfo.rollover_credits || [];
+
   return (
-    <BentoGridItem
+    <SettingsBentoGridItem
       className={className}
       title="Rollover Credits"
       icon={<Calendar className="h-5 w-5 text-primary" />}
     >
-      <div className="mt-4 space-y-3 max-h-[300px] overflow-y-auto pr-1">
-        {creditInfo.rollover_credits.length > 0 ? (
-          creditInfo.rollover_credits.map((credit: RolloverCredit, index: number) => (
+      <div className="mt-4 space-y-3 max-h-[300px] overflow-y-auto pr-1 bento-grid-fix">
+        {rolloverCredits.length > 0 ? (
+          rolloverCredits.map((credit: RolloverCredit, index: number) => (
             <div 
               key={index}
               className="bg-white/80 rounded-lg p-3 flex justify-between items-center"
@@ -65,7 +68,8 @@ export function RolloverCreditsCard({
           ))
         ) : (
           <div className="bg-white/90 rounded-lg p-4 text-center text-[#645b4b]">
-            No rollover credits available
+            <p>No rollover credits available</p>
+            <p className="text-xs mt-1">Unused credits will appear here</p>
           </div>
         )}
         
@@ -73,6 +77,6 @@ export function RolloverCreditsCard({
           Unused credits roll over for up to 30 days when your subscription renews
         </div>
       </div>
-    </BentoGridItem>
+    </SettingsBentoGridItem>
   );
 }

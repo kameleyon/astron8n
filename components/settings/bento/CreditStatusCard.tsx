@@ -1,6 +1,6 @@
 "use client";
 
-import { BentoGridItem } from "@/components/profile/bento/BentoGrid";
+import { SettingsBentoGridItem } from "@/components/settings/bento/SettingsBentoGridItem";
 import ProgressBar from "@/components/ui/ProgressBar";
 import { CreditInfo, RolloverCredit } from "@/types/credits";
 import { CreditCard, Calendar, Cog } from "lucide-react";
@@ -18,11 +18,11 @@ export function CreditStatusCard({
 }: CreditStatusCardProps) {
   if (isLoading) {
     return (
-      <BentoGridItem className={className}>
+      <SettingsBentoGridItem className={className}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </BentoGridItem>
+      </SettingsBentoGridItem>
     );
   }
 
@@ -38,7 +38,7 @@ export function CreditStatusCard({
   };
 
   return (
-    <BentoGridItem
+    <SettingsBentoGridItem
       className={`overflow-hidden flex flex-col ${className || ''}`}
       colSpan={2}
     >
@@ -93,6 +93,6 @@ export function CreditStatusCard({
           </div>
         </div>
       </div>
-    </BentoGridItem>
+    </SettingsBentoGridItem>
   );
 }

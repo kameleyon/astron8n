@@ -82,7 +82,7 @@ export default function SessionProvider({ children, requireAuth = false }: Sessi
         if (!requireAuth) {
           router.replace('/dashboard');
         }
-      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      } else if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
         if (requireAuth) {
           router.replace('/auth');

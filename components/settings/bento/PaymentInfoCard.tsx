@@ -1,6 +1,6 @@
 "use client";
 
-import { BentoGridItem } from "@/components/profile/bento/BentoGrid";
+import { SettingsBentoGridItem } from "@/components/settings/bento/SettingsBentoGridItem";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { BillingInfo } from "@/types/credits";
@@ -89,44 +89,49 @@ export function PaymentInfoCard({
 
   if (isLoading) {
     return (
-      <BentoGridItem className={className}>
+      <SettingsBentoGridItem className={className}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </BentoGridItem>
+      </SettingsBentoGridItem>
     );
   }
 
+  // Use actual data from billingInfo
+  const isPremium = !billingInfo.is_trial;
+  const nextPaymentDate = billingInfo.next_payment_date 
+    ? new Date(billingInfo.next_payment_date).toLocaleDateString() 
+    : 'Not available';
+  const trialEndDate = billingInfo.trial_end_date 
+    ? new Date(billingInfo.trial_end_date).toLocaleDateString() 
+    : 'Not available';
+
   return (
-    <BentoGridItem
+    <SettingsBentoGridItem
       className={className}
       title="Payment Information"
       icon={<CreditCard className="h-5 w-5 text-primary" />}
     >
-      <div className="mt-4 space-y-4">
+      <div className="mt-4 space-y-4 bento-grid-fix">
         <div className="bg-white/90 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-[#cd6301] mb-1">
-                {billingInfo.is_trial ? 'Trial Plan' : 'Premium Plan'}
+                {isPremium ? 'Premium Plan' : 'Trial Plan'}
               </p>
               <p className="text-sm text-[#645b4b]">
-                {billingInfo.is_trial 
-                  ? `Trial ends: ${billingInfo.trial_end_date 
-                      ? new Date(billingInfo.trial_end_date).toLocaleDateString() 
-                      : 'Not available'}`
-                  : `Next payment: ${billingInfo.next_payment_date 
-                      ? new Date(billingInfo.next_payment_date).toLocaleDateString()
-                      : 'Not available'}`
+                {isPremium 
+                  ? `Next payment: ${nextPaymentDate}`
+                  : `Trial ends: ${trialEndDate}`
                 }
               </p>
             </div>
             <div className={`px-3 py-1 rounded-full text-sm ${
-              billingInfo.is_trial 
-                ? 'bg-primary/10 text-primary'
-                : 'bg-secondary/10 text-secondary'
+              isPremium 
+                ? 'bg-secondary/10 text-secondary'
+                : 'bg-primary/10 text-primary'
             }`}>
-              {billingInfo.is_trial ? 'Trial' : 'Active'}
+              {isPremium ? 'Active' : 'Trial'}
             </div>
           </div>
           
@@ -168,6 +173,6 @@ export function PaymentInfoCard({
           <p className="mt-1">You can update or remove your payment method at any time.</p>
         </div>
       </div>
-    </BentoGridItem>
+    </SettingsBentoGridItem>
   );
 }
