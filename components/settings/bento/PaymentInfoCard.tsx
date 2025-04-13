@@ -29,7 +29,7 @@ export function PaymentInfoCard({
         throw new Error('No active session');
       }
 
-      const response = await fetch('/api/stripe/update-payment-method', {
+      const response = await fetch('/api/stripe/add-payment-method', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }

@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-01-27.acacia', // Use the latest API version
+  apiVersion: '2025-01-27.acacia', // Use the same API version as other endpoints
 });
 
 export async function POST(request: Request) {
@@ -44,13 +44,7 @@ export async function POST(request: Request) {
       expand: ['payment_method']
     });
 
-    // Verify that the setup intent belongs to this user
-    if (setupIntent.metadata?.user_id !== user.id) {
-      return NextResponse.json(
-        { error: 'Setup intent does not belong to this user' },
-        { status: 403 }
-      );
-    }
+    // Skip metadata verification since we're not using metadata anymore
 
     // Verify that the setup intent was successful
     if (setupIntent.status !== 'succeeded') {

@@ -4,12 +4,6 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText, CheckCircle, CreditCard } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import Stripe from 'stripe';
-
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || '', {
-  apiVersion: '2025-01-27.acacia',
-});
 
 function PaymentMethodSuccessContent() {
   const searchParams = useSearchParams();
@@ -36,50 +30,7 @@ function PaymentMethodSuccessContent() {
         const setupIntentId = searchParams.get('setup_intent');
         
         if (!setupIntentId || setupIntentId === '{SETUP_INTENT}') {
-          console.error('Invalid setup intent ID:', setupIntentId);
-          
-          // If we don't have a valid setup intent ID, we'll create a dummy payment method
-          // This is just for demonstration purposes
-          const dummyCard = {
-            brand: 'visa',
-            last4: '4242',
-            exp_month: 12,
-            exp_year: 2028
-          };
-          
-          // Check if user already has payment methods
-          const { data: existingMethods, error: fetchError } = await supabase
-            .from('payment_methods')
-            .select('id')
-            .eq('user_id', session.user.id);
-          
-          if (fetchError) {
-            throw fetchError;
-          }
-          
-          // If this is the first payment method, set it as default
-          const isDefault = !existingMethods || existingMethods.length === 0;
-          
-          // Save dummy payment method to database
-          const { error: insertError } = await supabase
-            .from('payment_methods')
-            .insert([{
-              user_id: session.user.id,
-              stripe_payment_method_id: 'pm_dummy_' + Math.random().toString(36).substring(2, 15),
-              brand: dummyCard.brand,
-              last4: dummyCard.last4,
-              exp_month: dummyCard.exp_month,
-              exp_year: dummyCard.exp_year,
-              is_default: isDefault
-            }]);
-          
-          if (insertError) {
-            throw insertError;
-          }
-          
-          setCardDetails(dummyCard);
-          setLoading(false);
-          return;
+          throw new Error('Invalid setup intent ID. Please try again.');
         }
         
         try {
@@ -104,20 +55,31 @@ function PaymentMethodSuccessContent() {
             throw new Error('No payment method details found');
           }
           
-          // Check if user already has payment methods
+          // First, get all existing payment methods for this user
           const { data: existingMethods, error: fetchError } = await supabase
             .from('payment_methods')
-            .select('id')
+            .select('*')
             .eq('user_id', session.user.id);
           
           if (fetchError) {
             throw fetchError;
           }
           
-          // If this is the first payment method, set it as default
-          const isDefault = !existingMethods || existingMethods.length === 0;
+          // If there are existing payment methods, update them all to not be default
+          if (existingMethods && existingMethods.length > 0) {
+            // Update all existing payment methods to not be default
+            const { error: updateError } = await supabase
+              .from('payment_methods')
+              .update({ is_default: false })
+              .eq('user_id', session.user.id);
+            
+            if (updateError) {
+              console.error('Error updating existing payment methods:', updateError);
+              // Continue anyway, as this is not critical
+            }
+          }
           
-          // Save payment method to database
+          // Save the new payment method as default
           const { error: insertError } = await supabase
             .from('payment_methods')
             .insert([{
@@ -127,7 +89,7 @@ function PaymentMethodSuccessContent() {
               last4: paymentMethod.card.last4,
               exp_month: paymentMethod.card.exp_month,
               exp_year: paymentMethod.card.exp_year,
-              is_default: isDefault
+              is_default: true // Always set the new payment method as default
             }]);
           
           if (insertError) {

@@ -196,6 +196,7 @@ export default function SettingsPage() {
               .select('*')
               .eq('user_id', user.id)
               .eq('is_default', true)
+              .limit(1)
               .maybeSingle();
             
             if (paymentMethodError) {
