@@ -40,51 +40,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user already has a Stripe customer ID
-    const { data: userData, error: userDataError } = await supabase
-      .from('user_profiles')
-      .select('stripe_customer_id')
-      .eq('id', user.id)
-      .single();
-
-    if (userDataError && userDataError.code !== 'PGRST116') {
-      console.error('Error fetching user data:', userDataError);
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      );
-    }
-
-    let customerId = userData?.stripe_customer_id;
-
-    // If user doesn't have a Stripe customer ID, create one
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: {
-          user_id: user.id
-        }
-      });
-
-      customerId = customer.id;
-
-      // Save the customer ID to the user's profile
-      const { error: updateError } = await supabase
-        .from('user_profiles')
-        .upsert({
-          id: user.id,
-          stripe_customer_id: customerId,
-          updated_at: new Date().toISOString()
-        });
-
-      if (updateError) {
-        console.error('Error updating user profile:', updateError);
-        return NextResponse.json(
-          { error: 'Failed to update user profile' },
-          { status: 500 }
-        );
-      }
-    }
+    // We don't need to check for a Stripe customer ID in the database
+    // Instead, we'll just create a checkout session with the user's ID in the metadata
 
     // Get the price ID based on the package selected
     let priceId: string;
@@ -113,21 +70,20 @@ export async function POST(request: Request) {
     // Create a Stripe Checkout session for purchasing credits
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      mode: 'payment',
-      customer: customerId,
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
+      mode: 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings?purchase_success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
       metadata: {
         user_id: user.id,
         package_id: packageId,
         credits: creditsAmount.toString(),
-      },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?purchase_success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
+      }
     });
 
     // Return the checkout URL
