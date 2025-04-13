@@ -45,7 +45,7 @@ export function ReportsCard({
             {reports.map((report, index) => (
               <div key={report.id} className="space-y-2">
                 {/* Date */}
-                <div className="text-gray-600 text-xs sm:text-sm">
+                <div className="text-[#645b4b] text-xs sm:text-xs">
                   {new Date(report.created_at).toLocaleDateString()} at{" "}
                   {new Date(report.created_at).toLocaleTimeString([], {
                     hour: "2-digit",
@@ -56,8 +56,8 @@ export function ReportsCard({
                 {/* Report Type and Download Button */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center text-primary">
-                    <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
-                    <span className="font-medium text-sm sm:text-base">
+                    <FileText className="h-4 w-4 sm:h-4 sm:w-4 mr-1 sm:mr-1" />
+                    <span className="font-medium text-sm sm:text-sm">
                       {report.report_type === '30-day' ? '30 days Forecast' : report.report_type}
                     </span>
                   </div>
@@ -66,24 +66,24 @@ export function ReportsCard({
                     onClick={() => onDownload(report.file_name)}
                     className="text-primary hover:text-primary/80 flex items-center"
                   >
-                    <Download className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Download className="h-4 w-4 sm:h-4 sm:w-4" />
                   </button>
                 </div>
                 
                 {/* Divider */}
                 {index < reports.length - 1 && (
-                  <div className="border-t border-gray-200 my-2"></div>
+                  <div className="border-t border-white/70 my-2"></div>
                 )}
               </div>
             ))}
             
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-between items-center mt-4">
+              <div className="flex justify-between items-center mt-1">
                 <button
                   onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
                   disabled={currentPage === 1}
-                  className="text-gray-500 disabled:opacity-50"
+                  className="text-[#645b4b] disabled:opacity-50"
                 >
                   ◀
                 </button>
@@ -98,7 +98,7 @@ export function ReportsCard({
                 <button
                   onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="text-gray-500 disabled:opacity-50"
+                  className="text-[#645b4b] disabled:opacity-50"
                 >
                   ▶
                 </button>
@@ -108,7 +108,7 @@ export function ReportsCard({
         ) : (
           <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
             <FileText className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mb-2" />
-            <p className="text-gray-500 text-sm sm:text-base">No reports available yet.</p>
+            <p className="text-[#645b4b] text-sm sm:text-base">No reports available yet.</p>
           </div>
         )}
       </div>

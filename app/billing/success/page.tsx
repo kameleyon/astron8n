@@ -53,7 +53,7 @@ function BillingSuccessContent() {
             <>
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Activating Your Subscription</h1>
-              <p className="text-gray-600">Please wait while we set up your subscription...</p>
+              <p className="text-[#645b4b]">Please wait while we set up your subscription...</p>
             </>
           ) : error ? (
             <>
@@ -61,7 +61,7 @@ function BillingSuccessContent() {
                 <FileText className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Oops!</h1>
-              <p className="text-gray-600">{error}</p>
+              <p className="text-[#645b4b]">{error}</p>
             </>
           ) : (
             <>
@@ -69,7 +69,7 @@ function BillingSuccessContent() {
                 <CheckCircle className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Subscription Activated!</h1>
-              <p className="text-gray-600 mb-4">Your subscription has been successfully activated. You now have access to 17,000 credits per month, after your 3 days trial.</p>
+              <p className="text-[#645b4b] mb-4">Your subscription has been successfully activated. You now have access to 17,000 credits per month, after your 3 days trial.</p>
               <button
                 onClick={() => router.push('/dashboard')}
                 className="w-full py-3 px-6 bg-primary text-white rounded-xl hover:bg-opacity-90 transition-all duration-300"
@@ -93,7 +93,7 @@ export default function BillingSuccessPage() {
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Loading...</h1>
-              <p className="text-gray-600">Please wait while we check your subscription status...</p>
+              <p className="text-[#645b4b]">Please wait while we check your subscription status...</p>
             </div>
           </div>
         </div>

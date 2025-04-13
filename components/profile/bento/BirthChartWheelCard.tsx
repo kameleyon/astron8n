@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { FlipCard } from "./FlipCard";
 import { BentoGridItem } from "./BentoGrid";
 import { BirthChartData } from "@/lib/types/birth-chart";
-import { BirthChartWheel } from "@/components/BirthChartWheel";
 import { Compass, Sun, Moon, Asterisk } from "lucide-react";
 
 
@@ -21,19 +21,19 @@ export function BirthChartWheelCard({ data, isLoading = false, className }: Birt
     const ascendant = data.ascendant;
     
     return (
-      <div className="space-y-3 text-sm">
+      <div className="space-y-3 text-xl mt-8 md:mt-0">
         <div>
          
-          <p className="font-regular text-xl text-primary"><Sun  className="h-9 w-9 sm:h-10 sm:w-10 md:h-10 md:w-10 text-white font-light mb-1 sm:mb-2" />Sun in {sunSign?.sign}</p>
-          <p className="text-gray-600">{sunSign?.formatted}</p>
+          <p className="font-regular text-2xl md:text-xl text-primary"><Sun  className="h-12 w-12 sm:h-10 sm:w-10 md:h-10 md:w-10 text-white font-light mb-1 sm:mb-2" />Sun in {sunSign?.sign}</p>
+          <p className="text-[#645b4b]">{sunSign?.formatted}</p>
         </div>
         <div>
-        <p className="font-regular text-xl text-primary"><Moon  className="h-9 w-9 sm:h-10 sm:w-10 md:h-10 md:w-10 text-white font-light mb-1 sm:mb-2" />Moon in {moonSign?.sign}</p>
-          <p className="text-gray-600">{moonSign?.formatted}</p>
+        <p className="font-regular text-2xl md:text-xl text-primary"><Moon  className="h-12 w-12 sm:h-10 sm:w-10 md:h-10 md:w-10 text-white font-light mb-1 sm:mb-2" />Moon in {moonSign?.sign}</p>
+          <p className="text-[#645b4b]">{moonSign?.formatted}</p>
         </div>
         <div>
-        <p className="font-regular text-xl text-primary"><Asterisk  className="h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 text-white font-light mb-1 sm:mb-2" />Ascendant in {ascendant?.sign}</p>
-          <p className="text-gray-600">{ascendant?.formatted}</p>
+        <p className="font-regular text-2xl md:text-xl text-primary"><Asterisk  className="h-14 w-14 sm:h-10 sm:w-10 md:h-12 md:w-12 text-white font-light mb-1 sm:mb-2" />Ascendant in {ascendant?.sign}</p>
+          <p className="text-[#645b4b]">{ascendant?.formatted}</p>
         </div>
       </div>
     );
@@ -42,17 +42,23 @@ export function BirthChartWheelCard({ data, isLoading = false, className }: Birt
   const frontContent = (
     <div className="w-full h-full flex flex-col items-center justify-center">
       {data ? (
-        <div className="w-full h-full">
-          <BirthChartWheel data={data} />
+        <div className="w-full h-full flex overflow-hidden ">
+          <Image 
+            src="/astrology/zodiac.png" 
+            alt="Zodiac Wheel" 
+            fill
+            className="object-cover rounded-2xl"
+            priority
+          />
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-full">
           <Compass className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-primary mb-1 sm:mb-2" />
           <h3 className="text-base sm:text-lg font-semibold text-primary">Birth Chart</h3>
           {isLoading ? (
-            <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Loading chart data...</p>
+            <p className="text-xs sm:text-sm text-[#645b4b] mt-1 sm:mt-2">Loading chart data...</p>
           ) : (
-            <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Complete your birth details to view</p>
+            <p className="text-xs sm:text-sm text-[#645b4b] mt-1 sm:mt-2">Complete your birth details to view</p>
           )}
         </div>
       )}
@@ -79,7 +85,7 @@ export function BirthChartWheelCard({ data, isLoading = false, className }: Birt
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-sm text-gray-500">Chart data not available</p>
+          <p className="text-sm text-[#645b4b]">Chart data not available</p>
           <p className="text-xs text-gray-400 mt-1">Complete your birth details to view</p>
         </div>
       )}

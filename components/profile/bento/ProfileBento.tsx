@@ -55,7 +55,7 @@ export function ProfileBento({
   onDownloadReport,
 }: ProfileBentoProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const reportsPerPage = 6;
+  const reportsPerPage = 7; // Changed from 6 to 4 reports per page
   
   // Calculate pagination
   const totalPages = Math.ceil((reports?.length || 0) / reportsPerPage);
@@ -79,7 +79,7 @@ export function ProfileBento({
         <BirthChartWheelCard 
           data={birthChartData} 
           isLoading={isLoading} 
-          className="sm:col-span-1"
+          className="sm:col-span-1 h-[550px] sm:h-auto"
         />
         
         {/* Middle Row */}
@@ -87,7 +87,7 @@ export function ProfileBento({
         <HumanDesignCard 
           data={humanDesignData} 
           isLoading={isLoading} 
-          className="row-span-2 sm:row-span-2" // Make it taller
+          className="row-span-2 sm:row-span-2 h-[550px] sm:h-auto" // Make it taller
         />
         
         {/* Life Path Card - Middle Column */}

@@ -57,19 +57,19 @@ export function HousesSection({ houses, hideTitle = false }: HousesSectionProps)
               </div>
             </div>
             <div className="pl-4 space-y-1">
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-[#645b4b] dark:text-gray-400">
                 {getHouseTitle(house.number)}
               </div>
               <div className="text-sm text-gray-900 dark:text-white">
                 {house.sign} {house.degree}
               </div>
               {house.ruler && (
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-[#645b4b] dark:text-gray-400">
                   Ruled by {house.ruler}
                 </div>
               )}
               {house.containingPlanets && house.containingPlanets.length > 0 && (
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-[#645b4b] dark:text-gray-400">
                   Planets: {house.containingPlanets.join(", ")}
                 </div>
               )}
@@ -83,7 +83,7 @@ export function HousesSection({ houses, hideTitle = false }: HousesSectionProps)
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
             House Patterns
           </h3>
-          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+          <div className="space-y-2 text-sm text-[#645b4b] dark:text-gray-300">
             {/* Angular Houses (1, 4, 7, 10) */}
             <div>
               <span className="text-[#D15200] dark:text-[#FFA600] font-medium">Angular Houses:</span>

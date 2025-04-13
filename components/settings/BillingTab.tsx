@@ -103,8 +103,8 @@ export function BillingTab(props: BillingTabProps) {
                   </div>
                 </div>
                 <div className="space-y-2 mb-6">
-                  <p className="text-center text-gray-600">5,000 tokens</p>
-                  <p className="text-sm text-center text-gray-500">Perfect for casual users</p>
+                  <p className="text-center text-[#645b4b]">5,000 tokens</p>
+                  <p className="text-sm text-center text-[#645b4b]">Perfect for casual users</p>
                 </div>
                 <button className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                   Purchase
@@ -122,8 +122,8 @@ export function BillingTab(props: BillingTabProps) {
                   </div>
                 </div>
                 <div className="space-y-2 mb-6">
-                  <p className="text-center text-gray-600">9,000 tokens</p>
-                  <p className="text-sm text-center text-gray-500">Best value for regular users</p>
+                  <p className="text-center text-[#645b4b]">9,000 tokens</p>
+                  <p className="text-sm text-center text-[#645b4b]">Best value for regular users</p>
                 </div>
                 <button className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                   Purchase
@@ -138,8 +138,8 @@ export function BillingTab(props: BillingTabProps) {
                   </div>
                 </div>
                 <div className="space-y-2 mb-6">
-                  <p className="text-center text-gray-600">17,000 tokens</p>
-                  <p className="text-sm text-center text-gray-500">Ideal for power users</p>
+                  <p className="text-center text-[#645b4b]">17,000 tokens</p>
+                  <p className="text-sm text-center text-[#645b4b]">Ideal for power users</p>
                 </div>
                 <button className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                   Purchase
@@ -153,10 +153,10 @@ export function BillingTab(props: BillingTabProps) {
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-gray-600 mb-1">
+                  <p className="text-[#645b4b] mb-1">
                     {billingInfo.is_trial ? 'Trial Plan' : 'Premium Plan'}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[#645b4b]">
                     {billingInfo.is_trial 
                       ? `Trial ends: ${new Date(billingInfo.trial_end_date!).toLocaleDateString()}`
                       : `Next payment: ${billingInfo.next_payment_date 
@@ -176,10 +176,10 @@ export function BillingTab(props: BillingTabProps) {
               {billingInfo.payment_method ? (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-[#645b4b]">
                       {billingInfo.payment_method.brand.charAt(0).toUpperCase() + billingInfo.payment_method.brand.slice(1)} •••• {billingInfo.payment_method.last4}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-[#645b4b]">
                       Expires {billingInfo.payment_method.exp_month}/{billingInfo.payment_method.exp_year}
                     </div>
                   </div>
@@ -260,12 +260,12 @@ export function BillingTab(props: BillingTabProps) {
                           {activity.type === 'token_purchase' ? 'Token Purchase' : 'Subscription Payment'}
                         </p>
                         {activity.tokens && (
-                          <p className="text-sm text-gray-500">{activity.tokens.toLocaleString()} tokens</p>
+                          <p className="text-sm text-[#645b4b]">{activity.tokens.toLocaleString()} tokens</p>
                         )}
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-gray-900">${activity.amount.toFixed(2)}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-[#645b4b]">
                           {new Date(activity.date).toLocaleDateString()}
                         </p>
                       </div>
@@ -283,7 +283,7 @@ export function BillingTab(props: BillingTabProps) {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
+              <div className="bg-gray-50 rounded-lg p-4 text-center text-[#645b4b]">
                 No billing activities to display
               </div>
             )}

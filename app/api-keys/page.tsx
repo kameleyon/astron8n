@@ -362,7 +362,7 @@ export default function ApiKeysPage() {
                 <h1 className="text-2xl font-normal font-league-spartan text-gray-900">AstroGenie API</h1>
               </div>
 
-              <p className="text-gray-600 mb-8">
+              <p className="text-[#645b4b] mb-8">
                 Integrate accurate astrological calculations into your applications with our powerful API. 
                 Generate birth charts, analyze planetary positions, and access astrological insights programmatically.
               </p>
@@ -402,7 +402,7 @@ export default function ApiKeysPage() {
                         />
                         <label
                           htmlFor="terms"
-                          className="text-sm text-gray-600"
+                          className="text-sm text-[#645b4b]"
                         >
                           I agree to the <Link href="/terms" className="text-primary hover:underline">terms and conditions</Link> and understand the API usage limits
                         </label>
@@ -421,7 +421,7 @@ export default function ApiKeysPage() {
                   {loadingKeys ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <p className="mt-2 text-gray-600">Loading your API keys...</p>
+                      <p className="mt-2 text-[#645b4b]">Loading your API keys...</p>
                     </div>
                   ) : apiKeys.length > 0 ? (
                     <div className="space-y-4">
@@ -442,8 +442,8 @@ export default function ApiKeysPage() {
                                   <span className="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">Disabled</span>
                                 )}
                               </div>
-                              <code className="text-sm font-mono text-gray-600">{apiKey.api_key}</code>
-                              <div className="text-xs text-gray-500 mt-1">
+                              <code className="text-sm font-mono text-[#645b4b]">{apiKey.api_key}</code>
+                              <div className="text-xs text-[#645b4b] mt-1">
                                 Created: {new Date(apiKey.created_at).toLocaleDateString()}
                                 {apiKey.last_used && ` • Last used: ${new Date(apiKey.last_used).toLocaleDateString()}`}
                                 {` • Usage: ${apiKey.usage_count}/${apiKey.rate_limit}`}
@@ -482,7 +482,7 @@ export default function ApiKeysPage() {
                     <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
                       <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                       <h3 className="text-lg font-medium text-[#645b4b] mb-1">No API Keys Found</h3>
-                      <p className="text-gray-600 mb-4">You haven't generated any API keys yet.</p>
+                      <p className="text-[#645b4b] mb-4">You haven't generated any API keys yet.</p>
                       <Button
                         onClick={() => document.getElementById('keyName')?.focus()}
                         variant="outline"
@@ -514,7 +514,7 @@ export default function ApiKeysPage() {
                         
                         <div className="mb-4">
                           <h3 className="text-lg font-normal font-league-spartan">{plan.name}</h3>
-                          <p className="text-sm text-gray-600">{plan.description}</p>
+                          <p className="text-sm text-[#645b4b]">{plan.description}</p>
                         </div>
                         
                         <div className="mb-6">
@@ -568,7 +568,7 @@ export default function ApiKeysPage() {
                   <div className="space-y-8">
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                       <h3 className="text-lg font-normal font-league-spartan mb-3">Authentication</h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-[#645b4b] mb-4">
                         All API requests require authentication using your API key in the Authorization header.
                       </p>
                       <pre className="bg-gray-100 p-4 rounded overflow-x-auto text-sm">
@@ -582,7 +582,7 @@ const headers = {
                     
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                       <h3 className="text-lg font-normal font-league-spartan mb-3">Birth Chart Endpoint</h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-[#645b4b] mb-4">
                         Generate a complete birth chart with planetary positions, houses, aspects, and patterns.
                       </p>
                       <div className="mb-4">
@@ -624,15 +624,15 @@ const headers = {
                     
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                       <h3 className="text-lg font-normal font-league-spartan mb-3">Rate Limits</h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-[#645b4b] mb-4">
                         API requests are rate-limited based on your subscription plan. The rate limits reset monthly.
                       </p>
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead>
                           <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Limit</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Overage Charges</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#645b4b] uppercase tracking-wider">Plan</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#645b4b] uppercase tracking-wider">Monthly Limit</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#645b4b] uppercase tracking-wider">Overage Charges</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -657,7 +657,7 @@ const headers = {
                     
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                       <h3 className="text-lg font-normal font-league-spartan mb-3">Response Format</h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-[#645b4b] mb-4">
                         The API returns a comprehensive birth chart with planetary positions, houses, aspects, and patterns.
                       </p>
                       <pre className="bg-gray-100 p-4 rounded overflow-x-auto text-sm">
@@ -715,7 +715,7 @@ const headers = {
                     
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                       <h3 className="text-lg font-normal font-league-spartan mb-3">Error Handling</h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-[#645b4b] mb-4">
                         The API returns standard HTTP status codes and detailed error messages.
                       </p>
                       <pre className="bg-gray-100 p-4 rounded overflow-x-auto text-sm">
@@ -750,7 +750,7 @@ const headers = {
                     
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                       <h3 className="text-lg font-normal font-league-spartan mb-3">SDK & Code Examples</h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-[#645b4b] mb-4">
                         We provide client libraries for popular programming languages to make integration easier.
                       </p>
                       

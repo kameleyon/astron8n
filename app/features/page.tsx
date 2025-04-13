@@ -150,10 +150,10 @@ export default function FeaturesPage() {
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                <p className="text-gray-600 mb-4">{feature.description}</p>
+                <p className="text-[#645b4b] mb-4">{feature.description}</p>
                 <ul className="space-y-2 mb-4">
                   {feature.features.map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                    <li key={i} className="flex items-center gap-2 text-sm text-[#645b4b]">
                       <Check className="w-4 h-4 text-primary flex-shrink-0" />
                       <span>{item}</span>
                     </li>
@@ -190,11 +190,11 @@ export default function FeaturesPage() {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="text-2xl font-bold text-primary">Monthly Plan</h3>
-                    <p className="text-gray-600">Perfect for regular insights</p>
+                    <p className="text-[#645b4b]">Perfect for regular insights</p>
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-bold text-primary">$7.99</div>
-                    <div className="text-sm text-gray-600">per month</div>
+                    <div className="text-sm text-[#645b4b]">per month</div>
                   </div>
                 </div>
 
@@ -249,11 +249,11 @@ export default function FeaturesPage() {
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-primary">{pkg.title}</h3>
-                        <p className="text-gray-600">{pkg.description}</p>
+                        <p className="text-[#645b4b]">{pkg.description}</p>
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-primary">{pkg.price}</div>
-                        <div className="text-sm text-gray-600">{pkg.tokens} tokens</div>
+                        <div className="text-sm text-[#645b4b]">{pkg.tokens} tokens</div>
                       </div>
                     </div>
                    

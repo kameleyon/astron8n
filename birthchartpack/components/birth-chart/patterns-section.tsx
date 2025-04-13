@@ -64,7 +64,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
       case 'water':
         return 'text-blue-500 dark:text-blue-400'
       default:
-        return 'text-gray-500 dark:text-gray-400'
+        return 'text-[#645b4b] dark:text-gray-400'
     }
   }
 
@@ -104,7 +104,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
               </span>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-[#645b4b] dark:text-gray-300">
               {pattern.description}
             </p>
 
@@ -121,7 +121,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
                     </span>
                     <span className="text-gray-400">in</span>
                     <span>{planet.sign}</span>
-                    <span className="text-gray-500">{planet.degree}</span>
+                    <span className="text-[#645b4b]">{planet.degree}</span>
                     {planet.house && (
                       <>
                         <span className="text-gray-400">House</span>
@@ -152,7 +152,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
                   {Object.entries(pattern.qualities).map(([quality, count]) => count > 0 && (
                     <span
                       key={quality}
-                      className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-600 dark:text-gray-300"
+                      className="text-xs px-2 py-1 rounded-full bg-white/10 text-[#645b4b] dark:text-gray-300"
                     >
                       {quality.charAt(0).toUpperCase() + quality.slice(1)}: {count}
                     </span>
@@ -162,7 +162,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
             </div>
 
             {pattern.interpretation && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+              <p className="text-sm text-[#645b4b] dark:text-gray-400 italic">
                 {pattern.interpretation}
               </p>
             )}
@@ -178,7 +178,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
         <div className="grid grid-cols-2 gap-4 text-xs">
           <div>
             <h4 className="font-medium text-[#D15200] dark:text-[#FFA600]">Major Patterns</h4>
-            <ul className="mt-1 space-y-1 text-gray-600 dark:text-gray-300">
+            <ul className="mt-1 space-y-1 text-[#645b4b] dark:text-gray-300">
               <li>• Grand Trine</li>
               <li>• Grand Cross</li>
               <li>• T-Square</li>
@@ -187,7 +187,7 @@ export function PatternsSection({ patterns }: PatternsSectionProps) {
           </div>
           <div>
             <h4 className="font-medium text-[#D15200] dark:text-[#FFA600]">Minor Patterns</h4>
-            <ul className="mt-1 space-y-1 text-gray-600 dark:text-gray-300">
+            <ul className="mt-1 space-y-1 text-[#645b4b] dark:text-gray-300">
               <li>• Stellium</li>
               <li>• Mystic Rectangle</li>
               <li>• Kite</li>

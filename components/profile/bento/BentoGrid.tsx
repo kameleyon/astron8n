@@ -53,7 +53,7 @@ export function BentoGridItem({
             <div>
               {icon && <div className="mb-2">{icon}</div>}
               {title && <h3 className="font-semibold text-primary mb-1 tracking-tight">{title}</h3>}
-              {description && <p className="text-sm text-gray-600">{description}</p>}
+              {description && <p className="text-sm text-[#645b4b]">{description}</p>}
             </div>
           </div>
         )}

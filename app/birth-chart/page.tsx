@@ -13,7 +13,7 @@ function BirthChartLoading() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Loading Birth Chart
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#645b4b]">
             Please wait while we prepare your chart...
           </p>
         </div>

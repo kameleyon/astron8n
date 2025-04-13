@@ -68,7 +68,7 @@ export default function ProfileCard({ profile, email }: ProfileCardProps) {
                   <PenSquare size={16} />
                 </button>
               </div>
-              <p className="text-sm text-gray-500">{email}</p>
+              <p className="text-sm text-[#645b4b]">{email}</p>
             </div>
           </div>
         </div>
@@ -95,17 +95,17 @@ export default function ProfileCard({ profile, email }: ProfileCardProps) {
           isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}>
           <div>
-            <label className="block text-sm font-medium text-gray-600">Birth Date</label>
+            <label className="block text-sm font-medium text-[#645b4b]">Birth Date</label>
             <p className="mt-1 text-gray-900">{formatDate(profile.birth_date)}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600">Birth Time</label>
+            <label className="block text-sm font-medium text-[#645b4b]">Birth Time</label>
             <p className="mt-1 text-gray-900">
               {profile.has_unknown_birth_time ? "Not provided" : formatTime(profile.birth_time)}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600">Birth Place</label>
+            <label className="block text-sm font-medium text-[#645b4b]">Birth Place</label>
             <p className="mt-1 text-gray-900">{profile.birth_location}</p>
           </div>
         </div>
@@ -116,17 +116,17 @@ export default function ProfileCard({ profile, email }: ProfileCardProps) {
         <h3 className="text-lg font-semibold text-primary mb-4">Birth Information</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600">Birth Date</label>
+            <label className="block text-sm font-medium text-[#645b4b]">Birth Date</label>
             <p className="mt-1 text-gray-900">{formatDate(profile.birth_date)}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600">Birth Time</label>
+            <label className="block text-sm font-medium text-[#645b4b]">Birth Time</label>
             <p className="mt-1 text-gray-900">
               {profile.has_unknown_birth_time ? "Not provided" : formatTime(profile.birth_time)}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600">Birth Place</label>
+            <label className="block text-sm font-medium text-[#645b4b]">Birth Place</label>
             <p className="mt-1 text-gray-900">{profile.birth_location}</p>
           </div>
         </div>

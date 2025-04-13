@@ -74,7 +74,7 @@ export default function SubscriptionModal({
             // Otherwise show error - they must complete the subscription
             setError("Please complete the subscription process to continue.");
           }}
-          className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b] transition-colors"
+          className="absolute top-4 right-4 text-[#645b4b] hover:text-[#645b4b] transition-colors"
         >
           <X size={24} />
         </button>
@@ -83,7 +83,7 @@ export default function SubscriptionModal({
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Start Your Journey
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#645b4b]">
             Begin with a 3-day free trial
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function SubscriptionModal({
           </ul>
 
           <div className="text-center mb-6">
-            <div className="text-sm text-gray-600 mb-1">After trial ends</div>
+            <div className="text-sm text-[#645b4b] mb-1">After trial ends</div>
             <div className="text-2xl font-bold text-gray-900">$7.99/month</div>
           </div>
 
@@ -135,7 +135,7 @@ export default function SubscriptionModal({
             {loading ? "Starting trial..." : "Start Free Trial"}
           </button>
 
-          <p className="text-xs text-gray-500 text-center mt-4">
+          <p className="text-xs text-[#645b4b] text-center mt-4">
             Cancel anytime during your trial. No commitment required.
           </p>
         </div>

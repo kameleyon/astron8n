@@ -27,7 +27,7 @@ export default function AboutPage() {
           {/* About Section */}
           <section className="bg-white/70 border border-white shadow-md shadow-black/40 backdrop-blur-sm rounded-3xl p-6 ">
             <h1 className="text-3xl font-bold text-primary mb-6">About AstroGenie</h1>
-            <p className="text-gray-600 leading-relaxed mb-6">
+            <p className="text-[#645b4b] leading-relaxed mb-6">
               AstroGenie is a proud women-owned venture revolutionizing the world of astrology through cutting-edge AI technology. Our mission is to make accurate astrological insights accessible to everyone, combining ancient wisdom with modern innovation to deliver precise predictions and personalized guidance at unprecedented speed. As pioneers in AI-powered astrology, we're committed to breaking down barriers and making professional-grade astrological insights available to historically underserved communities, with a special focus on supporting and empowering Black-owned businesses and women entrepreneurs.
             </p>
             <div className="grid md:grid-cols-3 gap-6 mt-8">
@@ -36,7 +36,7 @@ export default function AboutPage() {
                   <Users className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-gray-900">Inclusive Platform</h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-[#645b4b] text-sm">
                   Built with diversity and inclusion at its core, ensuring accurate predictions for all communities.
                 </p>
               </div>
@@ -45,7 +45,7 @@ export default function AboutPage() {
                   <Zap className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-gray-900">Lightning Fast</h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-[#645b4b] text-sm">
                   Lightning-fast calculations and instant insights powered by advanced AI technology.
                 </p>
               </div>
@@ -54,7 +54,7 @@ export default function AboutPage() {
                   <Globe className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-gray-900">Cultural Wisdom</h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-[#645b4b] text-sm">
                   Culturally-informed guidance combining multiple astrological traditions.
                 </p>
               </div>
@@ -65,7 +65,7 @@ export default function AboutPage() {
           <LegalAccordion title="Terms of Service">
             <div className="space-y-6">
               <div className="mb-6">
-                <p className="text-sm text-gray-500 mb-4">Effective Date: August 25, 2024</p>
+                <p className="text-sm text-[#645b4b] mb-4">Effective Date: August 25, 2024</p>
               </div>
 
               <div>
@@ -127,7 +127,7 @@ export default function AboutPage() {
           <LegalAccordion title="Privacy Policy">
             <div className="space-y-6">
               <div className="mb-6">
-                <p className="text-sm text-gray-500 mb-4">Effective Date: August 25, 2024</p>
+                <p className="text-sm text-[#645b4b] mb-4">Effective Date: August 25, 2024</p>
               </div>
 
               <div>

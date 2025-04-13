@@ -20,24 +20,24 @@ export function BirthChartDetailsCard({ data, isLoading = false, className }: Bi
       
       <div className="space-y-2">
         
-        <h3 className="text-base sm:text-lg font-semibold text-primary">Planets</h3>
+        <h3 className="text-xl sm:text-xl font-bold text-[#645b4b]">Planets</h3>
         <div className="space-y-1">
           {data.planets.map((planet) => (
             <div key={planet.name} className="flex justify-between text-sm">
-              <span className="text-primary font-medium">{planet.name}</span>
-              <span className="text-[#645b4b]">
+              <span className="text-[#cd6301] font-medium mb-2">{planet.name}</span>
+              <span className="text-[#645b4b]/90">
                 {planet.sign} {planet.formatted}
               </span>
             </div>
           ))}
           <div className="flex justify-between text-sm">
-            <span className="text-primary font-medium">ASC</span>
+            <span className="text-[#cd6301] font-medium mb-2">ASC</span>
             <span className="text-[#645b4b]">
               {data.ascendant?.sign} {data.ascendant?.formatted}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-primary font-medium">MC</span>
+            <span className="text-[#cd6301] font-medium mb-2">MC</span>
             <span className="text-[#645b4b]">
               {data.midheaven?.sign} {data.midheaven?.formatted}
             </span>
@@ -73,7 +73,7 @@ export function BirthChartDetailsCard({ data, isLoading = false, className }: Bi
 
     return (
       <div className="space-y-2">
-        <h3 className="text-base sm:text-lg font-semibold text-primary">Houses</h3>
+        <h3 className="text-xl sm:text-xl font-bold text-[#645b4b]">Houses</h3>
         <div className="space-y-1">
           {standardHouses.map(([house, houseData]) => {
             const houseNumber = parseInt(house.split('_')[1]);
@@ -82,15 +82,15 @@ export function BirthChartDetailsCard({ data, isLoading = false, className }: Bi
             return (
               <div key={house} className="text-sm">
                 <div className="flex justify-between">
-                  <span className="text-primary font-medium">
+                  <span className="text-[#cd6301] font-medium ">
                     {houseNumber}{houseNumber === 1 ? 'st' : houseNumber === 2 ? 'nd' : houseNumber === 3 ? 'rd' : 'th'} House
                   </span>
-                  <span className="text-[#645b4b]">
+                  <span className="text-[#645b4b] text-xs">
                     {houseData.sign} {houseData.formatted}
                   </span>
                 </div>
                 {planetsInHouse.length > 0 && (
-                  <div className="mt-0.5 text-xs text-gray-600">
+                  <div className="text-[11px] text-right text-[#763c00]/80 mt-0 py-0 mb-2">
                     {planetsInHouse.join(', ')}
                   </div>
                 )}
@@ -127,29 +127,27 @@ export function BirthChartDetailsCard({ data, isLoading = false, className }: Bi
 
     return (
       <div className="space-y-2">
-        <h3 className="text-base sm:text-lg font-semibold text-primary">Aspects</h3>
+        <h3 className="text-xl sm:text-xl font-bold text-[#645b4b]">Aspects</h3>
         <div className="space-y-1">
           {allAspects.map((aspect, i) => (
             <div key={i} className="flex justify-between text-sm">
-              <div className="text-primary font-medium">
-                <span className="mr-1">{aspectSymbols[aspect.aspect] || aspect.aspect}</span>
+              <div className="text-[#645b4b] font-medium mb-1">
+                <span className="mr-1 text-[#cd6301] text-md font-semibold">{aspectSymbols[aspect.aspect] || aspect.aspect}</span>
                 {aspect.planet1} {aspect.planet2}
               </div>
-              <div className="text-[#645b4b]">
-                ({natureAbbr[aspect.nature] || aspect.nature.charAt(0)})
-              </div>
+              
             </div>
           ))}
         </div>
         
-        {/* Legend */}
+        {/* Legend
         <div className="mt-2 pt-2 border-t border-primary/10 text-xs text-[#645b4b]">
           <div className="flex justify-between">
             <div>H: Harmonious</div>
             <div>C: Challenging</div>
             <div>N: Neutral</div>
           </div>
-        </div>
+        </div> */}
       </div>
     );
   };
@@ -173,21 +171,41 @@ export function BirthChartDetailsCard({ data, isLoading = false, className }: Bi
       
       <div className="p-4 bg-accent/70 rounded-b-3xl h-full">
         {data ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-            {renderPlanets(data)}
-            {renderHouses(data)}
-            {renderAspects(data)}
+          <div className="flex flex-col md:flex-row">
+            <div className="flex-1 md:pr-4">
+              {renderPlanets(data)}
+            </div>
+            <div className="hidden md:block w-px bg-white/80 mx-1"></div>
+            <div className="flex-1 md:px-2">
+              {renderHouses(data)}
+            </div>
+            <div className="hidden md:block w-px bg-white/80 mx-2"></div>
+            <div className="flex-1 md:pl-2">
+              {renderAspects(data)}
+            </div>
           </div>
         ) : isLoading ? (
-          <div className="animate-pulse grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 bg-primary/20 rounded w-1/2"></div>
-                {[...Array(6)].map((_, j) => (
-                  <div key={j} className="h-3 bg-primary/10 rounded w-full"></div>
-                ))}
-              </div>
-            ))}
+          <div className="animate-pulse flex flex-col md:flex-row">
+            <div className="flex-1 md:pr-4 space-y-2">
+              <div className="h-4 bg-primary/20 rounded w-1/2"></div>
+              {[...Array(6)].map((_, j) => (
+                <div key={j} className="h-3 bg-primary/10 rounded w-full"></div>
+              ))}
+            </div>
+            <div className="hidden md:block w-px bg-white/80 mx-2"></div>
+            <div className="flex-1 md:px-4 space-y-2">
+              <div className="h-4 bg-primary/20 rounded w-1/2"></div>
+              {[...Array(6)].map((_, j) => (
+                <div key={j} className="h-3 bg-primary/10 rounded w-full"></div>
+              ))}
+            </div>
+            <div className="hidden md:block w-px bg-white/80 mx-2"></div>
+            <div className="flex-1 md:pl-8 space-y-2">
+              <div className="h-4 bg-primary/20 rounded w-1/2"></div>
+              {[...Array(6)].map((_, j) => (
+                <div key={j} className="h-3 bg-primary/10 rounded w-full"></div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64 text-[#645b4b]">

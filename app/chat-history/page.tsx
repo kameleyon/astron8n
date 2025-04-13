@@ -174,9 +174,9 @@ export default function ChatHistoryPage() {
 
             <div className="space-y-4">
               {loading ? (
-                <div className="text-center text-gray-500">Loading...</div>
+                <div className="text-center text-[#645b4b]">Loading...</div>
               ) : paginatedSessions.length === 0 ? (
-                <div className="text-center text-gray-500">No chat sessions found</div>
+                <div className="text-center text-[#645b4b]">No chat sessions found</div>
               ) : (
                 <>
                   {paginatedSessions.map((session) => (
@@ -187,12 +187,12 @@ export default function ChatHistoryPage() {
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <div className="flex items-center gap-2 text-sm text-[#645b4b]">
                             <MessageSquare className="h-4 w-4 flex-shrink-0" />
                             <span>{session.message_count}</span>
                           </div>
                           <p className="text-gray-900 truncate flex-1">{session.first_message}</p>
-                          <span className="text-xs text-gray-500 flex-shrink-0">
+                          <span className="text-xs text-[#645b4b] flex-shrink-0">
                             {format(new Date(session.created_at), 'MMM d')}
                           </span>
                         </div>

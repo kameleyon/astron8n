@@ -69,7 +69,7 @@ function AuthPageInner() {
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
         <button 
           onClick={() => router.push("/")}
-          className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b]"
+          className="absolute top-4 right-4 text-[#645b4b] hover:text-[#645b4b]"
         >
           ×
         </button>
@@ -83,7 +83,7 @@ function AuthPageInner() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {isLogin ? "Secure Login" : "Create Secure Account"}
           </h2>
-          <p className="text-sm text-gray-600"></p>
+          <p className="text-sm text-[#645b4b]"></p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -114,7 +114,7 @@ function AuthPageInner() {
               placeholder="Enter your password"
             />
             {!isLogin && (
-              <div className="mt-2 text-xs text-gray-600">
+              <div className="mt-2 text-xs text-[#645b4b]">
                 <p>Password requirements:</p>
                 <ul className="list-disc pl-5">
                   <li>Minimum 12 characters</li>
@@ -154,7 +154,7 @@ function AuthPageInner() {
           </button>
         </div>
 
-        <div className="mt-4 text-center text-xs text-gray-500"></div>
+        <div className="mt-4 text-center text-xs text-[#645b4b]"></div>
       </div>
     </div>
   );

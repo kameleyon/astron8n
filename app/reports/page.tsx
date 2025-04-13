@@ -286,7 +286,7 @@ function ReportCard({ report, isActive }: ReportCardProps) {
           </div>
 
           <div className="h-[280px] md:h-[200px] overflow-y-auto pr-2 scrollbar-thin">
-            <p className="text-gray-600 text-sm md:text-base">
+            <p className="text-[#645b4b] text-sm md:text-base">
               {report.description}
             </p>
             {error && (
@@ -301,7 +301,7 @@ function ReportCard({ report, isActive }: ReportCardProps) {
           className={`w-full mt-4 py-2 md:py-3 px-3 md:px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 ${
             report.available
               ? `bg-primary text-white hover:scale-105 transform ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'}`
-              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              : 'bg-gray-300 text-[#645b4b] cursor-not-allowed'
           }`}
         >
           {loading ? (

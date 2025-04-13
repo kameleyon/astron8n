@@ -239,7 +239,7 @@ export default function BirthChartModal({
                   }
                   className="mr-2"
                 />
-                <label htmlFor="unknownTime" className="text-sm text-gray-600">
+                <label htmlFor="unknownTime" className="text-sm text-[#645b4b]">
                   Unknown
                 </label>
               </div>

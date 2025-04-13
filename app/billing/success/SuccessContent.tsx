@@ -119,7 +119,7 @@ export default function SuccessContent() {
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Setting Up Your Subscription
             </h2>
-            <p className="text-gray-600">
+            <p className="text-[#645b4b]">
               Please wait while we activate your account...
             </p>
           </div>
@@ -143,7 +143,7 @@ export default function SuccessContent() {
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Subscription Activated!
             </h2>
-            <p className="text-gray-600">
+            <p className="text-[#645b4b]">
               Your 3-day trial has started. Enjoy full access to all features!
             </p>
           </div>

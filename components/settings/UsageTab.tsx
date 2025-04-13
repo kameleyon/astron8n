@@ -29,7 +29,7 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
             </h2>
             <div className="bg-gray-50 rounded-lg p-6">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">Available Credits</span>
+                <span className="text-[#645b4b]">Available Credits</span>
                 <span className="text-2xl font-bold text-primary">
                               {creditInfo.total_credits - creditInfo.used_credits}
                 </span>
@@ -37,7 +37,7 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
               <ProgressBar 
                             value={(creditInfo.used_credits / creditInfo.total_credits) * 100} 
               />
-              <div className="flex justify-between text-sm text-gray-500 mt-1">
+              <div className="flex justify-between text-sm text-[#645b4b] mt-1">
                             <span>{creditInfo.used_credits} used</span>
                             <span>{creditInfo.total_credits} total</span>
               </div>
@@ -54,7 +54,7 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
                   <p className="font-medium text-gray-900">
                                 {creditInfo.is_subscriber ? 'Premium Plan' : 'Trial Plan'}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[#645b4b]">
                                 {creditInfo.is_subscriber 
                       ? '40,000 credits per month' 
                       : '10,000 credits for 3 days'}
@@ -82,7 +82,7 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
                       <p className="font-medium text-gray-900">
                         {credit.amount} credits
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-[#645b4b]">
                                     Expires on {new Date(credit.expiry_date).toLocaleDateString()}
                       </p>
                     </div>
@@ -93,7 +93,7 @@ export function UsageTab({ loading, creditInfo }: UsageTabProps) {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
+              <div className="bg-gray-50 rounded-lg p-4 text-center text-[#645b4b]">
                 No rollover credits available
               </div>
             )}

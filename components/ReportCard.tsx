@@ -97,7 +97,7 @@ export default function ReportCard({ report, isActive }: ReportCardProps) {
         </div>
 
         {/* Description */}
-        <p className="text-gray-600 mb-6">
+        <p className="text-[#645b4b] mb-6">
           {report.description}
         </p>
 

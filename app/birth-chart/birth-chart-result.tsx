@@ -186,7 +186,7 @@ Format as a single, flowing paragraph that captures ${data.name}'s unique essenc
   const secondColumnPlanets = wheelPlanets.slice(midPoint)
 
   return (
-    <div className="min-h-screen bg-background text-gray-600 mb-8 dark:text-white/80">
+    <div className="min-h-screen bg-background text-[#645b4b] mb-8 dark:text-white/80">
       <div className="max-w-7xl mx-auto px-4 py-4 mt-14">
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

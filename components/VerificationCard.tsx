@@ -26,7 +26,7 @@ export default function VerificationCard() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Email Verified Successfully!
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#645b4b]">
             Before we continue, please read and agree to our terms.
           </p>
         </div>

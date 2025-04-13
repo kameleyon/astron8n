@@ -28,12 +28,12 @@ export default function AcknowledgmentModal({ isOpen, onClose, onAccept }: Ackno
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Welcome to AstroGenie 🌟
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-[#645b4b] mb-6">
             Please accept our terms and complete your birth chart profile to get started.
           </p>
           
           <div className="space-y-6">
-            <div className="text-left text-sm text-gray-600 mb-4 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto">
+            <div className="text-left text-sm text-[#645b4b] mb-4 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto">
             <p className="mb-4">By using AstroGenie, you acknowledge and agree that:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>The astrological insights provided are for entertainment and self-reflection purposes only</li>
@@ -52,7 +52,7 @@ export default function AcknowledgmentModal({ isOpen, onClose, onAccept }: Ackno
               onChange={(e) => setAccepted(e.target.checked)}
               className="mr-2"
             />
-            <label htmlFor="accept" className="text-sm text-gray-600">
+            <label htmlFor="accept" className="text-sm text-[#645b4b]">
               I accept the terms of service
             </label>
           </div>

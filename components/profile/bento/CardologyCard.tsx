@@ -69,7 +69,7 @@ export function CardologyCard({ birthCard, isLoading = false, className }: Cardo
           <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
         </div>
       ) : (
-        <div className="text-gray-500">
+        <div className="text-[#645b4b]">
           <p>Birth Card not available</p>
           <p className="text-xs mt-1">Complete your birth date to view</p>
         </div>

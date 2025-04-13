@@ -30,7 +30,7 @@ export function SpecialFeaturesSection({ features }: SpecialFeaturesSectionProps
       case 'minor':
         return 'bg-blue-500/10 dark:bg-blue-500/20'
       default:
-        return 'bg-gray-500/10 dark:bg-gray-500/20'
+        return 'bg-[#645b4b]/10 dark:bg-[#645b4b]/20'
     }
   }
 
@@ -57,18 +57,18 @@ export function SpecialFeaturesSection({ features }: SpecialFeaturesSectionProps
                 {feature.title}
               </h3>
               {feature.significance && (
-                <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-600 dark:text-gray-300">
+                <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-[#645b4b] dark:text-gray-300">
                   {feature.significance.charAt(0).toUpperCase() + feature.significance.slice(1)}
                 </span>
               )}
             </div>
 
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm text-[#645b4b] dark:text-gray-300">
               {feature.description}
             </p>
 
             {feature.influence && (
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-2 text-xs text-[#645b4b] dark:text-gray-400">
                 Influence: {feature.influence}
               </p>
             )}
@@ -78,7 +78,7 @@ export function SpecialFeaturesSection({ features }: SpecialFeaturesSectionProps
                 {feature.relatedPlanets.map((planet) => (
                   <span
                     key={planet}
-                    className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-600 dark:text-gray-300"
+                    className="text-xs px-2 py-1 rounded-full bg-white/10 text-[#645b4b] dark:text-gray-300"
                   >
                     {planet}
                   </span>
@@ -89,17 +89,17 @@ export function SpecialFeaturesSection({ features }: SpecialFeaturesSectionProps
             {feature.details && (
               <div className="mt-2 space-y-1">
                 {feature.details.type && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[#645b4b] dark:text-gray-400">
                     Type: {feature.details.type}
                   </p>
                 )}
                 {feature.details.degree && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[#645b4b] dark:text-gray-400">
                     Degree: {feature.details.degree}
                   </p>
                 )}
                 {feature.details.houses && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[#645b4b] dark:text-gray-400">
                     Houses: {feature.details.houses.join(', ')}
                   </p>
                 )}
@@ -117,19 +117,19 @@ export function SpecialFeaturesSection({ features }: SpecialFeaturesSectionProps
         <div className="space-y-2">
           <div className="flex items-center space-x-2 text-xs">
             <div className="w-3 h-3 rounded-full bg-red-500/20" />
-            <span className="text-gray-600 dark:text-gray-300">
+            <span className="text-[#645b4b] dark:text-gray-300">
               Major: Strong influence on life path
             </span>
           </div>
           <div className="flex items-center space-x-2 text-xs">
             <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
-            <span className="text-gray-600 dark:text-gray-300">
+            <span className="text-[#645b4b] dark:text-gray-300">
               Moderate: Notable but not dominant influence
             </span>
           </div>
           <div className="flex items-center space-x-2 text-xs">
             <div className="w-3 h-3 rounded-full bg-blue-500/20" />
-            <span className="text-gray-600 dark:text-gray-300">
+            <span className="text-[#645b4b] dark:text-gray-300">
               Minor: Subtle background influence
             </span>
           </div>

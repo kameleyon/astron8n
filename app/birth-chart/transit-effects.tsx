@@ -86,11 +86,11 @@ export function TransitEffects({
           <h2 className="text-lg font-futura text-gray-900 dark:text-white">
             Current Transit Effects
           </h2>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-[#645b4b] dark:text-gray-400">
             As of {currentDate}
           </span>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-[#645b4b] dark:text-gray-300">
           {summary}
         </p>
       </div>
@@ -111,16 +111,16 @@ export function TransitEffects({
                   <span className="text-sm font-medium text-[#D15200] dark:text-[#FFA600]">
                     {effect.planet.name}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-[#645b4b] dark:text-gray-400">
                     in {effect.planet.sign} {effect.planet.degree}
                   </span>
                   {effect.planet.retrograde && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[#645b4b] dark:text-gray-300">
                       ℞
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-[#645b4b] dark:text-gray-400 mt-1">
                   House {effect.house} • {effect.duration}
                   {effect.peakDate && ` • Peak: ${effect.peakDate}`}
                 </p>
@@ -130,7 +130,7 @@ export function TransitEffects({
               </span>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-300 pl-4">
+            <p className="text-sm text-[#645b4b] dark:text-gray-300 pl-4">
               {effect.influence}
             </p>
 
@@ -150,7 +150,7 @@ export function TransitEffects({
                   <span className="text-[#D15200] dark:text-[#FFA600]">
                     {aspect.natalPlanet}
                   </span>
-                  <span className="text-gray-500 dark:text-gray-400 text-xs">
+                  <span className="text-[#645b4b] dark:text-gray-400 text-xs">
                     {aspect.degree} ({aspect.orb}° orb)
                     {aspect.applying ? ' applying' : ' separating'}
                     {aspect.exact && ' - exact'}
@@ -178,10 +178,10 @@ export function TransitEffects({
                 className="flex items-start justify-between"
               >
                 <div className="space-y-1">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-sm text-[#645b4b] dark:text-gray-400">
                     {period.startDate} - {period.endDate}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-[#645b4b] dark:text-gray-300">
                     {period.description}
                   </p>
                 </div>
@@ -208,15 +208,15 @@ export function TransitEffects({
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-gray-600 dark:text-gray-300">Opportunity</span>
+                <span className="text-[#645b4b] dark:text-gray-300">Opportunity</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-gray-600 dark:text-gray-300">Challenge</span>
+                <span className="text-[#645b4b] dark:text-gray-300">Challenge</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 rounded-full bg-purple-500" />
-                <span className="text-gray-600 dark:text-gray-300">Transformation</span>
+                <span className="text-[#645b4b] dark:text-gray-300">Transformation</span>
               </div>
             </div>
           </div>
@@ -225,15 +225,15 @@ export function TransitEffects({
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <span className="text-lg">☌</span>
-                <span className="text-gray-600 dark:text-gray-300">Conjunction</span>
+                <span className="text-[#645b4b] dark:text-gray-300">Conjunction</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-lg">△</span>
-                <span className="text-gray-600 dark:text-gray-300">Trine</span>
+                <span className="text-[#645b4b] dark:text-gray-300">Trine</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-lg">□</span>
-                <span className="text-gray-600 dark:text-gray-300">Square</span>
+                <span className="text-[#645b4b] dark:text-gray-300">Square</span>
               </div>
             </div>
           </div>

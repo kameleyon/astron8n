@@ -35,7 +35,7 @@ export function DataTable<T>({
                   <th
                     key={index}
                     className={cn(
-                      "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
+                      "px-4 py-3 text-left text-xs font-medium text-[#645b4b] uppercase tracking-wider",
                       column.className
                     )}
                   >
@@ -75,7 +75,7 @@ export function DataTable<T>({
       ) : (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <FileText className="h-10 w-10 text-gray-400 mb-2" />
-          <p className="text-gray-500">{emptyMessage}</p>
+          <p className="text-[#645b4b]">{emptyMessage}</p>
         </div>
       )}
     </div>

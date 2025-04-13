@@ -4,7 +4,7 @@ export const AboutUs = () => {
   return (
     <div className="bg-gradient-to-b from-orange-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="text-sm space-y-4 text-gray-600 leading-relaxed">
+        <div className="text-sm space-y-4 text-[#645b4b] leading-relaxed">
           <p>
             AstroGenie is a proud women-owned venture revolutionizing the world of astrology through cutting-edge AI technology. 
             Our mission is to make accurate astrological insights accessible to everyone, combining ancient wisdom with modern 

@@ -191,7 +191,7 @@ export default function BirthChartModal({
           <h2 className="text-2xl font-bold text-gray-900">Update Birth Details</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-[#645b4b] transition-colors"
+            className="text-[#645b4b] hover:text-[#645b4b] transition-colors"
           >
             ✕
           </button>
@@ -254,7 +254,7 @@ export default function BirthChartModal({
                   }
                   className="mr-2"
                 />
-                <label htmlFor="unknownTime" className="text-sm text-gray-600">
+                <label htmlFor="unknownTime" className="text-sm text-[#645b4b]">
                   Unknown
                 </label>
               </div>

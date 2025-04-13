@@ -40,7 +40,7 @@ export function PersonalitySnapshot({
           {traits.map((trait, index) => (
             <div key={index} className="space-y-2">
               <h4 className="font-medium">{trait.title}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{trait.description}</p>
+              <p className="text-sm text-[#645b4b] dark:text-gray-300">{trait.description}</p>
               <div className="flex flex-wrap gap-2">
                 {trait.keywords.map((keyword, idx) => (
                   <span
@@ -92,7 +92,7 @@ export function PersonalitySnapshot({
 
       <div>
         <h3 className="text-lg font-semibold mb-2">Summary</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{summary}</p>
+        <p className="text-sm text-[#645b4b] dark:text-gray-300">{summary}</p>
       </div>
     </Card>
   )
@@ -109,7 +109,7 @@ function getElementColor(element: string): string {
     case 'water':
       return 'bg-purple-500'
     default:
-      return 'bg-gray-500'
+      return 'bg-[#645b4b]'
   }
 }
 
@@ -122,6 +122,6 @@ function getQualityColor(quality: string): string {
     case 'mutable':
       return 'bg-teal-500'
     default:
-      return 'bg-gray-500'
+      return 'bg-[#645b4b]'
   }
 }

@@ -78,7 +78,7 @@ export function CompatibilitySection({
                 </span>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-[#645b4b] dark:text-gray-300">
               {match.reason}
             </p>
             {match.elements && (
@@ -86,7 +86,7 @@ export function CompatibilitySection({
                 {Object.entries(match.elements).map(([element, value]) => value && (
                   <span
                     key={element}
-                    className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+                    className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-[#645b4b] dark:text-gray-300"
                   >
                     {element}: {value}
                   </span>
@@ -110,7 +110,7 @@ export function CompatibilitySection({
         <h2 className="text-lg font-futura text-gray-900 dark:text-white mb-3">
           Compatibility Overview
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-[#645b4b] dark:text-gray-300">
           {generalAdvice}
         </p>
       </div>
@@ -139,11 +139,11 @@ export function CompatibilitySection({
                   <span className="text-sm font-medium text-[#D15200] dark:text-[#FFA600]">
                     {factor.planet}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-[#645b4b] dark:text-gray-400">
                     in {factor.sign} (House {factor.house})
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-[#645b4b] dark:text-gray-300">
                   {factor.influence}
                 </p>
               </div>
@@ -160,15 +160,15 @@ export function CompatibilitySection({
         <div className="grid grid-cols-3 gap-4 text-xs">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="text-gray-600 dark:text-gray-300">High Compatibility</span>
+            <span className="text-[#645b4b] dark:text-gray-300">High Compatibility</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <span className="text-gray-600 dark:text-gray-300">Moderate Compatibility</span>
+            <span className="text-[#645b4b] dark:text-gray-300">Moderate Compatibility</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 rounded-full bg-red-500" />
-            <span className="text-gray-600 dark:text-gray-300">Challenging Compatibility</span>
+            <span className="text-[#645b4b] dark:text-gray-300">Challenging Compatibility</span>
           </div>
         </div>
       </div>

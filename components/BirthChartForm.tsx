@@ -149,7 +149,7 @@ export default function BirthChartForm() {
 
           </h2>
 
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#645b4b]">
 
             Please provide your birth details for accurate readings
 
@@ -295,7 +295,7 @@ export default function BirthChartForm() {
 
                 />
 
-                <span className="ml-2 text-sm text-gray-600">
+                <span className="ml-2 text-sm text-[#645b4b]">
 
                   I don't know my birth time
 

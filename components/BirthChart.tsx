@@ -79,7 +79,7 @@ export default function BirthChart() {
 
   if (!chartData) {
     return (
-      <div className="text-gray-500 p-4 text-center">
+      <div className="text-[#645b4b] p-4 text-center">
         No chart data available
       </div>
     );

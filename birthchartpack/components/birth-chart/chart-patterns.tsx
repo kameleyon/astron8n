@@ -81,7 +81,7 @@ export function ChartPatterns({ patterns, features }: ChartPatternsProps) {
   // Helper function to render planets list
   const renderPlanets = (planets: PatternPlanetData[]) => {
     return (
-      <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
+      <div className="space-y-1 text-sm text-[#645b4b] dark:text-gray-400">
         {planets.map((planet, i) => (
           <div key={i}>{formatPlanetPosition(planet)}</div>
         ))}
@@ -146,14 +146,14 @@ export function ChartPatterns({ patterns, features }: ChartPatternsProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             {features.slice(0, Math.ceil(features.length / 2)).map((feature, index) => (
-              <div key={index} className="text-sm text-gray-600 dark:text-gray-300">
+              <div key={index} className="text-sm text-[#645b4b] dark:text-gray-300">
                 • {feature.description}
               </div>
             ))}
           </div>
           <div className="space-y-2">
             {features.slice(Math.ceil(features.length / 2)).map((feature, index) => (
-              <div key={index} className="text-sm text-gray-600 dark:text-gray-300">
+              <div key={index} className="text-sm text-[#645b4b] dark:text-gray-300">
                 • {feature.description}
               </div>
             ))}

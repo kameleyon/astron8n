@@ -144,7 +144,7 @@ export default function ChatHistory() {
           onClick={() => router.push('/dashboard')}
           className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-[#645b4b]" />
         </button>
         <h2 className="text-base font-bold text-gray-900 flex items-center gap-1.5">
           <Bookmark className="h-4 w-4" />
@@ -172,10 +172,10 @@ export default function ChatHistory() {
               onChange={(e) => setShowFavorites(e.target.checked)}
               className="h-3.5 w-3.5 rounded border-gray-300 text-primary focus:ring-primary"
             />
-            <span className="text-xs text-gray-600">Favorites</span>
+            <span className="text-xs text-[#645b4b]">Favorites</span>
           </label>
 
-          <button className="text-xs text-gray-600 flex items-center gap-1">
+          <button className="text-xs text-[#645b4b] flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" />
             <span>Date</span>
           </button>
@@ -184,9 +184,9 @@ export default function ChatHistory() {
 
       <div className="space-y-2">
         {loading ? (
-          <div className="text-center text-gray-500 py-4 text-sm">Loading...</div>
+          <div className="text-center text-[#645b4b] py-4 text-sm">Loading...</div>
         ) : paginatedSessions.length === 0 ? (
-          <div className="text-center text-gray-500 py-4 text-sm">No chats found</div>
+          <div className="text-center text-[#645b4b] py-4 text-sm">No chats found</div>
         ) : (
           <>
             {paginatedSessions.map((session) => (
@@ -241,7 +241,7 @@ export default function ChatHistory() {
                     className={`w-6 h-6 text-xs rounded-full flex items-center justify-center ${
                       currentPage === page
                         ? 'bg-primary text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-[#645b4b] hover:bg-gray-100'
                     }`}
                   >
                     {page}

@@ -200,7 +200,7 @@ export function InteractiveWheel({ houses, planets }: InteractiveWheelProps) {
                 content: (
                   <div className="space-y-1">
                     <div className="font-medium">{sign.name}</div>
-                    <div className="text-sm text-gray-500">{sign.element} sign</div>
+                    <div className="text-sm text-[#645b4b]">{sign.element} sign</div>
                   </div>
                 )
               })
@@ -338,12 +338,12 @@ export function InteractiveWheel({ houses, planets }: InteractiveWheelProps) {
                 <div className="space-y-2">
                   <div className="font-medium">{planet.name}</div>
                   <div>{planet.degree} {planet.sign}</div>
-                  <div className="text-gray-500">House {planet.house}</div>
+                  <div className="text-[#645b4b]">House {planet.house}</div>
                   {planetAspects.length > 0 && (
                     <div className="border-t border-gray-200 dark:border-[#645b4b] pt-2 mt-2">
                       <div className="text-xs font-medium mb-1">Aspects:</div>
                       {planetAspects.map((aspect, i) => (
-                        <div key={i} className="text-xs text-gray-500">
+                        <div key={i} className="text-xs text-[#645b4b]">
                           {aspect.type} with {aspect.planet}
                         </div>
                       ))}

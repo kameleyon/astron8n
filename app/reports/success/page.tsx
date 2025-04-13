@@ -82,7 +82,7 @@ function ReportSuccessContent() {
             <>
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Generating Your Report</h1>
-              <p className="text-gray-600">Please wait while we prepare your personalized report...</p>
+              <p className="text-[#645b4b]">Please wait while we prepare your personalized report...</p>
               <p className="text-[#0d0630] text-sm font-semibold mt-4">Takes up to 2 minutes</p>
             </>
           ) : error ? (
@@ -91,7 +91,7 @@ function ReportSuccessContent() {
                 <FileText className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Oops!</h1>
-              <p className="text-gray-600">{error}</p>
+              <p className="text-[#645b4b]">{error}</p>
             </>
           ) : (
             <>
@@ -99,7 +99,7 @@ function ReportSuccessContent() {
                 <FileText className="h-12 w-12 mx-auto" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Report Generated!</h1>
-              <p className="text-gray-600 mb-6">
+              <p className="text-[#645b4b] mb-6">
                 Your report has been generated and downloaded. You can also find it in your profile under the Reports section.
               </p>
               <button
@@ -124,7 +124,7 @@ export default function ReportSuccessPage() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Loading...</h1>
-            <p className="text-gray-600">Please wait while we prepare your report status...</p>
+            <p className="text-[#645b4b]">Please wait while we prepare your report status...</p>
           </div>
         </div>
       </div>

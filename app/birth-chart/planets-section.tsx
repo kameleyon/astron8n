@@ -35,7 +35,7 @@ type AspectType = keyof typeof AspectSymbols
 export function PlanetsSection({ planets, hideTitle = false }: PlanetsSectionProps) {
   const getAspectSymbol = (type: string) => {
     const aspectType = type.toLowerCase() as AspectType
-    return AspectSymbols[aspectType] || { symbol: '•', color: 'text-gray-500' }
+    return AspectSymbols[aspectType] || { symbol: '•', color: 'text-[#645b4b]' }
   }
 
   return (
@@ -54,7 +54,7 @@ export function PlanetsSection({ planets, hideTitle = false }: PlanetsSectionPro
                 <span className="text-[#D15200] dark:text-[#FFA600] font-medium text-sm">
                   {planet.name}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400 text-sm">in</span>
+                <span className="text-[#645b4b] dark:text-gray-400 text-sm">in</span>
                 <span className="text-gray-900 dark:text-white text-sm">
                   {planet.sign} {planet.degree}
                 </span>
@@ -64,7 +64,7 @@ export function PlanetsSection({ planets, hideTitle = false }: PlanetsSectionPro
             </div>
             
             {planet.retrograde && (
-              <div className="text-xs text-gray-500 dark:text-gray-400 pl-4">
+              <div className="text-xs text-[#645b4b] dark:text-gray-400 pl-4">
                 Retrograde
               </div>
             )}
@@ -75,7 +75,7 @@ export function PlanetsSection({ planets, hideTitle = false }: PlanetsSectionPro
                   return (
                     <div 
                       key={`${planet.name}-${aspect.planet}-${index}`}
-                      className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-2"
+                      className="text-xs text-[#645b4b] dark:text-gray-400 flex items-center space-x-2"
                     >
                       <span className={color}>{symbol}</span>
                       <span>{aspect.planet}</span>
@@ -83,7 +83,7 @@ export function PlanetsSection({ planets, hideTitle = false }: PlanetsSectionPro
                     </div>
                   )
                 })}
-                <span className="text-gray-500 dark:text-gray-400 text-sm">
+                <span className="text-[#645b4b] dark:text-gray-400 text-sm">
                 House {planet.house}
               </span>
               </div>

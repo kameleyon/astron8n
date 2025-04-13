@@ -174,7 +174,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative animate-in slide-in-from-bottom duration-300">
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b] transition-colors"
+            className="absolute top-4 right-4 text-[#645b4b] hover:text-[#645b4b] transition-colors"
           >
             <X size={24} />
           </button>
@@ -188,7 +188,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Verify Your Email
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[#645b4b]">
               We've sent a verification link to <strong>{email}</strong>. Please check your email and click the link to verify your account.
             </p>
           </div>
@@ -235,7 +235,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 relative animate-in slide-in-from-bottom duration-300">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-[#645b4b] transition-colors"
+          className="absolute top-4 right-4 text-[#645b4b] hover:text-[#645b4b] transition-colors"
         >
           <X size={24} />
         </button>
@@ -249,7 +249,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {isLogin ? "Welcome Back" : "Create Your Account"}
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#645b4b]">
             {isLogin ? "Sign in to continue your journey" : "Join us for personalized astrological insights"}
           </p>
         </div>
@@ -282,7 +282,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
               placeholder="Enter your password"
             />
             {!isLogin && (
-              <div className="mt-2 text-xs text-gray-600">
+              <div className="mt-2 text-xs text-[#645b4b]">
                 <p>Password requirements:</p>
                 <ul className="list-disc pl-5">
                   <li>Minimum 12 characters</li>
