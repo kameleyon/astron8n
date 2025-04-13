@@ -1,14 +1,15 @@
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from './supabase';
 
 // Initialize Stripe
-let stripeInstance: Promise<Stripe | null> | null = null;
+let stripeInstance: any = null;
 
 export const getStripe = async () => {
   if (!stripeInstance) {
-    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    // Use live key if available, otherwise fall back to test key
+    const key = process.env.NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
     if (!key) {
-      throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set');
+      throw new Error('Stripe publishable key is not set');
     }
     stripeInstance = loadStripe(key);
   }

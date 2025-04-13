@@ -4,6 +4,12 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText, CheckCircle, CreditCard } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import Stripe from 'stripe';
+
+// Initialize Stripe with your secret key
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || '', {
+  apiVersion: '2025-01-27.acacia',
+});
 
 function PaymentMethodSuccessContent() {
   const searchParams = useSearchParams();
@@ -73,11 +79,6 @@ function PaymentMethodSuccessContent() {
           
           setCardDetails(dummyCard);
           setLoading(false);
-          
-          // Redirect to settings page after a short delay to show success message
-          setTimeout(() => {
-            router.push('/settings');
-          }, 2000);
           return;
         }
         
@@ -133,19 +134,14 @@ function PaymentMethodSuccessContent() {
             throw insertError;
           }
           
-        setCardDetails({
-          brand: paymentMethod.card.brand,
-          last4: paymentMethod.card.last4,
-          exp_month: paymentMethod.card.exp_month,
-          exp_year: paymentMethod.card.exp_year
-        });
-        
-        setLoading(false);
-        
-        // Redirect to settings page after a short delay to show success message
-        setTimeout(() => {
-          router.push('/settings');
-        }, 2000);
+          setCardDetails({
+            brand: paymentMethod.card.brand,
+            last4: paymentMethod.card.last4,
+            exp_month: paymentMethod.card.exp_month,
+            exp_year: paymentMethod.card.exp_year
+          });
+          
+          setLoading(false);
         } catch (err) {
           console.error('Error processing payment method:', err);
           throw err; // Re-throw to be caught by the outer catch block

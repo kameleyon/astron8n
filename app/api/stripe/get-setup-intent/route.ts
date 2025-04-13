@@ -3,8 +3,8 @@ import { supabase } from '@/lib/supabase';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+// Initialize Stripe with your secret key (using live API)
+const stripe = new Stripe(process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-01-27.acacia', // Use the latest API version
 });
 

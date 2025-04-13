@@ -37,8 +37,53 @@ export default function SettingsPage() {
           return;
         }
         
-        // We're now using the success page to directly update the database
-        // No need to verify payment here
+        // Check if this is a return from a successful purchase or payment method update
+        if (typeof window !== 'undefined') {
+          const searchParams = new URLSearchParams(window.location.search);
+          const purchaseSuccess = searchParams.get('purchase_success');
+          const paymentSuccess = searchParams.get('payment_success');
+          const paymentUpdateSuccess = searchParams.get('payment_update_success');
+          
+          // Clear the query parameters to prevent multiple actions on refresh
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+          
+          if (purchaseSuccess === 'true') {
+            // Get the latest session ID from Stripe
+            const sessionId = searchParams.get('session_id');
+            
+            if (sessionId) {
+              try {
+                // Call an API to verify the payment and add credits
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                  const response = await fetch('/api/verify-payment', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ sessionId })
+                  });
+                  
+                  if (response.ok) {
+                    const result = await response.json();
+                    console.log(`Payment verified and ${result.creditsAdded} credits added`);
+                  } else {
+                    console.error('Failed to verify payment');
+                  }
+                }
+              } catch (err) {
+                console.error('Error verifying payment:', err);
+              }
+            }
+          }
+          
+          // Force a refresh of payment method data if returning from payment method pages
+          if (paymentSuccess === 'true' || paymentUpdateSuccess === 'true') {
+            console.log('Returning from payment method update, refreshing data...');
+          }
+        }
         // Get user's credit info from database
         const { data: creditData, error: creditError } = await supabase
           .from('user_credits')
