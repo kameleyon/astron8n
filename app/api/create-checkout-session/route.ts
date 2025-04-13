@@ -79,11 +79,8 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings/success?package_id=${packageId}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
-      metadata: {
-        user_id: user.id,
-        package_id: packageId,
-        credits: creditsAmount.toString(),
-      }
+      // Not including metadata to avoid webhook processing
+      client_reference_id: user.id // Use client_reference_id instead of metadata
     });
 
     // Return the checkout URL

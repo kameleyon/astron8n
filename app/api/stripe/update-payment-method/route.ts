@@ -29,36 +29,51 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check if user has a Stripe customer ID
-    const { data: userData, error: userDataError } = await supabase
-      .from('user_profiles')
-      .select('stripe_customer_id')
-      .eq('id', user.id)
-      .single();
+    // Check if user has any payment methods
+    const { data: paymentMethods, error: paymentMethodsError } = await supabase
+      .from('payment_methods')
+      .select('stripe_payment_method_id')
+      .eq('user_id', user.id)
+      .limit(1);
 
-    if (userDataError) {
-      console.error('Error fetching user data:', userDataError);
+    if (paymentMethodsError) {
+      console.error('Error fetching payment methods:', paymentMethodsError);
       return NextResponse.json(
-        { error: 'Failed to fetch user data' },
+        { error: 'Failed to fetch payment methods' },
         { status: 500 }
       );
     }
 
-    if (!userData?.stripe_customer_id) {
+    if (!paymentMethods || paymentMethods.length === 0) {
       return NextResponse.json(
         { error: 'No payment method found to update' },
         { status: 404 }
       );
     }
 
-    const customerId = userData.stripe_customer_id;
+    // Create a new Stripe customer for this user
+    const customer = await stripe.customers.create({
+      email: user.email,
+      // Not using metadata to avoid webhook processing
+    });
+
+    const customerId = customer.id;
+
+    // Create a SetupIntent to securely collect payment details
+    const setupIntent = await stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      usage: 'off_session', // Allow using this payment method for future payments
+      // Not using metadata to avoid webhook processing
+    });
 
     // Create a Stripe Checkout session for updating a payment method
     const session = await stripe.checkout.sessions.create({
       mode: 'setup',
       customer: customerId,
       payment_method_types: ['card'],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?payment_update_success=true`,
+      // Not using setup_intent_data metadata to avoid webhook processing
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings/payment-success?setup_intent={SETUP_INTENT}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?payment_update_cancelled=true`,
     });
 

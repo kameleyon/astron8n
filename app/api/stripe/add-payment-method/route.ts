@@ -29,57 +29,20 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check if user already has a Stripe customer ID
-    const { data: userData, error: userDataError } = await supabase
-      .from('user_profiles')
-      .select('stripe_customer_id')
-      .eq('id', user.id)
-      .single();
+    // Create a new Stripe customer for this user
+    const customer = await stripe.customers.create({
+      email: user.email,
+      // Not using metadata to avoid webhook processing
+    });
 
-    if (userDataError && userDataError.code !== 'PGRST116') {
-      console.error('Error fetching user data:', userDataError);
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      );
-    }
-
-    let customerId = userData?.stripe_customer_id;
-
-    // If user doesn't have a Stripe customer ID, create one
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: {
-          user_id: user.id
-        }
-      });
-
-      customerId = customer.id;
-
-      // Save the customer ID to the user's profile
-      const { error: updateError } = await supabase
-        .from('user_profiles')
-        .upsert({
-          id: user.id,
-          stripe_customer_id: customerId,
-          updated_at: new Date().toISOString()
-        });
-
-      if (updateError) {
-        console.error('Error updating user profile:', updateError);
-        return NextResponse.json(
-          { error: 'Failed to update user profile' },
-          { status: 500 }
-        );
-      }
-    }
+    const customerId = customer.id;
 
     // Create a SetupIntent to securely collect payment details
     const setupIntent = await stripe.setupIntents.create({
       customer: customerId,
       payment_method_types: ['card'],
       usage: 'off_session', // Allow using this payment method for future payments
+      // Not using metadata to avoid webhook processing
     });
 
     // Create a Stripe Checkout session for adding a payment method
@@ -87,7 +50,8 @@ export async function GET(request: Request) {
       mode: 'setup',
       customer: customerId,
       payment_method_types: ['card'],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?payment_success=true`,
+      // Not using setup_intent_data metadata to avoid webhook processing
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings/payment-success?setup_intent={SETUP_INTENT}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?payment_cancelled=true`,
     });
 
