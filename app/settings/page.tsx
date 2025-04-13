@@ -37,46 +37,8 @@ export default function SettingsPage() {
           return;
         }
         
-        // Check if this is a return from a successful purchase
-        if (typeof window !== 'undefined') {
-          const searchParams = new URLSearchParams(window.location.search);
-          const purchaseSuccess = searchParams.get('purchase_success');
-          
-          if (purchaseSuccess === 'true') {
-            // Clear the query parameter to prevent multiple credit additions on refresh
-            const newUrl = window.location.pathname;
-            window.history.replaceState({}, '', newUrl);
-            
-            // Get the latest session ID from Stripe
-            const sessionId = searchParams.get('session_id');
-            
-            if (sessionId) {
-              try {
-                // Call an API to verify the payment and add credits
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                  const response = await fetch('/api/verify-payment', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${session.access_token}`
-                    },
-                    body: JSON.stringify({ sessionId })
-                  });
-                  
-                  if (response.ok) {
-                    const result = await response.json();
-                    console.log(`Payment verified and ${result.creditsAdded} credits added`);
-                  } else {
-                    console.error('Failed to verify payment');
-                  }
-                }
-              } catch (err) {
-                console.error('Error verifying payment:', err);
-              }
-            }
-          }
-        }
+        // We're now using the success page to directly update the database
+        // No need to verify payment here
         // Get user's credit info from database
         const { data: creditData, error: creditError } = await supabase
           .from('user_credits')

@@ -51,8 +51,8 @@ export async function GET(request: Request) {
       customer: customerId,
       payment_method_types: ['card'],
       // Not using setup_intent_data metadata to avoid webhook processing
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings/payment-success?setup_intent={SETUP_INTENT}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/settings?payment_cancelled=true`,
+      success_url: `/settings/payment-success?setup_intent={SETUP_INTENT}`,
+      cancel_url: `/settings?payment_cancelled=true`,
     });
 
     // Return the checkout URL
