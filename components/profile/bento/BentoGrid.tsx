@@ -48,18 +48,19 @@ export function BentoGridItem({
     >
       <div className="relative h-full w-full p-4">
         {header && <div className="mb-2">{header}</div>}
-        <div>
-          {(title || description) && (
-            <div className="mb-4">
-              <div className="flex items-center">
-                {icon && <div className="mr-2">{icon}</div>}
-                {title && <h3 className="font-semibold text-primary tracking-tight">{title}</h3>}
-              </div>
-              {description && <p className="text-sm text-[#645b4b] mt-1">{description}</p>}
+        
+        {(title || description) && (
+          <div className="flex flex-col h-full justify-between">
+            <div>
+              {icon && <div className="mb-2">{icon}</div>}
+              {title && <h3 className="font-semibold text-primary mb-1 tracking-tight">{title}</h3>}
+              {description && <p className="text-sm text-[#645b4b]">{description}</p>}
+
+
             </div>
-          )}
-          {children}
-        </div>
+          </div>
+        )}
+        {children}
       </div>
     </div>
   );

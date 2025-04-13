@@ -32,17 +32,17 @@ export function SettingsBento({
           className="sm:col-span-2 md:col-span-2"
         />
         
-        {/* Top Row - Right Side - Payment Info Card */}
-        <PaymentInfoCard 
-          billingInfo={billingInfo} 
+        {/* Top Row - Right Side - Rollover Credits Card */}
+        <RolloverCreditsCard 
+          creditInfo={creditInfo} 
           isLoading={isLoading} 
           className="sm:col-span-1"
         />
         
         {/* Middle Row */}
-        {/* Rollover Credits Card - Left */}
-        <RolloverCreditsCard 
-          creditInfo={creditInfo} 
+        {/* Payment Info Card - Left */}
+        <PaymentInfoCard 
+          billingInfo={billingInfo} 
           isLoading={isLoading} 
           className="sm:col-span-1"
         />
