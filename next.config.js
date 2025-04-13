@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  // Temporarily removing standalone output to fix build issues
+  // output: 'standalone',
   poweredByHeader: false,
   compress: true,
   experimental: {

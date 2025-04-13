@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, CreditCard, Settings } from "lucide-react";
-import { UsageTab } from "@/components/settings/UsageTab";
-import { BillingTab } from "@/components/settings/BillingTab";
-import { OperationsTab } from "@/components/settings/OperationsTab";
+import { SettingsBento } from "@/components/settings/bento/SettingsBento";
 import type { CreditInfo, BillingInfo, RolloverCredit } from "@/types/credits";
 export default function SettingsPage() {
   const router = useRouter();
@@ -21,11 +17,13 @@ export default function SettingsPage() {
     is_subscriber: false,
     subscription_start_date: null
   });
+  
   const [billingInfo, setBillingInfo] = useState<BillingInfo>({ 
     next_payment_date: null,
     trial_end_date: null,
     is_trial: false,
-    activities: []
+    activities: [],
+    payment_method: null
   });
   useEffect(() => {
     const initializeUserData = async () => {
@@ -120,6 +118,68 @@ export default function SettingsPage() {
             .update({ rollover_credits: validRolloverCredits })
             .eq('user_id', user.id);
         }
+        
+        // Fetch billing information
+        try {
+          // Get subscription information
+          const { data: subscriptionData, error: subscriptionError } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (subscriptionError && subscriptionError.code !== 'PGRST116') {
+            throw subscriptionError;
+          }
+          
+          // Get payment methods
+          const { data: paymentMethodData, error: paymentMethodError } = await supabase
+            .from('payment_methods')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('is_default', true)
+            .single();
+          
+          if (paymentMethodError && paymentMethodError.code !== 'PGRST116') {
+            throw paymentMethodError;
+          }
+          
+          // Get billing activities
+          const { data: activitiesData, error: activitiesError } = await supabase
+            .from('billing_activities')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('date', { ascending: false })
+            .limit(10);
+          
+          if (activitiesError) {
+            throw activitiesError;
+          }
+          
+          // Format billing information
+          const formattedBillingInfo: BillingInfo = {
+            next_payment_date: subscriptionData?.next_payment_date || null,
+            trial_end_date: subscriptionData?.trial_end_date || null,
+            is_trial: subscriptionData?.is_trial || false,
+            activities: activitiesData?.map(activity => ({
+              type: activity.type as 'subscription_payment' | 'token_purchase',
+              amount: activity.amount,
+              date: activity.date,
+              status: activity.status as 'completed' | 'pending' | 'failed',
+              tokens: activity.tokens
+            })) || [],
+            payment_method: paymentMethodData ? {
+              brand: paymentMethodData.brand,
+              last4: paymentMethodData.last4,
+              exp_month: paymentMethodData.exp_month,
+              exp_year: paymentMethodData.exp_year
+            } : null
+          };
+          
+          setBillingInfo(formattedBillingInfo);
+        } catch (err) {
+          console.error('Error fetching billing information:', err);
+        }
       } catch (err) {
         console.error('Error initializing user data:', err);
       } finally {
@@ -135,45 +195,11 @@ export default function SettingsPage() {
         <Header onAuth={() => {}} />
         <main className="flex-grow relative z-10 py-12 mb-8">
           <div className="w-full max-w-5xl mx-auto px-4">
-            <h1 className="text-3xl font-bold text-white text-left mb-4 pl-8">
-              Settings
-            </h1>
-            <Tabs defaultValue="usage" className="w-full">
-              <TabsList className="grid grid-cols-3 bg-white/20 backdrop-blur-sm shadow-sm shadow-black/40  rounded-xl p-1 mb-8">
-                <TabsTrigger
-                  value="usage"
-                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
-                >
-                  <Activity className="h-4 w-4 mr-2" />
-                  Usage
-                </TabsTrigger>
-                <TabsTrigger
-                  value="billing"
-                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Billing
-                </TabsTrigger>
-                <TabsTrigger
-                  value="settings"
-                  className="text-white data-[state=active]:bg-white/80 rounded-lg data-[state=active]:text-primary"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="usage">
-                <UsageTab loading={loading} creditInfo={creditInfo} />
-              </TabsContent>
-              <TabsContent value="billing">
-                <div>
-                  <BillingTab billingInfo={billingInfo} />
-                </div>
-              </TabsContent>
-              <TabsContent value="settings">
-                <OperationsTab />
-              </TabsContent>
-            </Tabs>
+            <SettingsBento 
+              creditInfo={creditInfo}
+              billingInfo={billingInfo}
+              isLoading={loading}
+            />
           </div>
         </main>
         <Footer />
