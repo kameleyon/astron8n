@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { format } from 'date-fns';
-import { Bookmark, MessageSquare, Calendar, Search, Star, Trash2, ArrowLeft } from 'lucide-react';
+import { Bookmark, MessageCircle, MessageSquare, Calendar, Search, Star, Trash2, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import SessionProvider from '@/components/SessionProvider';
@@ -17,7 +17,7 @@ interface ChatSession {
   is_favorite?: boolean;
 }
 
-const ITEMS_PER_PAGE = 7;
+const ITEMS_PER_PAGE = 5;
 
 export default function ChatHistoryPage() {
   const router = useRouter();
@@ -140,105 +140,169 @@ export default function ChatHistoryPage() {
     <SessionProvider requireAuth>
       <ChatHistoryLayout>
       <main className="flex-grow relative z-10 py-4">
-          <div className="max-w-5xl mx-auto px-4">
-            <h1 className="text-3xl font-bold text-white text-left mb-8 pl-8">
-              My Chat History
-            </h1>
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg p-6">
-          
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="chat-container backdrop-blur-md bg-white/30 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mt-8 mb-8 h-[780px] min-h-auto w-full flex flex-col transition-all duration-300 rounded-3xl overflow-hidden font-questrial">
+            {/* Header with gradient */}
+            <div className="p-5 border-b border-white/20 bg-gradient-to-r from-primary/80 to-secondary/80 backdrop-blur-md flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <Bookmark className="h-5 w-5" />
+                My Chat History
+              </h2>
+              <button 
+                onClick={() => router.push('/dashboard')}
+                className="p-2 hover:bg-white/30 bg-white/20 rounded-full transition-colors"
+                title="Back to Dashboard"
+              >
+                <ArrowLeft className="h-5 w-5 text-white" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-gradient-to-b from-white/10 to-white/5 border-b border-white/10">
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white" />
                 <Input
                   type="text"
                   placeholder="Search chats..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-white/40 text-primary placeholder-primary/70 border-white focus:border-white focus:ring-primary"
+                  className="pl-10 py-2 h-10 text-md bg-white/20 border-white/50 rounded-full text-[#cd6301] placeholder-white"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-4 text-primary">
-                <label className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center justify-end">
+                <label className="flex items-center gap-1.5 text-[#645b4b]">
                   <input
                     type="checkbox"
                     checked={showFavorites}
                     onChange={(e) => setShowFavorites(e.target.checked)}
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                    className="h-4 w-4 rounded border-white"
                   />
-                  <span>Show Favorites</span>
+                  <span className="text-sm text-[#cd6301]">Show Favorites</span>
                 </label>
               </div>
             </div>
 
-            <div className="space-y-4">
-              {loading ? (
-                <div className="text-center text-[#645b4b]">Loading...</div>
-              ) : paginatedSessions.length === 0 ? (
-                <div className="text-center text-[#645b4b]">No chat sessions found</div>
-              ) : (
-                <>
-                  {paginatedSessions.map((session) => (
-                    <div
-                      key={session.session_id}
-                      onClick={() => openSession(session.session_id)}
-                      className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 cursor-pointer hover:bg-gray-50"
-                    >
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-sm text-[#645b4b]">
-                            <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                            <span>{session.message_count}</span>
+            <div className="flex-1  overflow-y-auto min-h-0 message-container  bg-gradient-to-b from-white/10 to-white/5">
+              <div className="space-y-4  rounded-xl m-4 p-2 ">
+                {loading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center text-[#645b4b] py-4">
+                      <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+                      <p>Loading your chat history...</p>
+                    </div>
+                  </div>
+                ) : paginatedSessions.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center text-[#645b4b] py-4">
+                      <MessageSquare className="h-12 w-12 mx-auto mb-2 text-primary/40" />
+                      <p>No chats found</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {paginatedSessions.map((session) => (
+                      <div
+                        key={session.session_id}
+                        onClick={() => openSession(session.session_id)}
+                        className="p-2  text-[#645b4b] border-l border-5 border-primary rounded-r-xl backdrop-blur-lg  bg-white/30 hover:shadow-md transition-all duration-300 cursor-pointer animate-fade-in"
+                      >
+                        <div className="flex flex-col gap-2 ">
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-1 font-semibold text-primary/80">
+                              <MessageCircle className="h-4 w-4" />
+                              <span>{session.message_count} messages</span>
+                            </div>
+                            <span className="text-[#645b4b] text-xs">
+                              {format(new Date(session.created_at), 'MMM d, h:mm a')}
+                            </span>
+                            <div className="flex items-right justify-end gap-4 pt-1">
+                            <button
+                              onClick={(e) => toggleFavorite(e, session.session_id)}
+                              className={`p-1.5 rounded-full ${
+                                session.is_favorite 
+                                  ? 'text-[#cd6301] bg-[#FFFFFF]/20' 
+                                  : 'text-[#cd6301]/50 hover:bg-white/50'
+                              }`}
+                            >
+                              <Star className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={(e) => deleteSession(e, session.session_id)}
+                              className="p-1.5 rounded-full text-[#cd6301]/50 hover:bg-red-50 hover:text-cd6301"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-                          <p className="text-gray-900 truncate flex-1">{session.first_message}</p>
-                          <span className="text-xs text-[#645b4b] flex-shrink-0">
-                            {format(new Date(session.created_at), 'MMM d')}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <button
-                            onClick={(e) => toggleFavorite(e, session.session_id)}
-                            className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${
-                              session.is_favorite ? 'text-[#FFA600]' : 'text-gray-400'
-                            }`}
-                          >
-                            <Star className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={(e) => deleteSession(e, session.session_id)}
-                            className="p-1 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-500"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[#645b4b] line-clamp-1 break-words">
+                              {session.first_message}
+                            </p>
+                          </div>
+
+                          
                         </div>
                       </div>
-                    </div>
-                  ))}
-
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-2 mt-6">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                            currentPage === page
-                              ? 'bg-primary text-white'
-                              : 'bg-white text-primary hover:bg-primary/10'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
+                    ))}
+                  </>
+                )}
+              </div>
             </div>
+
+            {totalPages > 1 && (
+              <div className="p-4 bg-gradient-to-r from-white/10 to-white/5 border-t border-white/10">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="text-[#645b4b] disabled:opacity-50"
+                  >
+                    ◀
+                  </button>
+                  
+                  <div className="h-1 bg-white/40 flex-grow mx-2 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary rounded-full" 
+                      style={{ width: `${(currentPage / totalPages) * 100}%` }}
+                    ></div>
+                  </div>
+                  
+                  <button
+                    onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="text-[#645b4b] disabled:opacity-50"
+                  >
+                    ▶
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            <style jsx>{`
+              @keyframes message-in {
+                0% {
+                  opacity: 0;
+                  transform: translateY(15px);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              .animate-fade-in {
+                animation: message-in 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+                will-change: transform, opacity;
+              }
+              
+              .message-container {
+                background-image: 
+                  radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+                  radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+                background-size: 40px 40px;
+              }
+            `}</style>
           </div>
-        </div>
         </div>
       </main>
       </ChatHistoryLayout>
