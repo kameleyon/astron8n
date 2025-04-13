@@ -79,7 +79,6 @@ export function TopUpCard({
         },
         body: JSON.stringify({
           packageId: selectedPackage,
-          credits: selectedPkg.credits,
           amount: selectedPkg.price
         })
       });

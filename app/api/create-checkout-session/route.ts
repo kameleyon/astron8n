@@ -31,9 +31,9 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { packageId, credits, amount } = body;
+    const { packageId, amount } = body;
 
-    if (!packageId || !credits || !amount) {
+    if (!packageId || !amount) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 400 }
