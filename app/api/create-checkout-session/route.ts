@@ -3,8 +3,8 @@ import { supabase } from '@/lib/supabase';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 
-// Initialize Stripe with your secret key (using live API)
-const stripe = new Stripe(process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || '', {
+// Initialize Stripe with your secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-01-27.acacia', // Use the latest API version
 });
 
@@ -77,8 +77,8 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'payment',
-      success_url: process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}/settings/success?package_id=${packageId}` : `/settings/success?package_id=${packageId}`,
-      cancel_url: process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}/settings?purchase_cancelled=true` : '/settings?purchase_cancelled=true',
+      success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings/success?package_id=${packageId}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/settings?purchase_cancelled=true`,
       // Not including metadata to avoid webhook processing
       client_reference_id: user.id // Use client_reference_id instead of metadata
     });

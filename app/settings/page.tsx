@@ -25,89 +25,6 @@ export default function SettingsPage() {
     activities: [],
     payment_method: null
   });
-  // Function to fetch payment method data
-  const fetchPaymentMethod = async (userId: string) => {
-    try {
-      // Get all payment methods for the user
-      const { data: paymentMethodsData, error: paymentMethodsError } = await supabase
-        .from('payment_methods')
-        .select('*')
-        .eq('user_id', userId);
-      
-      if (paymentMethodsError) {
-        console.log('Error fetching payment methods:', paymentMethodsError.message);
-        return null;
-      }
-      
-      // If no payment methods found, return null
-      if (!paymentMethodsData || paymentMethodsData.length === 0) {
-        return null;
-      }
-      
-      // Try to find a default payment method
-      let paymentMethod = paymentMethodsData.find(pm => pm.is_default === true);
-      
-      // If no default payment method, use the first one
-      if (!paymentMethod && paymentMethodsData.length > 0) {
-        paymentMethod = paymentMethodsData[0];
-      }
-      
-      if (paymentMethod) {
-        return {
-          brand: paymentMethod.brand || '',
-          last4: paymentMethod.last4 || '',
-          exp_month: paymentMethod.exp_month || 0,
-          exp_year: paymentMethod.exp_year || 0
-        };
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error fetching payment method:', error);
-      return null;
-    }
-  };
-
-  // Add a separate useEffect to refresh payment method data
-  useEffect(() => {
-    const refreshPaymentMethod = async () => {
-      try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
-        if (userError || !user) {
-          return;
-        }
-        
-        // Fetch the latest payment method data
-        const paymentMethod = await fetchPaymentMethod(user.id);
-        
-        if (paymentMethod) {
-          // Only log when payment method changes
-          if (JSON.stringify(paymentMethod) !== JSON.stringify(billingInfo.payment_method)) {
-            console.log('Payment method updated');
-          }
-          setBillingInfo(prevInfo => ({
-            ...prevInfo,
-            payment_method: paymentMethod
-          }));
-        }
-      } catch (err) {
-        console.error('Error refreshing payment method data:', err);
-      }
-    };
-    
-    // Refresh payment method data when component mounts
-    refreshPaymentMethod();
-    
-    // Set up an interval to refresh payment method data every 10 seconds
-    // This ensures the payment method data is refreshed even if the user
-    // returns to the settings page without a page reload
-    const intervalId = setInterval(refreshPaymentMethod, 10000);
-    
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
-
   useEffect(() => {
     const initializeUserData = async () => {
       setLoading(true);
@@ -120,18 +37,16 @@ export default function SettingsPage() {
           return;
         }
         
-        // Check if this is a return from a successful purchase or payment method update
+        // Check if this is a return from a successful purchase
         if (typeof window !== 'undefined') {
           const searchParams = new URLSearchParams(window.location.search);
           const purchaseSuccess = searchParams.get('purchase_success');
-          const paymentSuccess = searchParams.get('payment_success');
-          const paymentUpdateSuccess = searchParams.get('payment_update_success');
-          
-          // Clear the query parameters to prevent multiple actions on refresh
-          const newUrl = window.location.pathname;
-          window.history.replaceState({}, '', newUrl);
           
           if (purchaseSuccess === 'true') {
+            // Clear the query parameter to prevent multiple credit additions on refresh
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+            
             // Get the latest session ID from Stripe
             const sessionId = searchParams.get('session_id');
             
@@ -160,11 +75,6 @@ export default function SettingsPage() {
                 console.error('Error verifying payment:', err);
               }
             }
-          }
-          
-          // Force a refresh of payment method data if returning from payment method pages
-          if (paymentSuccess === 'true' || paymentUpdateSuccess === 'true') {
-            console.log('Returning from payment method update, refreshing data...');
           }
         }
         // Get user's credit info from database
@@ -279,14 +189,31 @@ export default function SettingsPage() {
             console.error('Error accessing subscription_history table:', subscriptionError);
           }
           
-          // Get payment methods using our fetchPaymentMethod function
-          const paymentMethod = await fetchPaymentMethod(user.id);
-          if (paymentMethod) {
-            // Update billing info with payment method data
-            setBillingInfo(prevInfo => ({
-              ...prevInfo,
-              payment_method: paymentMethod
-            }));
+          // Get payment methods
+          try {
+            const { data: paymentMethodData, error: paymentMethodError } = await supabase
+              .from('payment_methods')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('is_default', true)
+              .maybeSingle();
+            
+            if (paymentMethodError) {
+              console.log('Error fetching payment method data:', paymentMethodError.message);
+            } else if (paymentMethodData) {
+              // Update billing info with payment method data
+              setBillingInfo(prevInfo => ({
+                ...prevInfo,
+                payment_method: {
+                  brand: paymentMethodData.brand || '',
+                  last4: paymentMethodData.last4 || '',
+                  exp_month: paymentMethodData.exp_month || 0,
+                  exp_year: paymentMethodData.exp_year || 0
+                }
+              }));
+            }
+          } catch (paymentMethodError) {
+            console.error('Error accessing payment_methods table:', paymentMethodError);
           }
           
           // Try to get billing activities from both billing_activities and api_usage tables

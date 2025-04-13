@@ -4,6 +4,12 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FileText, CheckCircle, CreditCard } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import Stripe from 'stripe';
+
+// Initialize Stripe with your secret key
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || '', {
+  apiVersion: '2025-01-27.acacia',
+});
 
 function PaymentMethodSuccessContent() {
   const searchParams = useSearchParams();
